@@ -225,8 +225,8 @@ int main()
 
 	srand(0xfcfc);
 
-	width = 320;
-	height = 200;
+	width = 640;
+	height = 480;
 
 	if (init_graphics(width, height)) {
 		fprintf(stderr, "can't init graphics\n");

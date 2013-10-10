@@ -85,10 +85,11 @@ void draw_dot(struct dot *dot)
 	int x = (a + a / 8) / bp + 160;
 	if (x <= 319) {
 	
-		/* todo: shadow */
-
 		int shadow_y = (0x80000 / bp) + 100;
 		if (shadow_y <= 199) {
+
+			/* todo: shadow */
+
 
 			/* ball */
 	
@@ -100,10 +101,10 @@ void draw_dot(struct dot *dot)
 			}
 			dot->y = b;
 	
-			int y = dot->y / 128 - 100;
+			int y = (dot->y * 64) / bp + 100;
 			if (y <= 199) {
 				set_color(yellow);
-				glTranslatef(x, -y, 0.0f);
+				glTranslatef(x, 200 - y, 0.0f);
 		
 				glBegin(GL_TRIANGLES); // Draw a triangle
 				glVertex3f(0.0f, f, 0.0f);
