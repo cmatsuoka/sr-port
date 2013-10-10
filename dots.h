@@ -2,14 +2,14 @@
 #define __KICK_H
 
 struct dot {
-        int     x;
-        int     y;
-        int     z;
+        float   x;
+        float   y;
+        float   z;
         int     old1;
         int     old2;
         int     old3;
         int     old4;
-        int     yadd;
+        float   yadd;
 };
 
 

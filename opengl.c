@@ -14,8 +14,8 @@ static int view_height;
 static int screen_width;
 static int screen_height;
 
-extern int rotsin;
-extern int rotcos;
+extern float rotsin;
+extern float rotcos;
 extern int gravity;
 extern int gravityd;
 extern int gravitybottom;
@@ -65,13 +65,13 @@ void draw_dot(struct dot *dot)
 
 	glPushMatrix();
 
-	int bp = ((dot->z * rotcos - dot->x * rotsin) >> 16) + 9000;
-	int a = (dot->z * rotsin + dot->x * rotcos) >> 8; 
+	float bp = ((dot->z * rotcos - dot->x * rotsin) / 0x10000) + 9000;
+	float a = (dot->z * rotsin + dot->x * rotcos) / 0x100; 
 
-	int x = (a + a / 8) / bp + 160;
+	float x = (a + a / 8) / bp + 160;
 	if (x <= 319) {
 	
-		int shadow_y = (0x80000 / bp) + 100;
+		float shadow_y = (0x80000 / bp) + 100;
 		if (shadow_y <= 199) {
 
 			/* todo: shadow */
@@ -80,14 +80,14 @@ void draw_dot(struct dot *dot)
 			/* ball */
 	
 			dot->yadd += gravity;
-			int b = dot->y + dot->yadd;
+			float b = dot->y + dot->yadd;
 			if (b >= gravitybottom) {
-				dot->yadd = (-dot->yadd * gravityd) >> 4;
+				dot->yadd = (-dot->yadd * gravityd) / 0x10;
 				b += dot->yadd;
 			}
 			dot->y = b;
 	
-			int y = (dot->y * 64) / bp + 100;
+			float y = (dot->y * 64) / bp + 100;
 			if (y <= 199) {
 
 				color[0] = 0;

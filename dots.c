@@ -28,7 +28,7 @@ int dottaul[1024];
 
 struct dot dot[MAXDOTS];
 
-int rotsin, rotcos;
+float rotsin, rotcos;
 int gravitybottom = BOTTOM;
 int gravity = 0;
 int dotnum;
@@ -42,6 +42,7 @@ int depthtable4[128];
 
 extern int sin1024[];
 
+#if 0
 static int isin(int deg)
 {
         return(sin1024[deg&1023]);
@@ -51,6 +52,18 @@ static int icos(int deg)
 {
         return(sin1024[(deg+256)&1023]);
 }
+#endif
+
+static float isin(int deg)
+{
+	return sin(M_PI * deg / 512) * 255;
+}
+
+static float icos(int deg)
+{
+	return cos(M_PI * deg / 512) * 255;
+}
+
 
 static void setup_dots()
 {
