@@ -252,15 +252,10 @@ int main()
 
 	while(frame<2450) {
 		poll_event();
-
 		update_dots();
-
 		clear_screen();
-
-		unset_viewport();
 		projection();
 		draw_dots();
-
 		swap_buffers();
 	}
 

@@ -52,14 +52,6 @@ void clear_screen()
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void draw_line2d(float x0, float y0, float x1, float y1)
-{
-	glBegin(GL_LINES);
-	glVertex2f(x0, y0);
-	glVertex2f(x1, y1);
-	glEnd();
-}
-
 void draw_dot(struct dot *dot)
 {
 	float f = 4.0;
@@ -140,12 +132,5 @@ void projection()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, 320, 0, 200, -100, 100);
-}
-
-void screen_projection()
-{
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, screen_width, screen_height, 0, 0, 1);
 }
 

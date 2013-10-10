@@ -20,7 +20,6 @@ void unset_viewport(void);
 void projection(void);
 void swap_buffers(void);
 void clear_screen(void);
-void view_projection(void);
 void screen_projection(void);
 
 #endif
