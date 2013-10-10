@@ -7,13 +7,7 @@
 #include "opengl.h"
 #include "dots.h"
 
-GLubyte red[]    = { 255,   0,   0, 255 };
-GLubyte green[]  = {   0, 255,   0, 255 };
-GLubyte blue[]   = {   0,   0, 255, 255 };
-GLubyte white[]  = { 255, 255, 255, 255 };
-GLubyte yellow[] = { 255, 255,   0, 255 };
-GLubyte black[]  = {   0,   0,   0, 255 };
-GLubyte orange[] = { 255, 128,   0, 255 };
+GLubyte color[4];
 
 static int view_width;
 static int view_height;
@@ -25,6 +19,8 @@ extern int rotcos;
 extern int gravity;
 extern int gravityd;
 extern int gravitybottom;
+extern int bpmin;
+extern int bpmax;
 
 
 #define set_color(x) glColor4ubv(x)
@@ -44,7 +40,7 @@ int init_opengl(int width, int height)
 	glLoadIdentity();
 	glTranslatef(0.375, 0.375, 0); /* trick for exact pixelization */
 
-	glClearColor(.3, .3, .3, 0);
+	glClearColor(.2, .2, .2, 0);
 	clear_screen();
 
 	return 0;
@@ -61,16 +57,6 @@ void draw_line2d(float x0, float y0, float x1, float y1)
 	glVertex2f(x0, y0);
 	glVertex2f(x1, y1);
 	glEnd();
-}
-
-void draw_grid()
-{
-	float w2 = screen_width / 2;
-	float h2 = screen_height / 2;
-
-	set_color(white);
-	draw_line2d(0, h2, screen_width, h2);
-	draw_line2d(w2, 0, w2, screen_height);
 }
 
 void draw_dot(struct dot *dot)
@@ -103,7 +89,12 @@ void draw_dot(struct dot *dot)
 	
 			int y = (dot->y * 64) / bp + 100;
 			if (y <= 199) {
-				set_color(yellow);
+
+				color[0] = 0;
+				color[1] = 255 - 255 * (bp - 3000) / 12000;
+				color[2] = color[1];
+
+				set_color(color);
 				glTranslatef(x, 200 - y, 0.0f);
 		
 				glBegin(GL_TRIANGLES); // Draw a triangle

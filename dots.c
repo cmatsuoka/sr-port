@@ -20,6 +20,8 @@ int rot=0,rots=0;
 int a,b,c,d,i,j,mode;
 int grav,gravd;
 int f=0;
+int bpmin = 30000;
+int bpmax = -30000;
 
 
 int dottaul[1024];
