@@ -8,6 +8,7 @@
 #include "dots.h"
 
 GLubyte color[4];
+GLubyte shadow_color[4] = { .1, .1, .1, 0 };
 
 static int view_width;
 static int view_height;
@@ -76,6 +77,16 @@ void draw_dot(struct dot *dot)
 
 			/* todo: shadow */
 
+			glPushMatrix();
+			set_color(shadow_color);
+			glTranslatef(x, 200 - shadow_y, 0.0f);
+	
+			glBegin(GL_TRIANGLES); // Draw a triangle
+			glVertex3f(0.0f, f / 4, 0.0f);
+			glVertex3f(-f/2, 0.0f, 0.05f);
+			glVertex3f(f/2, 0.0f, 0.0f);
+			glEnd();
+			glPopMatrix();
 
 			/* ball */
 	
