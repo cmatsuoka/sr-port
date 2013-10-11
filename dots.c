@@ -34,10 +34,12 @@ int gravity = 0;
 int dotnum;
 int gravityd = 16;
 int rows[200];
+#if 0
 int depthtable1[128];
 int depthtable2[128];
 int depthtable3[128];
 int depthtable4[128];
+#endif
 
 
 extern int sin1024[];
@@ -109,10 +111,12 @@ static void setup_dots()
                 c+=8;
                 if(c<0) c=0; else if(c>15) c=15;
                 c=15-c;
+#if 0
                 depthtable1[a]=0x202+0x04040404*c;
                 depthtable2[a]=0x02030302+0x04040404*c;
                 depthtable3[a]=0x202+0x04040404*c;
                 //depthtable4[a]=0x02020302+0x04040404*c;
+#endif
         }
 
 
@@ -243,7 +247,7 @@ int main()
 	width = 640;
 	height = 480;
 
-	if (init_graphics(width, height)) {
+	if (init_graphics("DOTS", width, height)) {
 		fprintf(stderr, "can't init graphics\n");
 		exit(1);
 	}
