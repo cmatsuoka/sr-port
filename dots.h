@@ -1,5 +1,5 @@
-#ifndef __KICK_H
-#define __KICK_H
+#ifndef DOTS_H_
+#define DOTS_H_
 
 struct dot {
         float   x;
