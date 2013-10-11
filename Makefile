@@ -2,7 +2,7 @@ CC	= gcc
 CFLAGS	= -g -O0 -Wall -Wno-unused-function
 LD	= gcc
 LDFLAGS	=
-LIBS	= -lm -lSDL -lGL -lGLU
+LIBS	= -lm -lGL -lEGL -lGLU -lSDL -lX11
 OBJS	= dots.o sdl.o opengl.o sin1024.o
 
 .c.o:

@@ -248,6 +248,8 @@ int main()
 		exit(1);
 	}
 
+	unset_viewport();
+
 	setup_dots();
 
 	while(frame<2450) {
