@@ -15,6 +15,9 @@ static int view_height;
 static int screen_width;
 static int screen_height;
 
+static float radius;
+static float mi[16];
+
 extern float rotsin;
 extern float rotcos;
 extern int gravity;
@@ -23,16 +26,23 @@ extern int gravitybottom;
 extern int bpmin;
 extern int bpmax;
 
-static GLuint pMatrix_location;
-static GLuint uMatrix_location;
-static GLuint uColor_location;
-static GLuint aPosition_location;
-static GLuint program;
+struct program {
+	GLuint program;
+	GLuint pMatrix_location;
+	GLuint uMatrix_location;
+	GLuint aPosition_location;
+	GLuint uColor_location;
+};
+
+struct program dot_program;
+struct program floor_program;
+
+static GLuint uRadius_location;
 
 #define SQRT3 1.7320508075688772F
 #define SQRT3_3 0.5773502691896257F
 
-#define FF 4.0
+#define FF 4.0f
 float obj[9] = {
 	0.0f, FF * SQRT3_3, 0.0f,
 	-FF / 2, FF * -SQRT3_3 / 2, 0.0f,
@@ -43,6 +53,13 @@ float shadow_obj[9] = {
 	0.0f, FF * SQRT3_3, FF / 2,
 	-FF / 2, FF * -SQRT3_3 / 2, 0.0f,
 	FF / 2, FF * -SQRT3_3 / 2, 0.0f
+};
+
+float floor_obj[12] = {
+	0.0f, 0.0f, 0.0f,
+	320.0f, 0.0f, 0.0f,
+	0.0f, 100.0f, 0.0f,
+	320.0f, 100.0f, 0.0f
 };
 
 static const char vertex_shader[] =
@@ -60,29 +77,29 @@ static const char vertex_shader[] =
 "    vCenter = Matrix * vec4(0.0, 0.0, 0.0, 1.0);\n"
 "}\n";
 
-#if 0
-static const char fragment_shader[] =
-"precision mediump float;\n"
-"uniform vec4 uColor;\n"
-"varying vec3 vPosition;\n"
-"\n"
-"void main() {\n"
-"    gl_FragColor = vec4(uColor);\n"
-"}\n";
-#endif
-
 static const char dot_shader[] =
 "precision mediump float;\n"
 "uniform vec4 uColor;\n"
+"uniform float uRadius;\n"
 "varying vec3 vPosition;\n"
 "varying vec4 vCenter;\n"
 "\n"
 "void main() {\n"
 "    float dist = distance(vPosition, vCenter.xyz);\n"
-"    if (dist < 0.01) {\n"
+"    if (dist < uRadius) {\n"
 "        gl_FragColor = vec4(uColor.xyz, 1.0);\n"
 "    } else { gl_FragColor = vec4(0.0); }\n"
 "}\n";
+
+static const char floor_shader[] =
+"precision mediump float;\n"
+"uniform vec4 uColor;\n"
+"varying vec3 vPosition;\n"
+"\n"
+"void main() {\n"
+"    gl_FragColor = vec4(uColor.xyz, 1.0);\n"
+"}\n";
+
 
 void check_error(char *t)
 {
@@ -92,13 +109,13 @@ void check_error(char *t)
 	}
 }
 
-void set_color(GLfloat *c)
+void set_color(GLfloat *c, struct program *p)
 {
-	glUniform4fv(uColor_location, 1, c);
+	glUniform4fv(p->uColor_location, 1, c);
 }
 
 void applyOrtho(float left, float right, float bottom, float top, float near,
-		float far)
+		float far, struct program *p)
 {
 	float a = 2.0f / (right - left);
 	float b = 2.0f / (top - bottom);
@@ -115,88 +132,119 @@ void applyOrtho(float left, float right, float bottom, float top, float near,
 		tx, ty, tz, 1
 	};
 
-	glUniformMatrix4fv(pMatrix_location, 1, 0, ortho);
+	glUniformMatrix4fv(p->pMatrix_location, 1, 0, ortho);
+}
+
+int create_program(struct program *p, GLuint v, GLuint f)
+{
+	char msg[512];
+
+	p->program = glCreateProgram();
+	glAttachShader(p->program, v);
+	glAttachShader(p->program, f);
+	glBindAttribLocation(p->program, 0, "position");
+	check_error("ATTACH");
+
+	glLinkProgram(p->program);
+	glGetProgramInfoLog(p->program, sizeof msg, NULL, msg);
+	printf("info: %s\n", msg);
+
+	p->pMatrix_location = glGetUniformLocation(p->program, "pMatrix");
+	p->uMatrix_location = glGetUniformLocation(p->program, "uMatrix");
+	p->aPosition_location = glGetAttribLocation(p->program, "aPosition");
+	p->uColor_location = glGetUniformLocation(p->program, "uColor");
+
+	return 0;
+}
+
+GLuint compile_vertex_shader(const char *p)
+{
+	GLuint v = glCreateShader(GL_VERTEX_SHADER);
+	char msg[512];
+
+	glShaderSource(v, 1, &p, NULL);
+	glCompileShader(v);
+	glGetShaderInfoLog(v, sizeof msg, NULL, msg);
+	printf("vertex shader info: %s\n", msg);
+
+	return v;
+}
+
+GLuint compile_fragment_shader(const char *p)
+{
+	GLuint f = glCreateShader(GL_FRAGMENT_SHADER);
+	char msg[512];
+
+	glShaderSource(f, 1, &p, NULL);
+	glCompileShader(f);
+	glGetShaderInfoLog(f, sizeof msg, NULL, msg);
+	printf("fragment shader info: %s\n", msg);
+
+	return f;
 }
 
 int init_opengl(int width, int height)
 {
 	GLuint v, f;
-	const char *p;
-	char msg[512];
+
+	memset(mi, 0, sizeof(mi));
+	mi[0] = mi[5] = mi[10] = mi[15] = 1;
 
 	view_width = 320;
 	view_height = 200;
 	screen_width = width;
 	screen_height = height;
 
-	/* Compile the vertex shader */
-	p = vertex_shader;
-	v = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(v, 1, &p, NULL);
-	glCompileShader(v);
-	glGetShaderInfoLog(v, sizeof msg, NULL, msg);
-	printf("vertex shader info: %s\n", msg);
+	v = compile_vertex_shader(vertex_shader);
+	f = compile_fragment_shader(dot_shader);
+	create_program(&dot_program, f, v);
 
-	/* Compile the fragment shader */
-	p = dot_shader;
-	f = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(f, 1, &p, NULL);
-	glCompileShader(f);
-	glGetShaderInfoLog(f, sizeof msg, NULL, msg);
-	printf("fragment shader info: %s\n", msg);
-
-	/* Create and link the shader program */
-	program = glCreateProgram();
-	glAttachShader(program, v);
-	glAttachShader(program, f);
-	glBindAttribLocation(program, 0, "position");
-	glBindAttribLocation(program, 1, "normal");
-	check_error("ATTACH");
-
-	glLinkProgram(program);
-	glGetProgramInfoLog(program, sizeof msg, NULL, msg);
-	printf("info: %s\n", msg);
-
-	/* Enable the shaders */
-	glUseProgram(program);
+	f = compile_fragment_shader(floor_shader);
+	create_program(&floor_program, f, v);
 
 	/* Get the locations of the uniforms so we can access them */
-	pMatrix_location = glGetUniformLocation(program, "pMatrix");
-	uMatrix_location = glGetUniformLocation(program, "uMatrix");
-	aPosition_location = glGetAttribLocation(program, "aPosition");
+	uRadius_location = glGetUniformLocation(dot_program.program, "uRadius");
 
-	glEnableVertexAttribArray(aPosition_location);
-
-	//NormalMatrix_location = glGetUniformLocation(program, "NormalMatrix");
-	//LightSourcePosition_location = glGetUniformLocation(program, "LightSourcePosition");
-	//MaterialColor_location = glGetUniformLocation(program, "MaterialColor");
-
-	uColor_location = glGetUniformLocation(program, "uColor");
+	radius = (2.0 / width * FF) / 1.5;
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(.2, .2, .2, 0);
-	clear_screen();
 
 	return 0;
 }
 
 void clear_screen()
 {
+	float mu[16];
+
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	glUseProgram(floor_program.program);
+
+	glEnableVertexAttribArray(floor_program.aPosition_location);
+	set_color(shadow_color, &floor_program);
+
+	memcpy(mu, mi, sizeof(mi));
+	glUniformMatrix4fv(floor_program.uMatrix_location, 1, 0, mu);
+	glVertexAttribPointer(floor_program.aPosition_location, 3,
+			GL_FLOAT, 0, 3 * sizeof(float), floor_obj);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glDisableVertexAttribArray(floor_program.aPosition_location);
+
+	glUseProgram(dot_program.program);
 }
 
 void draw_dot(struct dot *dot)
 {
-	float mi[16], mu[16];
-
-	memset(mi, 0, sizeof(mi));
-	mi[0] = mi[5] = mi[10] = mi[15] = 1;
+	float mu[16];
 
 	float bp = ((dot->z * rotcos - dot->x * rotsin) / 0x10000) + 9000;
 	float a = (dot->z * rotsin + dot->x * rotcos) / 0x100;
+
+	glEnableVertexAttribArray(dot_program.aPosition_location);
 
 	float x = (a + a / 8) / bp + 160;
 	if (x <= 319) {
@@ -204,17 +252,16 @@ void draw_dot(struct dot *dot)
 		float shadow_y = (0x80000 / bp) + 100;
 		if (shadow_y <= 199) {
 
-			/* todo: shadow */
+			/* shadow */
 
-			set_color(shadow_color);
+			set_color(shadow_color, &dot_program);
 			memcpy(mu, mi, sizeof(mi));
 			mu[12] = x;
 			mu[13] = 200 - shadow_y;
 
-			glUniformMatrix4fv(uMatrix_location, 1, 0, mu);
-
-			glVertexAttribPointer(aPosition_location, 3,
-					GL_FLOAT, 0, 3 * sizeof(float), shadow_obj);
+			glUniformMatrix4fv(dot_program.uMatrix_location, 1, 0, mu);
+			glVertexAttribPointer(dot_program.aPosition_location, 3,
+				GL_FLOAT, 0, 3 * sizeof(float), shadow_obj);
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
 
 			/* ball */
@@ -230,28 +277,32 @@ void draw_dot(struct dot *dot)
 			float y = (dot->y * 64) / bp + 100;
 			if (y <= 199) {
 
-				color[0] = 0;
 				color[1] = 1.0f - (bp - 3000) / 12000;
-				color[2] = color[1];
+				color[2] = color[1] * 1.2f;
+				color[0] = color[1] / 5;
 
-				set_color(color);
+				set_color(color, &dot_program);
 
 				memcpy(mu, mi, sizeof(mi));
 				mu[12] = x;
 				mu[13] = 200 - y;
 
-				glUniformMatrix4fv(uMatrix_location, 1, 0, mu);
+				glUniformMatrix4fv(dot_program.uMatrix_location, 1, 0, mu);
+				glUniform1fv(uRadius_location, 1, &radius);
 
-				glVertexAttribPointer(aPosition_location, 3,
+				glVertexAttribPointer(dot_program.aPosition_location, 3,
 					GL_FLOAT, 0, 3 * sizeof(float), obj);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
 				check_error("DRAW");
 			}
 		}
 	}
+
+	glDisableVertexAttribArray(dot_program.aPosition_location);
 }
 
 void projection()
 {
-	applyOrtho(0, view_width, 0, view_height, -100, 100);
+	applyOrtho(0, view_width, 0, view_height, -100, 100, &floor_program);
+	applyOrtho(0, view_width, 0, view_height, -100, 100, &dot_program);
 }
