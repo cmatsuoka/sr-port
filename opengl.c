@@ -97,8 +97,9 @@ static const char floor_shader[] =
 "varying vec3 vPosition;\n"
 "\n"
 "void main() {\n"
-"    float x = 0.05 - vPosition.y / 3.6;\n"
-"    gl_FragColor = vec4(x, x, x, 1.0);\n"
+"    float x = -vPosition.y / 6.0;\n"
+"    float y = -x * x + 2.0 * x;\n"
+"    gl_FragColor = vec4(y, y, y, 1.0);\n"
 "}\n";
 
 
