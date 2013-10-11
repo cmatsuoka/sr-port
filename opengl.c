@@ -8,7 +8,7 @@
 #include "dots.h"
 
 GLfloat color[4];
-GLfloat shadow_color[4] = { .1, .1, .1, 0 };
+GLfloat shadow_color[4] = { .2, .2, .2, 1.0 };
 
 static int view_width;
 static int view_height;
@@ -42,7 +42,7 @@ static GLuint uRadius_location;
 #define SQRT3 1.7320508075688772F
 #define SQRT3_3 0.5773502691896257F
 
-#define FF 4.0f
+#define FF 5.0f
 float obj[9] = {
 	0.0f, FF * SQRT3_3, 0.0f,
 	-FF / 2, FF * -SQRT3_3 / 2, 0.0f,
@@ -97,7 +97,8 @@ static const char floor_shader[] =
 "varying vec3 vPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = vec4(uColor.xyz, 1.0);\n"
+"    float x = 0.05 - vPosition.y / 3.6;\n"
+"    gl_FragColor = vec4(x, x, x, 1.0);\n"
 "}\n";
 
 
@@ -132,6 +133,7 @@ void applyOrtho(float left, float right, float bottom, float top, float near,
 		tx, ty, tz, 1
 	};
 
+	glUseProgram(p->program);
 	glUniformMatrix4fv(p->pMatrix_location, 1, 0, ortho);
 }
 
@@ -211,7 +213,7 @@ int init_opengl(int width, int height)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glClearColor(.2, .2, .2, 0);
+	glClearColor(.0, .0, .0, 0);
 
 	return 0;
 }
@@ -225,7 +227,6 @@ void clear_screen()
 	glUseProgram(floor_program.program);
 
 	glEnableVertexAttribArray(floor_program.aPosition_location);
-	set_color(shadow_color, &floor_program);
 
 	memcpy(mu, mi, sizeof(mi));
 	glUniformMatrix4fv(floor_program.uMatrix_location, 1, 0, mu);
@@ -278,8 +279,8 @@ void draw_dot(struct dot *dot)
 			if (y <= 199) {
 
 				color[1] = 1.0f - (bp - 3000) / 12000;
-				color[2] = color[1] * 1.2f;
-				color[0] = color[1] / 5;
+				color[2] = color[1] * 1.1f;
+				color[0] = color[1] / 3;
 
 				set_color(color, &dot_program);
 
