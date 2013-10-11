@@ -29,32 +29,38 @@ static GLuint uColor_location;
 static GLuint aPosition_location;
 static GLuint program;
 
+#define SQRT3 1.7320508075688772F
+#define SQRT3_3 0.5773502691896257F
+
 #define FF 4.0
 float obj[9] = {
-	0.0f, FF, 0.0f,
-	-FF / 2, 0.0f, 0.05f,
-	FF / 2, 0.0f, 0.0f
+	0.0f, FF * SQRT3_3, 0.0f,
+	-FF / 2, FF * -SQRT3_3 / 2, 0.0f,
+	FF / 2, FF * -SQRT3_3 / 2, 0.0f
 };
 
 float shadow_obj[9] = {
-	0.0f, FF / 4, 0.0f,
-	-FF / 2, 0.0f, 0.05f,
-	FF / 2, 0.0f, 0.0f
+	0.0f, FF * SQRT3_3, FF / 2,
+	-FF / 2, FF * -SQRT3_3 / 2, 0.0f,
+	FF / 2, FF * -SQRT3_3 / 2, 0.0f
 };
 
 static const char vertex_shader[] =
 "uniform mat4 pMatrix;\n"
 "uniform mat4 uMatrix;\n"
-"\n"
 "attribute vec4 aPosition;\n"
 "varying vec3 vPosition;\n"
+"varying vec4 vCenter;\n"
 "\n"
 "void main(){\n"
-"    vec4 position = pMatrix * uMatrix * aPosition;\n"
+"    mat4 Matrix = pMatrix * uMatrix;\n"
+"    vec4 position = Matrix * aPosition;\n"
 "    gl_Position = position;\n"
-"    vPosition = vec3(position);"
+"    vPosition = vec3(position);\n"
+"    vCenter = Matrix * vec4(0.0, 0.0, 0.0, 1.0);\n"
 "}\n";
 
+#if 0
 static const char fragment_shader[] =
 "precision mediump float;\n"
 "uniform vec4 uColor;\n"
@@ -62,6 +68,20 @@ static const char fragment_shader[] =
 "\n"
 "void main() {\n"
 "    gl_FragColor = vec4(uColor);\n"
+"}\n";
+#endif
+
+static const char dot_shader[] =
+"precision mediump float;\n"
+"uniform vec4 uColor;\n"
+"varying vec3 vPosition;\n"
+"varying vec4 vCenter;\n"
+"\n"
+"void main() {\n"
+"    float dist = distance(vPosition, vCenter.xyz);\n"
+"    if (dist < 0.01) {\n"
+"        gl_FragColor = vec4(uColor.xyz, 1.0);\n"
+"    } else { gl_FragColor = vec4(0.0); }\n"
 "}\n";
 
 void check_error(char *t)
@@ -118,7 +138,7 @@ int init_opengl(int width, int height)
 	printf("vertex shader info: %s\n", msg);
 
 	/* Compile the fragment shader */
-	p = fragment_shader;
+	p = dot_shader;
 	f = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(f, 1, &p, NULL);
 	glCompileShader(f);
@@ -154,6 +174,8 @@ int init_opengl(int width, int height)
 	uColor_location = glGetUniformLocation(program, "uColor");
 
 	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(.2, .2, .2, 0);
 	clear_screen();
@@ -227,11 +249,6 @@ void draw_dot(struct dot *dot)
 			}
 		}
 	}
-}
-
-void unset_viewport()
-{
-	glViewport(0, 0, screen_width, screen_height);
 }
 
 void projection()
