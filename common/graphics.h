@@ -1,8 +1,7 @@
-#ifndef DOTS_OPENGL_H_
-#define DOTS_OPENGL_H_
+#ifndef GRAPHICS_H_
+#define GRAPHICS_H_
 
 int init_graphics(char *, int, int);
-int init_opengl(int, int);
 void projection(void);
 void swap_buffers(void);
 void clear_screen(void);

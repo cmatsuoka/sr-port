@@ -1,5 +1,5 @@
 
-COMMON_OBJS	= sin1024.o
+COMMON_OBJS	= sin1024.o sdl.o opengl.o
 
 COMMON_PATH	= common
 

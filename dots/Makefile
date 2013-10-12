@@ -1,5 +1,5 @@
 
-DOTS_OBJS	= dots.o sdl.o opengl.o
+DOTS_OBJS	= dots.o opengl.o
 
 DOTS_PATH	= dots
 

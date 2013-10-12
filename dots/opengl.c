@@ -23,14 +23,6 @@ extern int gravitybottom;
 extern int bpmin;
 extern int bpmax;
 
-struct program {
-	GLuint program;
-	GLuint pMatrix_location;
-	GLuint uMatrix_location;
-	GLuint aPosition_location;
-	GLuint uColor_location;
-};
-
 struct program dot_program;
 struct program floor_program;
 
@@ -100,107 +92,6 @@ static const char floor_shader[] =
 "    gl_FragColor = vec4(y, y, y, 1.0);\n"
 "}\n";
 
-void check_error(char *t)
-{
-	int e = glGetError();
-	if (e != GL_NO_ERROR) {
-		fprintf(stderr, "[%s] %s\n", t, gluErrorString(e));
-	}
-}
-
-inline void matrix_identity(float *m)
-{
-	memcpy(m, mi, sizeof(mi));
-}
-
-inline void matrix_set(struct program *p, float *m)
-{
-	glUniformMatrix4fv(p->uMatrix_location, 1, 0, m);
-}
-
-void draw_triangle_strip(struct program *p, float *obj, int num)
-{
-	glEnableVertexAttribArray(p->aPosition_location);
-	glVertexAttribPointer(p->aPosition_location, 3, GL_FLOAT,
-					0, 3 * sizeof(float), obj);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, num);
-	glDisableVertexAttribArray(p->aPosition_location);
-	//check_error("DRAW");
-}
-
-void set_color(GLfloat *c, struct program *p)
-{
-	glUniform4fv(p->uColor_location, 1, c);
-}
-
-void applyOrtho(float left, float right, float bottom, float top, struct program *p)
-{
-	float far = 1000.0f, near = -1000.0f;
-	float a = 2.0f / (right - left);
-	float b = 2.0f / (top - bottom);
-	float c = -2.0f / (far - near);
-
-	float tx = -(right + left) / (right - left);
-	float ty = -(top + bottom) / (top - bottom);
-	float tz = -(far + near) / (far - near);
-
-	float ortho[16] = {
-		a, 0, 0, 0,
-		0, b, 0, 0,
-		0, 0, c, 0,
-		tx, ty, tz, 1
-	};
-
-	glUniformMatrix4fv(p->pMatrix_location, 1, 0, ortho);
-}
-
-int create_program(struct program *p, GLuint v, GLuint f)
-{
-	char msg[512];
-
-	p->program = glCreateProgram();
-	glAttachShader(p->program, v);
-	glAttachShader(p->program, f);
-	glBindAttribLocation(p->program, 0, "position");
-	check_error("ATTACH");
-
-	glLinkProgram(p->program);
-	glGetProgramInfoLog(p->program, sizeof msg, NULL, msg);
-	printf("program info: %s\n", msg);
-
-	p->pMatrix_location = glGetUniformLocation(p->program, "pMatrix");
-	p->uMatrix_location = glGetUniformLocation(p->program, "uMatrix");
-	p->aPosition_location = glGetAttribLocation(p->program, "aPosition");
-	p->uColor_location = glGetUniformLocation(p->program, "uColor");
-
-	return 0;
-}
-
-GLuint compile_vertex_shader(const char *p)
-{
-	GLuint v = glCreateShader(GL_VERTEX_SHADER);
-	char msg[512];
-
-	glShaderSource(v, 1, &p, NULL);
-	glCompileShader(v);
-	glGetShaderInfoLog(v, sizeof msg, NULL, msg);
-	printf("vertex shader info: %s\n", msg);
-
-	return v;
-}
-
-GLuint compile_fragment_shader(const char *p)
-{
-	GLuint f = glCreateShader(GL_FRAGMENT_SHADER);
-	char msg[512];
-
-	glShaderSource(f, 1, &p, NULL);
-	glCompileShader(f);
-	glGetShaderInfoLog(f, sizeof msg, NULL, msg);
-	printf("fragment shader info: %s\n", msg);
-
-	return f;
-}
 
 int init_opengl(int width, int height)
 {
@@ -262,8 +153,7 @@ void draw_dot(struct dot *dot)
 			set_color(shadow_color, &dot_program);
 
 			matrix_identity(m);
-			m[12] = x;
-			m[13] = 200 - shadow_y;
+			matrix_translate(m, x, 200 - shadow_y);
 
 			matrix_set(&dot_program, m);
 			draw_triangle_strip(&dot_program, shadow_obj, 3);
@@ -288,8 +178,7 @@ void draw_dot(struct dot *dot)
 				set_color(color, &dot_program);
 
 				matrix_identity(m);
-				m[12] = x;
-				m[13] = 200 - y;
+				matrix_translate(m, x, 200 - y);
 
 				matrix_set(&dot_program, m);
 				glUniform1fv(uRadius_location, 1, &radius);

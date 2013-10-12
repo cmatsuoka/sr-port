@@ -5,8 +5,8 @@
 #include <math.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "graphics.h"
 #include "dots.h"
-#include "opengl.h"
 
 #define MAXDOTS 1024
 #define BOTTOM 8000
