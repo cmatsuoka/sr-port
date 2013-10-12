@@ -1,17 +1,20 @@
 CC	= gcc
-CFLAGS	= -g -O0 -Wall -Wno-unused-function
+CFLAGS	= -g -O0 -Wall
 LD	= gcc
 LDFLAGS	=
-LIBS	= -lm -lGL -lEGL -lGLU -lSDL -lX11
-OBJS	= dots.o sdl.o opengl.o sin1024.o
+LIBS	= -Lcommon -lcommon -lm -lGL -lEGL -lGLU -lSDL -lX11
+RANLIB	= ranlib
+AR	= ar
+
+all: common/libcommon.a dots/dots
+
+include common/Makefile
+include dots/Makefile
+
+.SUFFIXES: .c .o .pov .a
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $*.o $<
-
-all: poc
-
-poc: $(OBJS) Makefile
-	$(LD) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
 
 clean:
 	rm -f core *~ $(OBJS) depend

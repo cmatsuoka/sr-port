@@ -8,7 +8,7 @@
 #include "dots.h"
 
 GLfloat color[4];
-GLfloat shadow_color[4] = { .2, .2, .2, 1.0 };
+GLfloat shadow_color[4] = { .17, .17, .17, 1.0 };
 
 static int view_width;
 static int view_height;
@@ -47,9 +47,9 @@ float obj[9] = {
 };
 
 float shadow_obj[9] = {
-	0.0f, FF * SQRT3_3, FF / 2,
+	0.0f, FF * SQRT3_3, FF * 5,
 	-FF / 2, FF * -SQRT3_3 / 2, 0.0f,
-	FF / 2, FF * -SQRT3_3 / 2, 0.0f
+	FF / 2, FF * -SQRT3_3 / 2, 0.0f, 
 };
 
 float floor_obj[12] = {
@@ -94,8 +94,9 @@ static const char floor_shader[] =
 "varying vec3 vPosition;\n"
 "\n"
 "void main() {\n"
-"    float x = -vPosition.y / 6.0;\n"
-"    float y = -x * x + 2.0 * x;\n"
+"    float x = -vPosition.y / 2.0;\n"
+//"    float y = -x * x + 2.0 * x / 2.2;\n"
+"    float y = pow(1.0 - (x - 1.0) * (x - 1.0), 0.5) / 3.3;\n"
 "    gl_FragColor = vec4(y, y, y, 1.0);\n"
 "}\n";
 
@@ -132,9 +133,9 @@ void set_color(GLfloat *c, struct program *p)
 	glUniform4fv(p->uColor_location, 1, c);
 }
 
-void applyOrtho(float left, float right, float bottom, float top, float near,
-		float far, struct program *p)
+void applyOrtho(float left, float right, float bottom, float top, struct program *p)
 {
+	float far = 1000.0f, near = -1000.0f;
 	float a = 2.0f / (right - left);
 	float b = 2.0f / (top - bottom);
 	float c = -2.0f / (far - near);
@@ -302,7 +303,7 @@ void draw_dot(struct dot *dot)
 void projection()
 {
 	glUseProgram(floor_program.program);
-	applyOrtho(0, view_width, 0, view_height, -100, 100, &floor_program);
+	applyOrtho(0, view_width, 0, view_height, &floor_program);
 	glUseProgram(dot_program.program);
-	applyOrtho(0, view_width, 0, view_height, -100, 100, &dot_program);
+	applyOrtho(0, view_width, 0, view_height, &dot_program);
 }
