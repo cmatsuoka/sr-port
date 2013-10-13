@@ -1,5 +1,5 @@
-#ifndef TUN10_H_
-#define TUN10_H_
+#ifndef SR_TUN10_H_
+#define SR_TUN10_H_
 
 struct bc {		/* each pixel */
 	float x;

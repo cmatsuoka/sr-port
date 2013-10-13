@@ -1,5 +1,5 @@
-#ifndef DOTS_OPENGL_H_
-#define DOTS_OPENGL_H_
+#ifndef SR_OPENGL_H_
+#define SR_OPENGL_H_
 
 #include <string.h>
 

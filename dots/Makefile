@@ -1,5 +1,5 @@
 
-DOTS_OBJS	= dots.o opengl.o
+DOTS_OBJS	= main.o opengl.o
 
 DOTS_PATH	= dots
 

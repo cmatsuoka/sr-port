@@ -2,17 +2,19 @@ CC	= gcc
 CFLAGS	= -g -O3 -Wall -Icommon
 LD	= gcc
 LDFLAGS	=
-LIBS	= -Lcommon -lcommon -lm -lGL -lEGL -lGLU -lSDL -lX11
+LIBS	= -Lcommon -lcommon -Ldis -ldis -lm -lGL -lEGL -lGLU -lSDL -lX11
 RANLIB	= ranlib
 AR	= ar
 POVRAY	= povray
 
-all: common-all dots-all water-all tunneli-all
+all: common-all dis-all dots-all water-all tunneli-all
 
 include common/Makefile
+include dis/Makefile
 include dots/Makefile
 include water/Makefile
 include tunneli/Makefile
+include glenz/Makefile
 
 .SUFFIXES: .c .o .a .pov .png
 

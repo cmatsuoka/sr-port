@@ -1,5 +1,5 @@
-#ifndef DOTS_H_
-#define DOTS_H_
+#ifndef SR_DOTS_H_
+#define SR_DOTS_H_
 
 struct dot {
         float   x;
