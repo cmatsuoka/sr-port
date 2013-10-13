@@ -167,7 +167,7 @@ void draw_dot(struct dot *dot)
 			float y = (dot->y * 64) / bp + 100;
 			if (y <= 199) {
 
-				color[1] = 1.0f - (bp - 3000) / 12000;
+				color[1] = 0.75f - (bp - 4000) / 16000;
 				color[2] = color[1] * 1.1f;
 				color[0] = color[1] / 3;
 
