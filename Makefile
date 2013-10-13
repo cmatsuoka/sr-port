@@ -15,6 +15,7 @@ include dots/Makefile
 include water/Makefile
 include tunneli/Makefile
 include glenz/Makefile
+include techno/Makefile
 
 .SUFFIXES: .c .o .a .pov .png
 

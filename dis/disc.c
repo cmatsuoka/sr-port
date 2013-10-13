@@ -147,7 +147,7 @@ _dis_musplus PROC FAR
 _dis_musplus ENDP
 #endif
 
-int dis_musrow(int row)
+int dis_musrow()
 {
 	return 0;
 }
