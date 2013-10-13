@@ -13,7 +13,6 @@ GLfloat shadow_color[4] = { .17, .17, .17, 1.0 };
 static int view_width;
 static int view_height;
 static float radius;
-static float mi[16];
 
 extern float rotsin;
 extern float rotcos;
@@ -96,9 +95,6 @@ static const char floor_shader[] =
 int init_opengl(int width, int height)
 {
 	GLuint v, f;
-
-	memset(mi, 0, sizeof(mi));
-	mi[0] = mi[5] = mi[10] = mi[15] = 1;
 
 	view_width = 320;
 	view_height = 200;

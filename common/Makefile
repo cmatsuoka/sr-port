@@ -10,9 +10,9 @@ COMMON_LIB	= libcommon.a
 OBJS += $(COMMON_PATH_OBJS)
 
 default-common:
-	$(MAKE) -C ..
+	$(MAKE) -C .. common-all
 
-common_all: $(COMMON_PATH)/$(COMMON_LIB)
+common-all: $(COMMON_PATH)/$(COMMON_LIB)
 
 $(COMMON_PATH)/$(COMMON_LIB): $(COMMON_PATH_OBJS)
 	$(AR) r $@ $(COMMON_PATH_OBJS)

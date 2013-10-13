@@ -13,6 +13,8 @@ static Display *x11Disp = NULL;
 
 #define configs_in 10
 
+int window_width = 640;
+int window_height = 480;
 
 static uint32_t timer_function(uint32_t i)
 {
@@ -159,7 +161,7 @@ int init_graphics(char *caption, int width, int height)
 	SDL_SetTimer(4, timer_function);
 	SDL_WM_SetCaption(caption, caption);
 
-	return init_opengl(width, height);
+	return 0;
 }
 
 void swap_buffers()

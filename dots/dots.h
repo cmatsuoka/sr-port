@@ -13,7 +13,7 @@ struct dot {
 };
 
 
+int init_opengl(int, int);
 void draw_dot(struct dot *);
-void poll_event(void);
 
 #endif

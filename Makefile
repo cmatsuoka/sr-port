@@ -7,11 +7,12 @@ RANLIB	= ranlib
 AR	= ar
 POVRAY	= povray
 
-all: common_all dots_all water_all
+all: common-all dots-all water-all tunneli-all
 
 include common/Makefile
 include dots/Makefile
 include water/Makefile
+include tunneli/Makefile
 
 .SUFFIXES: .c .o .a .pov .png
 

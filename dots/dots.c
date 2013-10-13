@@ -244,21 +244,23 @@ int main()
 
 	srand(0xfcfc);
 
-	width = 640;
-	height = 480;
+	width = window_width;
+	height = window_height;
 
-	if (init_graphics("DOTS", width, height)) {
+	if (init_graphics("DOTS", width, height) < 0) {
 		fprintf(stderr, "can't init graphics\n");
 		exit(1);
 	}
 
+	init_opengl(width, height);
 	setup_dots();
+
+	projection();
 
 	while(frame<2450) {
 		poll_event();
 		update_dots();
 		clear_screen();
-		projection();
 		draw_dots();
 		swap_buffers();
 	}

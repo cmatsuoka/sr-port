@@ -10,9 +10,9 @@ WATER_BIN	= water
 OBJS += $(WATER_PATH_OBJS)
 
 default-water:
-	$(MAKE) -C ..
+	$(MAKE) -C .. water-all
 
-water_all:
+water-all:
 
 water_image: $(WATER_PATH)/kk.png
 
