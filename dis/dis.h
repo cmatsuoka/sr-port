@@ -39,7 +39,7 @@ extern int dis_muscode(int);
 ** code you are waiting, so a skip can be easily done by DIS.
 */
 
-extern int dis_musplus(int);
+extern int dis_musplus(void);
 /* returns a music syncronization code. As a parameter, give the
 ** code you are waiting, so a skip can be easily done by DIS.
 */

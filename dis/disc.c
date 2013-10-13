@@ -128,7 +128,7 @@ _dis_muscode PROC FAR
 _dis_muscode ENDP
 #endif
 
-int dis_musplus(int plus)
+int dis_musplus()
 {
 	return 0;
 }
