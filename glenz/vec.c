@@ -502,33 +502,13 @@ _ceasypolylist ENDP
 
 void cglenzinit()
 {
+	//newgroup(0, rows);
 }
-
-#if 0
-PUBLIC _cglenzinit
-_cglenzinit PROC FAR
-	CBEG
-	LOADDS
-	mov	ax,0
-	call	__newgroup
-	CEND
-_cglenzinit ENDP
-#endif
 
 void cglenzdone()
 {
+	//newgroup(2, rows);
 }
-
-#if 0
-PUBLIC _cglenzdone
-_cglenzdone PROC FAR
-	CBEG
-	LOADDS
-	mov	ax,2
-	call	__newgroup
-	CEND
-_cglenzdone ENDP
-#endif
 
 void cglenzpolylist(int *polylist)
 {
@@ -545,156 +525,5 @@ _cglenzpolylist PROC FAR
 	call	__newgroup
 	CEND
 _cglenzpolylist ENDP
-#endif
-
-int cdrawpolylist(int *a)
-{
-	return 0;
-}
-
-#if 0
-PUBLIC _cdrawpolylist
-_cdrawpolylist PROC FAR
-	CBEG
-	LOADDS
-	movpar	di,0
-	mov	es,word ptr [bp+8]
-	call	VIDPOLYGROUP
-	CEND
-_cdrawpolylist ENDP
-#endif
-
-int clipz = 2200;
-
-void clipsidi()
-{
-}
-
-#if 0
-clipsidi PROC NEAR
-	;si=point1(hidden), di=point2
-	;adds new point to pointlist (fs:bp-4)
-	;returns number of new point (si)
-	push	bx
-	mov	ecx,fs:[di+8]
-	mov	edx,ecx
-	sub	ecx,fs:[si+8]
-	;cx=length of entire edge
-	sub	edx,cs:clipz
-	;dx=length of clipped edge
-	xor	eax,eax
-	div	ecx
-	shr	eax,16
-	mov	ecx,eax
-	;ecx=multiplier (0..65535)
-	mov	eax,fs:[si]
-	sub	eax,fs:[di]
-	imul	ecx
-	shld	edx,eax,16
-	add	edx,fs:[di]
-	push	edx ;X
-	mov	eax,fs:[si+4]
-	sub	eax,fs:[di+4]
-	imul	ecx
-	shld	edx,eax,16
-	add	edx,fs:[di+4] ;edx=Y
-	;
-	mov	bx,fs:[bp-4]
-	inc	bx
-	mov	fs:[bp-4],bx
-	dec	bx
-	mov	si,bx
-	shl	bx,1
-	add	bx,si
-	shl	bx,2
-	add	bx,bp
-	mov	fs:[bx+4],edx
-	pop	edx
-	mov	fs:[bx],edx
-	mov	edx,cs:clipz
-	mov	fs:[bx+8],edx
-	pop	bx
-	ret
-clipsidi ENDP
-#endif
-
-int cclipedges(int *a, int *b, int *c) // modifies given point list
-{
-	return 0;
-}
-
-#if 0
-PUBLIC _cclipedges
-_cclipedges PROC FAR ;(destedges,edges,points)
-	CBEG
-	movpar	bx,0
-	movpar	es,1
-	movpar	si,2
-	movpar	ds,3
-	movpar	fs,5
-	movpar	bp,4
-	mov	cx,ds:[si]
-	add	si,4
-	mov	es:[bx],cx
-	add	bx,4
-	add	bp,4
-	;
-@@1:	push	cx
-	push	si
-	push	di
-	push	bx
-	mov	ax,ds:[si+4]
-	mov	es:[bx+4],ax
-	mov	di,ds:[si+2]
-	mov	es:[bx+2],di
-	mov	ax,di
-	shl	di,1
-	add	di,ax
-	shl	di,2
-	add	di,bp
-	mov	si,ds:[si]
-	mov	es:[bx],si
-	mov	ax,si
-	shl	si,1
-	add	si,ax
-	shl	si,2
-	add	si,bp
-	;
-	xor	cx,cx
-	mov	eax,fs:[si+8] ;Z
-	cmp	eax,cs:clipz
-	jge	@@2
-	or	cx,1
-@@2:	mov	edx,fs:[di+8] ;Z
-	cmp	edx,cs:clipz
-	jge	@@3
-	or	cx,2
-@@3:	;
-	cmp	cx,0
-	je	@@4
-	cmp	cx,3
-	jne	@@5
-	or	word ptr es:[bx+4],8000h
-	jmp	@@4
-@@5:	cmp	cx,1
-	jne	@@6
-	;si hidden
-	call	clipsidi
-	mov	es:[bx],si
-	jmp	@@4
-@@6:	;di hidden
-	xchg	si,di
-	call	clipsidi
-	mov	es:[bx+2],si
-@@4:	pop	bx
-	add	bx,8
-	pop	di
-	add	di,8
-	pop	si
-	add	si,8
-	pop	cx
-	loop	@@1
-	CEND
-_cclipedges ENDP
 #endif
 

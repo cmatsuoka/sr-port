@@ -30,6 +30,7 @@ extern char lightshift;
 
 extern int demomode[];
 
+#if 0
 int    cubepoints[]={8,
 -999,-999,-999,
 999,-999,-999,
@@ -48,6 +49,7 @@ int cubeepolys[]={
 4,0x400c,2,3,7,6,
 4,0x400a,3,0,4,7,
 0};
+#endif
 
 #define ZZZ 50
 #define QQQ 99
@@ -67,6 +69,7 @@ int    points[64]={14,
 -170*ZZZ,0*ZZZ,0*ZZZ,
 0*ZZZ,170*ZZZ,0*ZZZ,
 0*ZZZ,-170*ZZZ,0*ZZZ};
+#if 0
 int    points1[64]={14,
 -100*ZZZ,-100*ZZZ,-100*ZZZ,
 100*ZZZ,-100*ZZZ,-100*ZZZ,
@@ -127,6 +130,7 @@ int    points7[64]={14,
 -170*ZZZ,0*ZZZ,0*ZZZ,
 0*ZZZ,170*ZZZ,0*ZZZ,
 0*ZZZ,-170*ZZZ,0*ZZZ};
+#endif
 int    pointsb[64]={14,
 -60*QQQ,-60*QQQ,-60*QQQ,
 60*QQQ,-60*QQQ,-60*QQQ,
@@ -145,6 +149,7 @@ int    pointsb[64]={14,
 int    points2[256];
 int    points2b[256];
 int points3[256*2];
+#if 0
 int edges[64]={12,0,
 0,1,0,0,
 1,2,0,0,
@@ -159,6 +164,7 @@ int edges[64]={12,0,
 2,6,0,0,
 3,7,0,0};
 int edges2[64];
+#endif
 int polys[64]={
 4,0x4010,0,1,2,3,
 4,0x4008,0,8,4,9,
@@ -284,7 +290,7 @@ int main()
     char    *ps,*pd,*pp;
     //unsigned int u;
 
-    //dis_partstart();
+    dis_partstart();
 
     while(!dis_exit() && dis_musplus()<-19) ;
     dis_setmframe(0);
