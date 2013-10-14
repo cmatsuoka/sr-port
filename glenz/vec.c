@@ -8,6 +8,20 @@ float yadd = 0.0f;
 float zadd = 0.0f;
 int mtrm[9];
 
+/* For 320x200 */
+int projxmul = 256;
+int projymul = 213;
+int projxadd = 160;
+int projyadd = 130;
+int projminz = 128;
+int projminzshr = 7;
+int wminx = 0;
+int wminy = 0;
+int wmaxx = 319;
+int wmaxy = 199;
+int framerate10 = 700;
+
+
 int csetmatrix(int *matrix, int x, int y, int z)
 {
 	memcpy(mtrm, matrix, 9 * sizeof(int));
@@ -20,11 +34,9 @@ int csetmatrix(int *matrix, int x, int y, int z)
 
 int crotlist(int *dest, int *src)
 {
-	int count = src[0];
+	int count = *src++;
 
-	dest[0] = count;
-	src++;
-	dest++;
+	*dest++ = count;
 	
 	while (count--) {
 		dest[0] = mtrm[0] * src[0] +
@@ -48,141 +60,75 @@ int crotlist(int *dest, int *src)
 
 int cprojlist(int *dest, int *src)
 {
+	int count = *src++;
+	int size = *dest;
+
+	*dest = count;
+	dest += size * 3 + 1;
+
+	while (count--) {
+		int x = src[0];
+		int y = src[1];
+		int z = src[2];
+		int bp = 0;
+		int xx, yy;
+		
+		dest[2] = z;
+		if (z < projminz) {
+			z = projminz;
+			bp |= 16;
+		}
+
+		/* Store Y */
+		yy = y * projymul / z + projyadd;
+		if (yy > wmaxy)
+			bp |= 8;
+		if (yy < wminy)
+			bp |= 4;
+		dest[1] = yy;
+
+		/* Store X */
+		xx = x * projxmul / z + projxadd;
+		if (xx > wmaxx)
+			bp |= 2;
+		if (xx < wminx)
+			bp |= 1;
+		dest[0] = xx;
+
+		/* Store visibility flags */
+		dest[2] = bp;
+
+		src += 3;
+		dest += 3;
+	}
+	
 	return 0;
 }
 
-#if 0
-PUBLIC _cprojlist
-_cprojlist PROC FAR
-	CBEG
-	mov	si,[bp+10]
-	mov	ds,word ptr [bp+12]
-	mov	di,[bp+6]
-	mov	es,word ptr [bp+8]
-	call	projlist
-	CEND
-_cprojlist ENDP
-#endif
-#if 0
-projlist PROC FAR
-	;pointlist@DS:SI=>projectedpointlist@ES:DI
-	push	di
-	LOADGS
-	mov	cx,ds:[si]
-	add	si,4
-	mov	cs:count,cx
-	mov	ax,es:[di]
-	add	es:[di],cx
-	mov	bx,ax
-	shl	ax,1
-	add	ax,bx
-	shl	ax,2
-	add	di,ax
-	add	di,4
-
-@@1:	;rotate with matrix
-	mov	ebx,ds:[si+8]
-	mov	eax,ds:[si+4]
-	mov	ecx,ds:[si+0]
-	
-	;project
-
-	xor	bp,bp
-	mov	dword ptr es:[di+8],ebx
-	cmp	ebx,gs:projminz
-	jge	@@2
-	mov	ebx,gs:projminz
-	or	bp,16
-@@2:	;
-	imul	gs:projymul
-	idiv	ebx
-	add	ax,gs:projyadd
-	cmp	ax,gs:wmaxy
-	jng	@@41
-	or	bp,8
-@@41:	cmp	ax,gs:wminy
-	jnl	@@42
-	or	bp,4
-@@42:	mov	es:[di+2],ax ;store Y
-	;
-	mov	eax,gs:projxmul
-	imul	ecx
-	idiv	ebx
-	add	ax,gs:projxadd
-	cmp	ax,gs:wmaxx
-	jng	@@43
-	or	bp,2
-@@43:	cmp	ax,gs:wminx
-	jnl	@@44
-	or	bp,1
-@@44:	mov	es:[di+0],ax ;store X
-
-@@5:	mov	es:[di+4],bp ;store visiblity flags
-	
-	;next point
-	add	si,12
-	add	di,12
-	dec	cs:count
-	jnz	@@1
-	pop	di
-	ret
-projlist ENDP
-#endif
-
-int ccliplist(int *a)
+int ccliplist(int *points)
 {
+	int count = *points++;
+
+	while (count--) {
+		if (points[1] > 1500)
+			points[1] = 1500;
+		points += 3;
+	}
+
 	return 0;
 }
 
-#if 0
-PUBLIC _ccliplist
-_ccliplist PROC FAR
-	CBEG
-	mov	si,[bp+6]
-	mov	ds,word ptr [bp+8]
-	call	cliplist
-	CEND
-_ccliplist ENDP
-#endif
-
-int count = 0;
-
-
-
-
-void cliplist()
-{
-}
-
-#if 0
-cliplist PROC FAR
-	;pointlist@DS:SI
-	push	di
-	LOADGS
-	mov	cx,ds:[si]
-	add	si,4
-
-@@1:	;rotate with matrix
-	mov	eax,ds:[si+4]
-	cmp	eax,1500
-	jl	@@2
-	mov	dword ptr ds:[si+4],1500
-@@2:
-	;next point
-	add	si,12
-	dec	cx
-	jnz	@@1
-	pop	di
-	ret
-cliplist ENDP
-#endif
 
 int edgesoff = 0;
 int pointsoff = 0;
 int cntoff = 0; 
 
-void adddot()
+void adddot(int *polylist, int *points3, int x)
 {
+	if (x == -1)
+		return;
+
+	*polylist = points3[x * 3 + pointsoff];
 }
 
 #if 0
@@ -479,6 +425,30 @@ void (*demomode[])() = {
 
 int ceasypolylist(int *polylist, int *polys, int *points3)
 {
+	int *pointsoff = points3 + 1;
+	int *cntoff;
+	int i;
+
+	while (*polys != 0) {	// @@2
+			
+		*polylist++ = *polys++;
+		cntoff = polylist;
+
+		for (i = 0; i < *polys; i++) {	// @@3
+			adddot(polylist++, points3, *polys++);
+		}
+
+		if (*cntoff == polylist[-2]) {
+			polylist -= 2;
+		}
+
+		*(cntoff - 2) = (polylist - cntoff) / 4;
+		checkhiddenbx(*(cntoff - 2));
+
+		demomode[0]();  // sets colors etc / hidden faces flipped
+	}
+	
+
 	return 0;
 }
 
@@ -487,14 +457,15 @@ PUBLIC _ceasypolylist
 _ceasypolylist PROC FAR ;polylist,polys,points3
 	CBEG
 	mov	di,[bp+6]
-	mov	es,word ptr [bp+8]
+	mov	es,word ptr [bp+8]	; es:di = polylist
 	mov	si,[bp+10]
-	mov	ds,word ptr [bp+12]
+	mov	ds,word ptr [bp+12]	; ds:si = polys
 	mov	ax,[bp+14]
 	add	ax,4
 	mov	cs:pointsoff,ax
-	mov	gs,word ptr [bp+16]
+	mov	gs,word ptr [bp+16]	; gs:ax = points3
 	mov	bp,-1
+
 @@2:	lodsw
 	cmp	ax,0
 	je	@@1
@@ -502,17 +473,20 @@ _ceasypolylist PROC FAR ;polylist,polys,points3
 	mov	cx,ax
 	movsw
 	mov	cs:cntoff,di
+
 @@3:	push	cx
 	mov	ax,ds:[si]
 	add	si,2
 	call	adddot
 	pop	cx
 	loop	@@3
+
 @@6:	mov	bx,cs:cntoff
 	mov	eax,es:[bx]
 	cmp	eax,es:[di-4]
 	jne	@@4
 	sub	di,4
+
 @@4:	mov	ax,di
 	sub	ax,cs:cntoff
 	shr	ax,2
@@ -520,6 +494,7 @@ _ceasypolylist PROC FAR ;polylist,polys,points3
 	call	checkhiddenbx
 	call	cs:_demomode ;sets colors etc / hidden faces flipped
 	jmp	@@2
+
 @@1:	mov	word ptr es:[di],0
 	CEND
 _ceasypolylist ENDP

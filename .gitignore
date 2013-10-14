@@ -1,0 +1,8 @@
+.gitignore
+depend
+*.o
+*.a
+*.swp
+dots/dots
+tunneli/tun10
+glenz/glenz

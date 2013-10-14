@@ -1,5 +1,5 @@
 
-GLENZ_OBJS	= vec.o main.o zoomer.o math.o
+GLENZ_OBJS	= vec.o main.o zoomer.o math.o mathsin.o fc.o
 
 GLENZ_PATH	= glenz
 

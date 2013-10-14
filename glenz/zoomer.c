@@ -67,7 +67,7 @@ void	zoomer2()
 		}
 		frame++;
 		dis_waitb();
-		setpalarea(pal2,0,128);
+		//setpalarea(pal2,0,128);
 	}
 
 	//v=vram+(194)*80;

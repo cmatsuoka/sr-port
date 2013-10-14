@@ -1,7 +1,7 @@
 #if 0
 include mathsin.inc
 #endif
-	
+
 /* rotate sins/coss */
 int rxsin = 0;
 int rxcos = 0;
