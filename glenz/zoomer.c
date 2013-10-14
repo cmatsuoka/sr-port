@@ -47,7 +47,7 @@ void	zoomer2()
 		//v=vram+zly*80;
 		for(y=zly;y<=zy;y++)
 		{
-			memset(v,255,80);
+			//memset(v,255,80);
 			v+=80;
 		}
 		zly2=zy2;
@@ -55,7 +55,7 @@ void	zoomer2()
 		//v=vram+(399-zy2)*80;
 		for(y=zly2;y<=zy2;y++)
 		{
-			memset(v,255,80);
+			//memset(v,255,80);
 			v+=80;
 		}
 		c=frame;
@@ -80,7 +80,7 @@ void	zoomer2()
 	//v=vram+(0)*80;
 	for(y=0;y<=399;y++)
 	{
-		if(y<=274 || y>=260) memset(v,0,80);
+		//if(y<=274 || y>=260) memset(v,0,80);
 		v+=80;
 	}
 }

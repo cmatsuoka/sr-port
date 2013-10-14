@@ -56,6 +56,7 @@ static void calcmatrix(int *matrix)
 	int rotx = matrix[0];
 	int roty = matrix[1];
 	int rotz = matrix[2];
+	int temp;
 
 	/* ROT-X */
 	rotx = checkdeg(rotx);
@@ -82,15 +83,37 @@ static void calcmatrix(int *matrix)
 	 *    Ysin*Zcos			   Xsin*Ycos*Zcos\
 	 */
 
-	matrix[0] = rycos * rzcos;
-	matrix[1] = rxsin * rysin * rzcos + rycos * rzsin;
-	matrix[2] = -rxcos * rysin;
-	matrix[3] = -rxcos * rzsin;
-	matrix[4]	= rxcos *rzcos;
+	/* 0 & 7 */
+	matrix[7] = ((rysin * rzsin) * 2) / 256;
+	temp = ((rycos * rzcos) * 2) / 256;
+	matrix[0] = temp;
+	matrix[7] -= ((temp * rxsin) * 2) / 256;
+	temp = ((rxsin * rysin) * 2) / 256;
+	matrix[0] -= ((rzsin * temp) * 2) / 256;
+
+	/* 1 */
+	matrix[1] = ((rzcos * temp) * 2) / 256;
+	temp = ((rycos * rzsin) * 2) / 256;
+	matrix[1] += temp;
+
+	/* 6 */
+	matrix[6] = ((rxsin * temp) * 2) / 256;
+	matrix[6] += ((rysin * rzcos) * 2) / 256;
+
+	/* 3 */
+	matrix[3] = -((rxcos * rzsin) * 2) / 256;
+
+	/* 4 */
+	matrix[4] = ((rxcos * rzcos) * 2) / 256;
+
+	/* 2 */
+	matrix[2] = -((rxcos * rysin) * 2) / 256;
+
+	/* 8 */
+	matrix[8] = ((rxcos * rycos) * 2) / 256;
+
+	/* 5 */
 	matrix[5] = rxsin;
-	matrix[6] = rxsin * rycos * rzsin + rysin * rzcos;
-	matrix[7] = rysin * rzsin - rxsin * rycos * rzcos;
-	matrix[8] = rxcos * rycos;
 }
 
 void calcmatrixsep()

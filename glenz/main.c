@@ -343,23 +343,23 @@ int main()
         for(ry=y1-4;ry<y1;ry++,pd+=320)
         {
             if(ry>199) continue;
-            memset(pd,0,320);
+            //memset(pd,0,320);
         }
         for(c=0,ry=y1;ry<y2;ry++,pd+=320,c+=b)
         {
             if(ry>199) continue;
-            memcpy(pd,fcrow[c/256],320);
+            //memcpy(pd,fcrow[c/256],320);
         }
         for(c=0;c<16;c++,pd+=320,ry++)
         {
             if(ry>199) continue;
-            if(c>7) memset(pd,0,320);
-            else memcpy(pd,fcrow2[c],320);
+            //if(c>7) memset(pd,0,320);
+            //else memcpy(pd,fcrow2[c],320);
         }
         waitb();
     }
     
-    while(!dis_exit() && dis_getmframe()<300);
+    //while(!dis_exit() && dis_getmframe()<300);
     dis_waitb();
 
     //initnewgroup();
@@ -408,7 +408,7 @@ int main()
     dis_waitb();
     //memcpy(bgpic,vram,64000);
     
-    while(!dis_exit() && dis_getmframe()<333);
+    //while(!dis_exit() && dis_getmframe()<333);
 
     memcpy(pal,backpal,16*3);
     dis_partstart();
@@ -610,9 +610,14 @@ int main()
         if(xscale>4)
         {
             demomode[0]=demomode[1];
+printf("xscale=%d yscale=%d zscale=%d\n", xscale, yscale, zscale);
+printf("rx=%d ry=%d rz=%d\n", rx, ry, rz);
             cmatrix_yxz(rx,ry,rz,matrix);
+printf("[[%f %f %f]\n [%f %f %f]\n [%f %f %f]]\n", 1.0*matrix[0]/8388096, 1.0*matrix[1]/8388096, 1.0*matrix[2]/8388096, 1.0*matrix[3]/8388096, 1.0*matrix[4]/8388096, 1.0*matrix[5]/8388096, 1.0*matrix[6]/8388096, 1.0*matrix[7]/8388096, 1.0*matrix[8]/8388096);
             csetmatrix(matrix,0,0,0);
+printf("orig => %f %f %f\n", 1.0*points[1], 1.0*points[2], 1.0*points[3]);
             points2b[0]=0; crotlist(points2b,points);
+printf("rot1 => %f %f %f\n", 1.0*points2b[1]/8388096, 1.0*points2b[2]/8388096, 1.0*points2b[3]/8388096);
             matrix[0]=xscale*64;
             matrix[1]=0;
             matrix[2]=0;
@@ -624,10 +629,13 @@ int main()
             matrix[8]=zscale*64;
             csetmatrix(matrix,0+oxp,ypos+1500+oyp,zpos+ozp);
             points2[0]=0; crotlist(points2,points2b);
+printf("rot  => %5d %5d %5d\n", points2[1], points2[2], points2[3]);
             if(frame<800) ccliplist(points2);
+printf("clip => %5d %5d %5d\n", points2[1], points2[2], points2[3]);
             points3[0]=0; cprojlist((int *)points3,points2);
-            ceasypolylist(polylist,epolys,points3);
-            cglenzpolylist(polylist);
+printf("proj => %5d %5d\t\t%x\n\n", points3[1], points3[2], points3[3]);
+            //ceasypolylist(polylist,epolys,points3);
+            //cglenzpolylist(polylist);
         }
 
         if(frame>800 && bscale>4)
