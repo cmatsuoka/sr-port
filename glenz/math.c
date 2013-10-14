@@ -1,15 +1,29 @@
 #if 0
 include mathsin.inc
-	
-;rotate sins/coss
-rxsin	dw	0
-rxcos	dw	0
-rysin	dw	0
-rycos	dw	0
-rzsin	dw	0
-rzcos	dw	0
 #endif
+	
+/* rotate sins/coss */
+int rxsin = 0;
+int rxcos = 0;
+int rysin = 0;
+int rycos = 0;
+int rzsin = 0;
+int rzcos = 0;
 
+extern int sintable16[];
+extern int costable16[];
+
+static void calcmatrix(int *matrix);
+
+int checkdeg(int angle)
+{
+	while (angle >= 3600)
+		angle -= 3600;
+	while (angle < 0)
+		angle += 3600;
+
+	return angle;
+}
 
 #if 0
 checkdeg MACRO reg
@@ -27,149 +41,57 @@ l1:	ENDM
 #endif
 
 
-void cmatrix_yxz()
+void cmatrix_yxz(int rotx, int roty, int rotz, int *matrix)
 {
+	matrix[1] = rotx; 
+	matrix[0] = roty;
+	matrix[2] = rotz;
+
+	calcmatrix(matrix);
 }
 
 
-#if 0
-public _cmatrix_yxz
-_cmatrix_yxz PROC FAR
-	CBEG
-	movpar	ds,4
-	movpar	si,3
-	mov	di,si
-	movpar	ax,0 ;rotx
-	mov	ds:[si+2],ax
-	movpar	ax,1 ;roty
-	mov	ds:[si+0],ax
-	movpar	ax,2 ;rotz
-	mov	ds:[si+4],ax
-	call	calcmatrix
-	CEND
-_cmatrix_yxz ENDP
-#endif
-
-void calcmatrix()
+static void calcmatrix(int *matrix)
 {
+	int rotx = matrix[0];
+	int roty = matrix[1];
+	int rotz = matrix[2];
+
+	/* ROT-X */
+	rotx = checkdeg(rotx);
+	rxsin = sintable16[rotx];
+	rxcos = costable16[rotx];
+
+	/* ROT-Y */
+	roty = checkdeg(roty);
+	rysin = sintable16[roty];
+	rycos = costable16[roty];
+
+	/* ROT-Z */
+	rotz = checkdeg(rotz);
+	rzsin = sintable16[rotz];
+	rzcos = costable16[rotz];
+
+	/*
+	 * matrix equations: rY*rX*rZ
+	 *  0=Ycos*Zcos-		 2=Xsin*Ysin*Zcos+	 4=-Xcos*Ysin
+	 *    Xsin*Ysin*Zsin		   Ycos*Zsin
+	 *  6=-Xcos*Zsin		 8=Xcos*Zcos		10=Xsin
+	 *  
+	 * 12=Xsin*Ycos*Zsin+		14=Ysin*Zsin-		16=Xcos*Ycos
+	 *    Ysin*Zcos			   Xsin*Ycos*Zcos\
+	 */
+
+	matrix[0] = rycos * rzcos;
+	matrix[1] = rxsin * rysin * rzcos + rycos * rzsin;
+	matrix[2] = -rxcos * rysin;
+	matrix[3] = -rxcos * rzsin;
+	matrix[4]	= rxcos *rzcos;
+	matrix[5] = rxsin;
+	matrix[6] = rxsin * rycos * rzsin + rysin * rzcos;
+	matrix[7] = rysin * rzsin - rxsin * rycos * rzcos;
+	matrix[8] = rxcos * rycos;
 }
-
-#if 0
-calcmatrix PROC NEAR ;rY*rX*rZ
-	;ds:[si+0]=rotx
-	;ds:[si+2]=roty
-	;ds:[si+4]=rotz
-	;dest: ds:[di]
-	;load values, check 'em and calc sin/cos
-	;ROT-X
-	mov	bx,ds:[si]
-	checkdeg bx
-	mov	ds:[si],bx
-	shl	bx,1
-	mov	ax,cs:sintable16[bx]
-	mov	cs:rxsin,ax
-	mov	ax,cs:costable16[bx]
-	mov	cs:rxcos,ax
-	;ROT-Y
-	mov	bx,ds:[si+2]
-	checkdeg bx
-	mov	ds:[si+2],bx
-	shl	bx,1
-	mov	ax,cs:sintable16[bx]
-	mov	cs:rysin,ax
-	mov	ax,cs:costable16[bx]
-	mov	cs:rycos,ax
-	;ROT-Z
-	mov	bx,ds:[si+4]
-	checkdeg bx
-	mov	ds:[si+4],bx
-	shl	bx,1
-	mov	ax,cs:sintable16[bx]
-	mov	cs:rzsin,ax
-	mov	ax,cs:costable16[bx]
-	mov	cs:rzcos,ax
-	
-	;matrix equations: rY*rX*rZ
-	; 0=Ycos*Zcos-		 2=Xsin*Ysin*Zcos+	 4=-Xcos*Ysin
-	;   Xsin*Ysin*Zsin	   Ycos*Zsin
-	; 6=-Xcos*Zsin		 8=Xcos*Zcos		10=Xsin
-	; 
-	;12=Xsin*Ycos*Zsin+	14=Ysin*Zsin-		16=Xcos*Ycos
-	;   Ysin*Zcos		   Xsin*Ycos*Zcos\
-
-	mov	ax,cs:rysin
-	imul	cs:rzsin
-	shld	dx,ax,1
-	mov	ds:[di+14],dx ;14a
-	
-	mov	ax,cs:rycos
-	imul	cs:rzcos
-	shld	dx,ax,1
-	mov	ds:[di+0],dx ;0a
-	
-	mov	ax,dx
-	imul	cs:rxsin
-	shld	dx,ax,1
-	sub	ds:[di+14],dx ;14b
-	
-	mov	ax,cs:rxsin
-	imul	cs:rysin
-	shld	dx,ax,1
-	mov	cx,dx
-	
-	mov	ax,cs:rzsin
-	imul	dx
-	shld	dx,ax,1
-	sub	ds:[di+0],dx ;0b
-
-	mov	ax,cs:rzcos
-	imul	cx
-	shld	dx,ax,1
-	mov	ds:[di+2],dx ;2a
-	
-	mov	ax,cs:rycos
-	imul	cs:rzsin
-	shld	dx,ax,1
-	add	ds:[di+2],dx ;2b
-	
-	mov	ax,cs:rxsin
-	imul	dx
-	shld	dx,ax,1
-	mov	ds:[di+12],dx ;12a
-	
-	mov	ax,cs:rysin
-	imul	cs:rzcos
-	shld	dx,ax,1
-	add	ds:[di+12],dx ;12b
-	
-	mov	ax,cs:rxcos
-	imul	cs:rzsin
-	shld	dx,ax,1
-	neg	dx
-	mov	ds:[di+6],dx ;6
-
-	mov	ax,cs:rxcos
-	imul	cs:rzcos
-	shld	dx,ax,1
-	mov	ds:[di+8],dx ;8
-
-	mov	ax,cs:rxcos
-	imul	cs:rysin
-	shld	dx,ax,1
-	neg	dx
-	mov	ds:[di+4],dx ;4
-
-	mov	ax,cs:rxcos
-	imul	cs:rycos
-	shld	dx,ax,1
-	mov	ds:[di+16],dx ;16
-	
-	mov	ax,cs:rxsin
-	mov	ds:[di+10],ax ;10
-
-	ret
-calcmatrix ENDP
-#endif
 
 void calcmatrixsep()
 {

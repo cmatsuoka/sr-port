@@ -1,50 +1,52 @@
+#include <string.h>
 #include "glenz.h"
 #include "vec.h"
 
 int lightshift = 0;
+float xadd = 0.0f;
+float yadd = 0.0f;
+float zadd = 0.0f;
+int mtrm[9];
 
-int csetmatrix(int *m, int a, int b, int c)
+int csetmatrix(int *matrix, int x, int y, int z)
 {
+	memcpy(mtrm, matrix, 9 * sizeof(int));
+	xadd = x;
+	yadd = y;
+	zadd = z;
+
 	return 0;
 }
 
-#if 0
-PUBLIC _csetmatrix
-_csetmatrix PROC FAR
-	CBEG
-	LOADDS
-	mov	eax,[bp+10]
-	mov	ds:xadd,eax		
-	mov	eax,[bp+14]
-	mov	ds:yadd,eax		
-	mov	eax,[bp+18]
-	mov	ds:zadd,eax		
-	mov	si,[bp+6]
-	mov	ds,word ptr [bp+8]
-	call	setmatrix
-	CEND
-_csetmatrix ENDP
-#endif
-
-int crotlist(int *a, int *b)
+int crotlist(int *dest, int *src)
 {
+	int count = src[0];
+
+	dest[0] = count;
+	src++;
+	dest++;
+	
+	while (count--) {
+		dest[0] = mtrm[0] * src[0] +
+			  mtrm[1] * src[1] +
+			  mtrm[2] * src[2] + xadd;
+
+		dest[1] = mtrm[3] * src[0] +
+			  mtrm[4] * src[1] +
+			  mtrm[5] * src[2] + yadd;
+
+		dest[2] = mtrm[6] * src[0] +
+			  mtrm[7] * src[1] +
+			  mtrm[8] * src[2] + zadd;
+
+		src += 3;
+		dest += 3;
+	}
+
 	return 0;
 }
 
-#if 0
-PUBLIC _crotlist
-_crotlist PROC FAR
-	CBEG
-	mov	si,[bp+10]
-	mov	ds,word ptr [bp+12]
-	mov	di,[bp+6]
-	mov	es,word ptr [bp+8]
-	call	rotlist
-	CEND
-_crotlist ENDP
-#endif
-
-int cprojlist(int *a, int *b)
+int cprojlist(int *dest, int *src)
 {
 	return 0;
 }
@@ -61,149 +63,6 @@ _cprojlist PROC FAR
 	CEND
 _cprojlist ENDP
 #endif
-
-int ccliplist(int *a)
-{
-	return 0;
-}
-
-#if 0
-PUBLIC _ccliplist
-_ccliplist PROC FAR
-	CBEG
-	mov	si,[bp+6]
-	mov	ds,word ptr [bp+8]
-	call	cliplist
-	CEND
-_ccliplist ENDP
-#endif
-
-void setmatrix()
-{
-}
-
-#if 0
-PUBLIC setmatrix
-setmatrix PROC FAR
-	;ds:si=matrix
-	movsx	eax,word ptr ds:[si+0]
-	mov	dword ptr cs:[2+mtrm00],eax
-	movsx	eax,word ptr ds:[si+2]
-	mov	dword ptr cs:[2+mtrm02],eax
-	movsx	eax,word ptr ds:[si+4]
-	mov	dword ptr cs:[2+mtrm04],eax
-	movsx	eax,word ptr ds:[si+6]
-	mov	dword ptr cs:[2+mtrm06],eax
-	movsx	eax,word ptr ds:[si+8]
-	mov	dword ptr cs:[2+mtrm08],eax
-	movsx	eax,word ptr ds:[si+10]
-	mov	dword ptr cs:[2+mtrm10],eax
-	movsx	eax,word ptr ds:[si+12]
-	mov	dword ptr cs:[2+mtrm12],eax
-	movsx	eax,word ptr ds:[si+14]
-	mov	dword ptr cs:[2+mtrm14],eax
-	movsx	eax,word ptr ds:[si+16]
-	mov	dword ptr cs:[2+mtrm16],eax
-	ret
-setmatrix ENDP
-#endif
-
-int count = 0;
-
-void rotlist()
-{
-}
-
-#if 0
-rotlist PROC FAR
-	;pointlist@DS:SI=>pointlist@ES:DI
-	push	di
-	LOADGS
-	mov	cx,ds:[si]
-	add	si,4
-	mov	cs:count,cx
-	mov	ax,es:[di]
-	add	es:[di],cx
-	mov	bx,ax
-	shl	ax,1
-	add	ax,bx
-	shl	ax,2
-	add	di,ax
-	add	di,4
-
-nrup1:	;rotate with matrix
-	push	si
-	push	di
-	mov	ebp,ds:[si+8]
-	mov	edi,ds:[si+4]
-	mov	esi,ds:[si+0]
-mtrm00:	mov	eax,12345678h
-	imul	esi
-	mov	ebx,eax
-	mov	ecx,edx
-mtrm02:	mov	eax,12345678h
-	imul	edi
-	add	ebx,eax
-	adc	ecx,edx
-mtrm04:	mov	eax,12345678h
-	imul	ebp
-	add	ebx,eax
-	adc	ecx,edx
-	shld	ecx,ebx,17
-	push	ecx
-mtrm06:	mov	eax,12345678h
-	imul	esi
-	mov	ebx,eax
-	mov	ecx,edx
-mtrm08:	mov	eax,12345678h
-	imul	edi
-	add	ebx,eax
-	adc	ecx,edx
-mtrm10:	mov	eax,12345678h
-	imul	ebp
-	add	ebx,eax
-	adc	ecx,edx
-	shld	ecx,ebx,17
-	push	ecx
-mtrm12:	mov	eax,12345678h
-	imul	esi
-	mov	ebx,eax
-	mov	ecx,edx
-mtrm14:	mov	eax,12345678h
-	imul	edi
-	add	ebx,eax
-	adc	ecx,edx
-mtrm16:	mov	eax,12345678h
-	imul	ebp
-	add	ebx,eax
-	adc	ecx,edx
-	shld	ecx,ebx,17
-	pop	edx
-	pop	eax
-	pop	di
-	pop	si
-	;
-	add	eax,gs:xadd
-	mov	es:[di+0],eax
-	add	ecx,gs:yadd
-	mov	es:[di+4],ecx
-	add	edx,gs:zadd
-	mov	es:[di+8],edx
-	;next point
-	add	si,12
-	add	di,12
-	dec	cs:count
-	jnz	nrup1
-	pop	di
-	ret
-rotlist ENDP
-#endif
-
-
-void projlist()
-{
-}
-
 #if 0
 projlist PROC FAR
 	;pointlist@DS:SI=>projectedpointlist@ES:DI
@@ -269,6 +128,27 @@ projlist PROC FAR
 	ret
 projlist ENDP
 #endif
+
+int ccliplist(int *a)
+{
+	return 0;
+}
+
+#if 0
+PUBLIC _ccliplist
+_ccliplist PROC FAR
+	CBEG
+	mov	si,[bp+6]
+	mov	ds,word ptr [bp+8]
+	call	cliplist
+	CEND
+_ccliplist ENDP
+#endif
+
+int count = 0;
+
+
+
 
 void cliplist()
 {
