@@ -24,7 +24,6 @@ int framerate10 = 700;
 
 int csetmatrix(int *matrix, int x, int y, int z)
 {
-printf("csetmatrix translate %d %d %d\n", x, y, z);
 	memcpy(mtrm, matrix, 9 * sizeof(int));
 	xadd = x;
 	yadd = y;
@@ -38,19 +37,18 @@ int crotlist(int *dest, int *src)
 	int count = *src++;
 	int size = *dest;
 
-printf("crotlist count=%d\n", count);
 	*dest += count;
 	dest += size * 3 + 1;
 	
 	while (count--) {
-		dest[0] = (mtrm[0] * src[0] + mtrm[1] * src[1] +
-			   mtrm[2] * src[2]) * 2 + xadd;
+		dest[0] = ((mtrm[0] * src[0] + mtrm[1] * src[1] +
+			    mtrm[2] * src[2]) >> 15) + xadd;
 
-		dest[1] = (mtrm[3] * src[0] + mtrm[4] * src[1] +
-			   mtrm[5] * src[2]) * 2 + yadd;
+		dest[1] = ((mtrm[3] * src[0] + mtrm[4] * src[1] +
+			    mtrm[5] * src[2]) >> 15) + yadd;
 
-		dest[2] = (mtrm[6] * src[0] + mtrm[7] * src[1] +
-			   mtrm[8] * src[2]) * 2 + zadd;
+		dest[2] = ((mtrm[6] * src[0] + mtrm[7] * src[1] +
+			    mtrm[8] * src[2]) >> 15) + zadd;
 
 		src += 3;
 		dest += 3;

@@ -275,6 +275,15 @@ void /*_loadds*/ copper(void)
 }
 //#pragma check_stack(on)
     
+float color[256][3];
+
+void setrgb(int c, int r, int g, int b)
+{
+    color[c][0] = (float)r / 64;
+    color[c][1] = (float)g / 64;
+    color[c][2] = (float)b / 64;
+}
+
 int main()
 {
     int a,b,c,/*x,*/y,rx,ry,rz,/*n=8,p1,p2,*/r,g,zpos=7500,y1,y2,/*rya,*/ypos,yposa;
@@ -289,6 +298,7 @@ int main()
     //int lasta=-1;
     char    *ps,*pd,*pp;
     //unsigned int u;
+    int i;
 
     dis_partstart();
 
@@ -296,6 +306,15 @@ int main()
     dis_setmframe(0);
 
     zoomer2();
+
+    if (init_graphics("Tunneli", window_width, window_height) < 0) {
+        fprintf(stderr, "Can't init graphics\n");
+        return -1;
+    };
+
+    init_opengl(window_width, window_height);
+
+    projection();
 
 #if 0
     _asm mov dx,3c4h
@@ -421,6 +440,9 @@ int main()
 #endif
     while(frame<7000 && !dis_exit())
     {
+	poll_event();
+	clear_screen();
+
         a=dis_musplus(); if(a<0 && a>-16) break;
         
 	repeat=dis_waitb();
@@ -610,14 +632,9 @@ int main()
         if(xscale>4)
         {
             demomode[0]=demomode[1];
-printf("xscale=%d yscale=%d zscale=%d\n", xscale, yscale, zscale);
-printf("rx=%d ry=%d rz=%d\n", rx, ry, rz);
             cmatrix_yxz(rx,ry,rz,matrix);
-printf("[[%f %f %f]\n [%f %f %f]\n [%f %f %f]]\n", 1.0*matrix[0]/8388096, 1.0*matrix[1]/8388096, 1.0*matrix[2]/8388096, 1.0*matrix[3]/8388096, 1.0*matrix[4]/8388096, 1.0*matrix[5]/8388096, 1.0*matrix[6]/8388096, 1.0*matrix[7]/8388096, 1.0*matrix[8]/8388096);
             csetmatrix(matrix,0,0,0);
-printf("orig => %f %f %f\n", 1.0*points[1], 1.0*points[2], 1.0*points[3]);
             points2b[0]=0; crotlist(points2b,points);
-printf("rot1 => %f %f %f\n", 1.0*points2b[1]/8388096, 1.0*points2b[2]/8388096, 1.0*points2b[3]/8388096);
             matrix[0]=xscale*64;
             matrix[1]=0;
             matrix[2]=0;
@@ -629,13 +646,15 @@ printf("rot1 => %f %f %f\n", 1.0*points2b[1]/8388096, 1.0*points2b[2]/8388096, 1
             matrix[8]=zscale*64;
             csetmatrix(matrix,0+oxp,ypos+1500+oyp,zpos+ozp);
             points2[0]=0; crotlist(points2,points2b);
-printf("rot  => %5d %5d %5d\n", points2[1], points2[2], points2[3]);
             if(frame<800) ccliplist(points2);
-printf("clip => %5d %5d %5d\n", points2[1], points2[2], points2[3]);
             points3[0]=0; cprojlist((int *)points3,points2);
-printf("proj => %5d %5d\t\t%x\n\n", points3[1], points3[2], points3[3]);
             //ceasypolylist(polylist,epolys,points3);
             //cglenzpolylist(polylist);
+setrgb(1, 40, 50, 40);
+//printf("%d %d\n", points3[1], points3[2]);
+for(i = 0; i < 14; i++) {
+draw_pixel(points3[i * 4 + 1], points3[i * 4 + 2], 1);
+}
         }
 
         if(frame>800 && bscale>4)
@@ -661,6 +680,8 @@ printf("proj => %5d %5d\t\t%x\n\n", points3[1], points3[2], points3[3]);
         }
         
         cglenzdone();
+
+	swap_buffers();
     }
     dis_setcopper(0,NULL);
 #if 0

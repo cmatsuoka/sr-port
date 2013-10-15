@@ -84,33 +84,33 @@ static void calcmatrix(int *matrix)
 	 */
 
 	/* 0 & 7 */
-	matrix[7] = ((rysin * rzsin) * 2) / 256;
-	temp = ((rycos * rzcos) * 2) / 256;
+	matrix[7] = (rysin * rzsin) >> 15;
+	temp = (rycos * rzcos) >> 15;
 	matrix[0] = temp;
-	matrix[7] -= ((temp * rxsin) * 2) / 256;
-	temp = ((rxsin * rysin) * 2) / 256;
-	matrix[0] -= ((rzsin * temp) * 2) / 256;
+	matrix[7] -= (temp * rxsin) >> 15;
+	temp = (rxsin * rysin) >> 15;
+	matrix[0] -= (rzsin * temp) >> 15;
 
 	/* 1 */
-	matrix[1] = ((rzcos * temp) * 2) / 256;
-	temp = ((rycos * rzsin) * 2) / 256;
+	matrix[1] = (rzcos * temp) >> 15;
+	temp = (rycos * rzsin) >> 15;
 	matrix[1] += temp;
 
 	/* 6 */
-	matrix[6] = ((rxsin * temp) * 2) / 256;
-	matrix[6] += ((rysin * rzcos) * 2) / 256;
+	matrix[6] = (rxsin * temp) >> 15;
+	matrix[6] += (rysin * rzcos) >> 15;
 
 	/* 3 */
-	matrix[3] = -((rxcos * rzsin) * 2) / 256;
+	matrix[3] = -(rxcos * rzsin) >> 15;
 
 	/* 4 */
-	matrix[4] = ((rxcos * rzcos) * 2) / 256;
+	matrix[4] = (rxcos * rzcos) >> 15;
 
 	/* 2 */
-	matrix[2] = -((rxcos * rysin) * 2) / 256;
+	matrix[2] = -(rxcos * rysin) >> 15;
 
 	/* 8 */
-	matrix[8] = ((rxcos * rycos) * 2) / 256;
+	matrix[8] = (rxcos * rycos) >> 15;
 
 	/* 5 */
 	matrix[5] = rxsin;
