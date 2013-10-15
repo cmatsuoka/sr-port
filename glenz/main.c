@@ -663,8 +663,8 @@ int main()
             csetmatrix(matrix,0+oxb,ypos+1500+oyb,zpos+ozb);
             points2[0]=0; crotlist(points2,points2b);
             points3[0]=0; cprojlist((int *)points3,points2);
-            ceasypolylist(polylist,epolysb,points3);
-            cglenzpolylist(polylist);
+            //ceasypolylist(polylist,epolysb,points3);
+            //cglenzpolylist(polylist);
 
             draw_poly(epolysb, points3);
         }
