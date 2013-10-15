@@ -164,7 +164,6 @@ int edges[64]={12,0,
 2,6,0,0,
 3,7,0,0};
 int edges2[64];
-#endif
 int polys[64]={
 4,0x4010,0,1,2,3,
 4,0x4008,0,8,4,9,
@@ -173,6 +172,7 @@ int polys[64]={
 4,0x4040,3,11,7,12,
 4,0x4080,4,5,6,7,
 0};
+#endif
 
 int epolys[]={
 3,0x4002,0,1,8,
@@ -245,10 +245,12 @@ int matrix[9];
 extern  char    backpal[16*3];
 char    pal[768];
 
+#if 0
 int testlist[]={
 3,16, 190,100, 90,50, 110,150,
 3,20, 10,100, 90,50, 99,150,
 0};
+#endif
 
 void    waitb(void)
 {
@@ -266,24 +268,13 @@ int frame=0;
 //#pragma check_stack(off)
 void /*_loadds*/ copper(void)
 {
-	//int	a;
+	int	a;
 	repeat++;
-#if 0
-        outp(0x3c8,0);
-        for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
-#endif
+        //outp(0x3c8,0);
+        //for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
 }
 //#pragma check_stack(on)
     
-float color[256][3];
-
-void setrgb(int c, int r, int g, int b)
-{
-    color[c][0] = (float)r / 64;
-    color[c][1] = (float)g / 64;
-    color[c][2] = (float)b / 64;
-}
-
 int main()
 {
     int a,b,c,/*x,*/y,rx,ry,rz,/*n=8,p1,p2,*/r,g,zpos=7500,y1,y2,/*rya,*/ypos,yposa;
@@ -650,11 +641,8 @@ int main()
             points3[0]=0; cprojlist((int *)points3,points2);
             //ceasypolylist(polylist,epolys,points3);
             //cglenzpolylist(polylist);
-setrgb(1, 40, 50, 40);
-//printf("%d %d\n", points3[1], points3[2]);
-for(i = 0; i < 14; i++) {
-draw_pixel(points3[i * 4 + 1], points3[i * 4 + 2], 1);
-}
+
+            draw_poly(epolys, points3);
         }
 
         if(frame>800 && bscale>4)
@@ -677,6 +665,8 @@ draw_pixel(points3[i * 4 + 1], points3[i * 4 + 2], 1);
             points3[0]=0; cprojlist((int *)points3,points2);
             ceasypolylist(polylist,epolysb,points3);
             cglenzpolylist(polylist);
+
+            draw_poly(epolysb, points3);
         }
         
         cglenzdone();

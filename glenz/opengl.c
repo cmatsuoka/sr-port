@@ -10,11 +10,9 @@ static int view_width;
 static int view_height;
 static float radius;
 
-struct program pixel_program;
+struct program triangle_program;
 
 static GLuint uRadius_location;
-
-extern float color[256][3];
 
 #define SQRT3 1.7320508075688772F
 #define SQRT3_3 0.5773502691896257F
@@ -31,30 +29,81 @@ static const char vertex_shader[] =
 "uniform mat4 uMatrix;\n"
 "attribute vec4 aPosition;\n"
 "varying vec3 vPosition;\n"
-"varying vec4 vCenter;\n"
 "\n"
 "void main(){\n"
 "    mat4 Matrix = pMatrix * uMatrix;\n"
 "    vec4 position = Matrix * aPosition;\n"
 "    gl_Position = position;\n"
 "    vPosition = vec3(position);\n"
-"    vCenter = Matrix * vec4(0.0, 0.0, 0.0, 1.0);\n"
 "}\n";
 
-static const char pixel_shader[] =
+static const char triangle_shader[] =
 "precision mediump float;\n"
 "uniform vec4 uColor;\n"
 "uniform float uRadius;\n"
 "varying vec3 vPosition;\n"
-"varying vec4 vCenter;\n"
 "\n"
 "void main() {\n"
-"    float dist = distance(vPosition, vCenter.xyz);\n"
-"    if (dist < uRadius) {\n"
-"        gl_FragColor = vec4(uColor.xyz, 1.0);\n"
-"    } else { gl_FragColor = vec4(0.0); }\n"
+"    gl_FragColor = vec4(uColor.xyz, 0.5);\n"
 "}\n";
 
+
+
+static float color[256][3];
+
+void setrgb(int c, int r, int g, int b)
+{
+    color[c][0] = (float)r / 64;
+    color[c][1] = (float)g / 64;
+    color[c][2] = (float)b / 64;
+}
+
+static void draw_triangle(float *f, int c)
+{
+	float m[16];
+
+	set_color(color[c], &triangle_program);
+
+	matrix_identity(m);
+	//matrix_translate(m, x, 200 - y);
+
+	matrix_set(&triangle_program, m);
+
+	obj[0] = *f++;
+	obj[1] = *f++;
+
+	obj[3] = *f++;
+	obj[4] = *f++;
+
+	obj[6] = *f++;
+	obj[7] = *f++;
+
+	draw_triangle_strip(&triangle_program, obj, 3);
+}
+
+void draw_poly(int *polys, int *points3)
+{
+	int num, c, i, v;
+	float f[6];
+	int k = 0;
+	int kk = 30;
+
+	points3++;	/* numv */
+
+	while ((num = *polys++) != 0) {
+		c = *polys++;
+
+		for (i = 0; i < num; i++) {
+			v = *polys++;
+			f[i * 2    ] = points3[v * 4];
+	 		f[i * 2 + 1] = 200.0f - points3[v * 4 + 1];
+		}
+
+		setrgb(k, 20, 20, 20 + kk);
+		kk ^= 30;
+		draw_triangle(f, k++);
+	}
+}
 
 int init_opengl(int width, int height)
 {
@@ -64,10 +113,10 @@ int init_opengl(int width, int height)
 	view_height = 200;
 
 	v = compile_vertex_shader(vertex_shader);
-	f = compile_fragment_shader(pixel_shader);
-	create_program(&pixel_program, f, v);
+	f = compile_fragment_shader(triangle_shader);
+	create_program(&triangle_program, f, v);
 
-	uRadius_location = glGetUniformLocation(pixel_program.program, "uRadius");
+	uRadius_location = glGetUniformLocation(triangle_program.program, "uRadius");
 	radius = (2.0 / width * FF) / 1.5;
 
 	glDisable(GL_DEPTH_TEST);
@@ -76,7 +125,7 @@ int init_opengl(int width, int height)
 
 	glClearColor(.0, .0, .0, 0);
 
-	glUseProgram(pixel_program.program);
+	glUseProgram(triangle_program.program);
 
 	return 0;
 }
@@ -86,23 +135,8 @@ void clear_screen()
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void draw_pixel(float x, float y, int c)
-{
-	float m[16];
-
-	set_color(color[c], &pixel_program);
-
-	matrix_identity(m);
-	matrix_translate(m, x, 200 - y);
-
-	matrix_set(&pixel_program, m);
-	glUniform1fv(uRadius_location, 1, &radius);
-
-	draw_triangle_strip(&pixel_program, obj, 3);
-}
-
 void projection()
 {
-	glUseProgram(pixel_program.program);
-	applyOrtho(0, view_width, 0, view_height, &pixel_program);
+	glUseProgram(triangle_program.program);
+	applyOrtho(0, view_width, 0, view_height, &triangle_program);
 }
