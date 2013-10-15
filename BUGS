@@ -1,0 +1,13 @@
+Known bugs:
+
+Dots:
+
+- Ball size doesn't scale correctly with window size
+- Shadow disappears in 1024x768
+- Fade do white at end not implemented
+
+
+Tunneli:
+
+- One ring of dots missing
+

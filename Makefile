@@ -7,7 +7,7 @@ RANLIB	= ranlib
 AR	= ar
 POVRAY	= povray
 
-all: common-all dis-all dots-all water-all tunneli-all
+all: common-all dis-all dots-all water-all tunneli-all glenz-all
 
 include common/Makefile
 include dis/Makefile

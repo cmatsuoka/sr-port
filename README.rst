@@ -24,6 +24,17 @@ Notes
 Screenshots
 -----------
 
+Dots
+""""
 .. image:: https://raw.github.com/cmatsuoka/sr-dots/master/doc/dots-small.png
 
+
+Tunneli
+"""""""
 .. image:: https://raw.github.com/cmatsuoka/sr-dots/master/doc/tunnel-small.png
+
+
+Glenz
+"""""
+
+Work in progress.
