@@ -268,7 +268,7 @@ int frame=0;
 //#pragma check_stack(off)
 void /*_loadds*/ copper(void)
 {
-	int	a;
+	//int	a;
 	repeat++;
         //outp(0x3c8,0);
         //for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
@@ -289,7 +289,6 @@ int main()
     //int lasta=-1;
     char    *ps,*pd,*pp;
     //unsigned int u;
-    int i;
 
     dis_partstart();
 

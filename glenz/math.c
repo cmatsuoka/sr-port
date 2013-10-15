@@ -10,8 +10,8 @@ int rycos = 0;
 int rzsin = 0;
 int rzcos = 0;
 
-extern int sintable16[];
-extern int costable16[];
+extern int *sintable16;
+extern int *costable16;
 
 static void calcmatrix(int *matrix);
 
