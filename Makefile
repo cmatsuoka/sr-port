@@ -30,6 +30,11 @@ clean:
 
 depend:
 	@echo Generating dependencies...
-	@$(CC) -MM $(CFLAGS) $(OBJS:.o=.c) > $@
+	@rm -f $@
+	@for i in $(OBJS); do \
+	  j=`echo $$i | sed 's/\.o$$/.c/'`; \
+	  $(CC) -MM -MT $$i $(CFLAGS) $$j >> $@; \
+	done
+	
 
 include depend
