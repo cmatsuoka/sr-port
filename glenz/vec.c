@@ -149,8 +149,13 @@ adddot PROC NEAR
 adddot ENDP
 #endif
 
-void checkhiddenbx()
+void checkhiddenbx(int *src)
 {
+	(src[0] - src[2]) * (src[1] - src[4 + 1]);
+
+	(src[1] - src[2 + 1]) * (src[0] - src[4]);
+
+	
 }
 
 #if 0
@@ -299,8 +304,11 @@ demo_norm PROC NEAR
 demo_norm ENDP
 #endif
 
-void demo_glz2()
+void demo_glz2(int visible)
 {
+	if (visible) {
+		
+	}
 }
 
 #if 0
@@ -316,6 +324,8 @@ demo_glz2 ENDP
 
 void demo_glz()
 {
+	if (lightshift != 9) {
+	}
 }
 
 #if 0
@@ -340,6 +350,8 @@ demo_glz PROC NEAR
 @@7:	mov	cl,cs:_lightshift
 	cmp	cl,9
 	je	@@x9
+	if (lightshift != 9) {
+	}
 	shrd	ax,dx,8
 	push	ax	
 	shrd	ax,dx,1

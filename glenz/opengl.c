@@ -82,22 +82,26 @@ void draw_poly(int *polys, int *points3)
 	int num, c, i, v;
 	float f[6];
 	int k = 0;
-	int kk = 30;
+	int ah = 60;
 
 	points3++;	/* numv */
 
 	while ((num = *polys++) != 0) {
-		c = *polys++;
+		c = *polys++ & 0xff;
 
 		for (i = 0; i < num; i++) {
 			v = *polys++;
 			f[i * 2    ] = points3[v * 4];
 	 		f[i * 2 + 1] = 200.0f - points3[v * 4 + 1];
 		}
+	
+		if (c & 2) {
+			setrgb(c, 0.0f, ah / 2, ah); 
+		} else {
+			setrgb(c, ah / 2, ah / 2, ah / 2); 
+		}
 
-		setrgb(k, 20, 20, 20 + kk);
-		kk ^= 30;
-		draw_triangle(f, k++);
+		draw_triangle(f, c);
 	}
 }
 
