@@ -1,5 +1,5 @@
-#ifndef SR_KOE_H_
-#define SR_KOE_H_
+#ifndef U2_KOE_H_
+#define U2_KOE_H_
 
 void dointerference(void);
 void dointerference2(void);

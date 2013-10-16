@@ -1,5 +1,5 @@
-#ifndef SR_GRAPHICS_H_
-#define SR_GRAPHICS_H_
+#ifndef U2_GRAPHICS_H_
+#define U2_GRAPHICS_H_
 
 extern int window_width;
 extern int window_height;

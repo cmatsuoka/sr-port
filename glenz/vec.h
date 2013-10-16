@@ -1,5 +1,5 @@
-#ifndef SR_VEC_H_
-#define SR_VEC_H_
+#ifndef U2_VEC_H_
+#define U2_VEC_H_
 
 int csetmatrix(int *,int,int,int);
 int crotlist(int *,int *);

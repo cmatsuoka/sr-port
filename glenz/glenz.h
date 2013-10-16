@@ -1,5 +1,5 @@
-#ifndef SR_GLENZ_H_
-#define SR_GLENZ_H_
+#ifndef U2_GLENZ_H_
+#define U2_GLENZ_H_
 
 void cglenzdone(void);
 void zoomer2(void);
