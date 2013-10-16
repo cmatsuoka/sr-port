@@ -4,7 +4,7 @@
 #include <math.h>
 #include <GLES2/gl2.h>
 #include <GL/glu.h>
-#include "opengl.h"
+#include "u2gl.h"
 #include "dots.h"
 
 GLfloat color[4];
@@ -21,8 +21,8 @@ extern int gravitybottom;
 extern int bpmin;
 extern int bpmax;
 
-struct program dot_program;
-struct program floor_program;
+static struct u2gl_program dot_program;
+static struct u2gl_program floor_program;
 
 #define SQRT3 1.7320508075688772F
 #define SQRT3_3 0.5773502691896257F
@@ -95,12 +95,12 @@ int init_opengl(int width, int height)
 	view_width = 320;
 	view_height = 200;
 
-	v = compile_vertex_shader(vertex_shader);
-	f = compile_fragment_shader(dot_shader);
-	create_program(&dot_program, f, v);
+	v = u2gl_compile_vertex_shader(vertex_shader);
+	f = u2gl_compile_fragment_shader(dot_shader);
+	u2gl_create_program(&dot_program, f, v);
 
-	f = compile_fragment_shader(floor_shader);
-	create_program(&floor_program, f, v);
+	f = u2gl_compile_fragment_shader(floor_shader);
+	u2gl_create_program(&floor_program, f, v);
 
 	//radius = 1.0 / 640 * FF * 1.5;
 
@@ -115,22 +115,23 @@ int init_opengl(int width, int height)
 
 void clear_screen()
 {
-	float m[16];
+	Matrix m;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(floor_program.program);
 
 	matrix_identity(m);
-	matrix_set(&floor_program, m);
-	draw_triangle_strip(&floor_program, floor_obj, 4);
+
+	u2gl_set_matrix(&floor_program, m);
+	u2gl_draw_triangle_strip(&floor_program, floor_obj, 4);
 
 	glUseProgram(dot_program.program);
 }
 
 void draw_dot(struct dot *dot)
 {
-	float m[16];
+	Matrix m;
 	float bp = ((dot->z * rotcos - dot->x * rotsin) / 0x10000) + 9000;
 	float a = (dot->z * rotsin + dot->x * rotcos) / 0x100;
 
@@ -141,13 +142,13 @@ void draw_dot(struct dot *dot)
 
 			/* shadow */
 
-			set_color(shadow_color, &dot_program);
+			u2gl_set_color(shadow_color, &dot_program);
 
 			matrix_identity(m);
 			matrix_translate(m, x, 200 - shadow_y);
-			matrix_set(&dot_program, m);
 
-			draw_triangle_strip(&dot_program, shadow_obj, 3);
+			u2gl_set_matrix(&dot_program, m);
+			u2gl_draw_triangle_strip(&dot_program, shadow_obj, 3);
 
 			/* ball */
 
@@ -166,13 +167,13 @@ void draw_dot(struct dot *dot)
 				color[2] = color[1] * 1.1f;
 				color[0] = color[1] / 3;
 
-				set_color(color, &dot_program);
+				u2gl_set_color(color, &dot_program);
 
 				matrix_identity(m);
 				matrix_translate(m, x, 200 - y);
-				matrix_set(&dot_program, m);
 
-				draw_triangle_strip(&dot_program, obj, 3);
+				u2gl_set_matrix(&dot_program, m);
+				u2gl_draw_triangle_strip(&dot_program, obj, 3);
 			}
 		}
 	}
@@ -180,8 +181,6 @@ void draw_dot(struct dot *dot)
 
 void projection()
 {
-	glUseProgram(floor_program.program);
-	applyOrtho(0, view_width, 0, view_height, &floor_program);
-	glUseProgram(dot_program.program);
-	applyOrtho(0, view_width, 0, view_height, &dot_program);
+	u2gl_projection(0, view_width, 0, view_height, &floor_program);
+	u2gl_projection(0, view_width, 0, view_height, &dot_program);
 }

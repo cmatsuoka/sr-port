@@ -4,15 +4,12 @@
 #include <math.h>
 #include <GLES2/gl2.h>
 #include <GL/glu.h>
-#include "opengl.h"
+#include "u2gl.h"
 
 static int view_width;
 static int view_height;
-static float radius;
 
-struct program triangle_program;
-
-static GLuint uRadius_location;
+static struct u2gl_program triangle_program;
 
 #define SQRT3 1.7320508075688772F
 #define SQRT3_3 0.5773502691896257F
@@ -40,7 +37,6 @@ static const char vertex_shader[] =
 static const char triangle_shader[] =
 "precision mediump float;\n"
 "uniform vec4 uColor;\n"
-"uniform float uRadius;\n"
 "varying vec3 vPosition;\n"
 "\n"
 "void main() {\n"
@@ -60,14 +56,14 @@ void setrgb(int c, int r, int g, int b)
 
 static void draw_triangle(float *f, int c)
 {
-	float m[16];
+	Matrix m;
 
-	set_color(color[c], &triangle_program);
+	u2gl_set_color(color[c], &triangle_program);
 
 	matrix_identity(m);
 	//matrix_translate(m, x, 200 - y);
 
-	matrix_set(&triangle_program, m);
+	u2gl_set_matrix(&triangle_program, m);
 
 	obj[0] = *f++;
 	obj[1] = *f++;
@@ -78,7 +74,7 @@ static void draw_triangle(float *f, int c)
 	obj[6] = *f++;
 	obj[7] = *f++;
 
-	draw_triangle_strip(&triangle_program, obj, 3);
+	u2gl_draw_triangle_strip(&triangle_program, obj, 3);
 }
 
 void draw_poly(int *polys, int *points3)
@@ -112,12 +108,9 @@ int init_opengl(int width, int height)
 	view_width = 320;
 	view_height = 200;
 
-	v = compile_vertex_shader(vertex_shader);
-	f = compile_fragment_shader(triangle_shader);
-	create_program(&triangle_program, f, v);
-
-	uRadius_location = glGetUniformLocation(triangle_program.program, "uRadius");
-	radius = (2.0 / width * FF) / 1.5;
+	v = u2gl_compile_vertex_shader(vertex_shader);
+	f = u2gl_compile_fragment_shader(triangle_shader);
+	u2gl_create_program(&triangle_program, f, v);
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -137,6 +130,5 @@ void clear_screen()
 
 void projection()
 {
-	glUseProgram(triangle_program.program);
-	applyOrtho(0, view_width, 0, view_height, &triangle_program);
+	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
 }

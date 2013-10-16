@@ -3,7 +3,7 @@
 #include <X11/Xlib.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
-#include "opengl.h"
+#include "u2gl.h"
 
 static volatile uint32_t tick_timer = 0;
 static EGLDisplay display;

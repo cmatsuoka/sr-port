@@ -4,12 +4,12 @@
 #include <math.h>
 #include <GLES2/gl2.h>
 #include <GL/glu.h>
-#include "opengl.h"
+#include "u2gl.h"
 
 static int view_width;
 static int view_height;
 
-struct program pixel_program;
+static struct u2gl_program pixel_program;
 
 extern float color[256][3];
 
@@ -59,9 +59,9 @@ int init_opengl(int width, int height)
 	view_width = 320;
 	view_height = 200;
 
-	v = compile_vertex_shader(vertex_shader);
-	f = compile_fragment_shader(pixel_shader);
-	create_program(&pixel_program, f, v);
+	v = u2gl_compile_vertex_shader(vertex_shader);
+	f = u2gl_compile_fragment_shader(pixel_shader);
+	u2gl_create_program(&pixel_program, f, v);
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -81,19 +81,18 @@ void clear_screen()
 
 void draw_pixel(float x, float y, int c)
 {
-	float m[16];
+	Matrix m;
 
-	set_color(color[c], &pixel_program);
+	u2gl_set_color(color[c], &pixel_program);
 
 	matrix_identity(m);
 	matrix_translate(m, x, 200 - y);
-	matrix_set(&pixel_program, m);
 
-	draw_triangle_strip(&pixel_program, obj, 3);
+	u2gl_set_matrix(&pixel_program, m);
+	u2gl_draw_triangle_strip(&pixel_program, obj, 3);
 }
 
 void projection()
 {
-	glUseProgram(pixel_program.program);
-	applyOrtho(0, view_width, 0, view_height, &pixel_program);
+	u2gl_projection(0, view_width, 0, view_height, &pixel_program);
 }

@@ -2,7 +2,7 @@
 #include <math.h>
 #include <GLES2/gl2.h>
 #include <GL/glu.h>
-#include "opengl.h"
+#include "u2gl.h"
 
 Matrix identity = {
 	1.0f, 0.0f, 0.0f, 0.0f,
@@ -12,7 +12,7 @@ Matrix identity = {
 };
 
 
-void check_error(char *t)
+void u2gl_check_error(char *t)
 {
 	int e = glGetError();
 	if (e != GL_NO_ERROR) {
@@ -20,7 +20,7 @@ void check_error(char *t)
 	}
 }
 
-void draw_triangle_strip(struct program *p, float *obj, int num)
+void u2gl_draw_triangle_strip(struct u2gl_program *p, float *obj, int num)
 {
 	glEnableVertexAttribArray(p->aPosition_location);
 	glVertexAttribPointer(p->aPosition_location, 3, GL_FLOAT,
@@ -30,7 +30,7 @@ void draw_triangle_strip(struct program *p, float *obj, int num)
 	//check_error("DRAW");
 }
 
-void applyOrtho(float left, float right, float bottom, float top, struct program *p)
+void u2gl_projection(float left, float right, float bottom, float top, struct u2gl_program *p)
 {
 	float far = 1000.0f, near = -1000.0f;
 	float a = 2.0f / (right - left);
@@ -48,10 +48,11 @@ void applyOrtho(float left, float right, float bottom, float top, struct program
 		tx, ty, tz, 1
 	};
 
+	glUseProgram(p->program);
 	glUniformMatrix4fv(p->pMatrix_location, 1, 0, ortho);
 }
 
-int create_program(struct program *p, GLuint v, GLuint f)
+int u2gl_create_program(struct u2gl_program *p, GLuint v, GLuint f)
 {
 	char msg[512];
 
@@ -59,7 +60,7 @@ int create_program(struct program *p, GLuint v, GLuint f)
 	glAttachShader(p->program, v);
 	glAttachShader(p->program, f);
 	glBindAttribLocation(p->program, 0, "position");
-	check_error("ATTACH");
+	u2gl_check_error("ATTACH");
 
 	glLinkProgram(p->program);
 	glGetProgramInfoLog(p->program, sizeof msg, NULL, msg);
@@ -73,7 +74,7 @@ int create_program(struct program *p, GLuint v, GLuint f)
 	return 0;
 }
 
-GLuint compile_vertex_shader(const char *p)
+GLuint u2gl_compile_vertex_shader(const char *p)
 {
 	GLuint v = glCreateShader(GL_VERTEX_SHADER);
 	char msg[512];
@@ -86,7 +87,7 @@ GLuint compile_vertex_shader(const char *p)
 	return v;
 }
 
-GLuint compile_fragment_shader(const char *p)
+GLuint u2gl_compile_fragment_shader(const char *p)
 {
 	GLuint f = glCreateShader(GL_FRAGMENT_SHADER);
 	char msg[512];
