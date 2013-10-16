@@ -6,8 +6,9 @@ LIBS	= -Lcommon -lcommon -Ldis -ldis -lm -lGL -lEGL -lGLU -lSDL -lX11
 RANLIB	= ranlib
 AR	= ar
 POVRAY	= povray
+PARTS	= dots/dots tunneli/tun10 glenz/glenz
 
-all: common-all dis-all dots-all water-all tunneli-all glenz-all
+all: common-all dis-all $(PARTS)
 
 include common/Makefile
 include dis/Makefile
@@ -24,6 +25,8 @@ include techno/Makefile
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $*.o $<
+
+$(PARTS): common/libcommon.a dis/libdis.a
 
 clean:
 	rm -f core *~ $(OBJS) depend

@@ -8,11 +8,8 @@
 
 static int view_width;
 static int view_height;
-static float radius;
 
 struct program pixel_program;
-
-static GLuint uRadius_location;
 
 extern float color[256][3];
 
@@ -44,14 +41,13 @@ static const char vertex_shader[] =
 static const char pixel_shader[] =
 "precision mediump float;\n"
 "uniform vec4 uColor;\n"
-"uniform float uRadius;\n"
 "varying vec3 vPosition;\n"
 "varying vec4 vCenter;\n"
 "\n"
 "void main() {\n"
 "    float dist = distance(vPosition, vCenter.xyz);\n"
-"    if (dist < uRadius) {\n"
-"        gl_FragColor = vec4(uColor.xyz * (uRadius - dist) / uRadius, 1.0);\n"
+"    if (dist < 0.005) {\n"
+"        gl_FragColor = vec4(uColor.xyz * (0.005 - dist) / 0.005, 1.0);\n"
 "    } else { gl_FragColor = vec4(0.0); }\n"
 "}\n";
 
@@ -66,9 +62,6 @@ int init_opengl(int width, int height)
 	v = compile_vertex_shader(vertex_shader);
 	f = compile_fragment_shader(pixel_shader);
 	create_program(&pixel_program, f, v);
-
-	uRadius_location = glGetUniformLocation(pixel_program.program, "uRadius");
-	radius = (2.0 / width * FF) / 1.5;
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -94,9 +87,7 @@ void draw_pixel(float x, float y, int c)
 
 	matrix_identity(m);
 	matrix_translate(m, x, 200 - y);
-
 	matrix_set(&pixel_program, m);
-	glUniform1fv(uRadius_location, 1, &radius);
 
 	draw_triangle_strip(&pixel_program, obj, 3);
 }
