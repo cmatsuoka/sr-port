@@ -42,4 +42,4 @@ in fact a `tetrakis hexahedron`_.
 
 
 
-.. _tetrakis-hexahedron: http://mathworld.wolfram.com/TetrakisHexahedron.html
+.. _tetrakis hexahedron: http://mathworld.wolfram.com/TetrakisHexahedron.html
