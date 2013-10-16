@@ -40,7 +40,7 @@ int depthtable3[128];
 int depthtable4[128];
 #endif
 
-
+extern float colorshift;
 extern int sin1024[];
 
 #if 0
@@ -137,7 +137,6 @@ if(dis_indemo())
 	if(a>-4 && a<0) break;
 }
 #endif
-
 	frame++;
 	if(frame==500) f=0;
 	i=dottaul[j];
@@ -184,6 +183,10 @@ if(dis_indemo())
 	}
 	else if(frame<2400)
 	{
+		colorshift = 1.0f * (frame - 2360) / 32;
+		if (colorshift > 1.0f)
+			colorshift = 1.0f;
+
 #if 0
 		a=frame-2360;
 		for(b=0;b<768;b+=3)
@@ -202,6 +205,9 @@ if(dis_indemo())
 	}
 	else if(frame<2440)
 	{
+		colorshift = 1.0f + 1.0f * (frame - 2400) / 32;
+		if (colorshift > 2.0f)
+			colorshift = 2.0f;
 #if 0
 		a=frame-2400;
 		for(b=0;b<768;b+=3)

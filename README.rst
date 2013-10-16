@@ -37,8 +37,8 @@ Tunneli
 Glenz
 """""
 
-Work in progress. I thought the polyhedron was an icosahedron, but it is
-in fact a `tetrakis hexahedron`_.
+Work in progress. I always thought the polyhedron was an icosahedron, but
+it is in fact a `tetrakis hexahedron`_.
 
 
 

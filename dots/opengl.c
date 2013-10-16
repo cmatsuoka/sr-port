@@ -24,6 +24,8 @@ extern int bpmax;
 static struct u2gl_program dot_program;
 static struct u2gl_program floor_program;
 
+float colorshift;
+
 #define SQRT3 1.7320508075688772F
 #define SQRT3_3 0.5773502691896257F
 
@@ -82,8 +84,9 @@ static const char floor_shader[] =
 "\n"
 "void main() {\n"
 "    float x = -vPosition.y / 2.0;\n"
-//"    float y = -x * x + 2.0 * x / 2.2;\n"
 "    float y = pow(1.0 - (x - 1.0) * (x - 1.0), 0.5) / 3.3;\n"
+"    if (uColor.x > 1.0) { y = 2.0 - uColor.x; }\n"
+"    else if (uColor.x > 0.0) { y = y + (1.0 - y) * uColor.x; }\n"
 "    gl_FragColor = vec4(y, y, y, 1.0);\n"
 "}\n";
 
@@ -108,22 +111,46 @@ int init_opengl(int width, int height)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glClearColor(.0, .0, .0, 0);
-
 	return 0;
+}
+
+#define SHIFT_TO_WHITE(x) ((x) + (1.0f - (x)) * colorshift)
+
+void shift_color(float *color2, float *color)
+{
+	if (colorshift > 1.0f) {
+		color2[0] = 2.0f - colorshift;
+		color2[1] = 2.0f - colorshift;
+		color2[2] = 2.0f - colorshift;
+	} else if (colorshift > 0.0f) {
+		color2[0] = SHIFT_TO_WHITE(color[0]);
+		color2[1] = SHIFT_TO_WHITE(color[1]);
+		color2[2] = SHIFT_TO_WHITE(color[2]);
+	} else {
+		color2[0] = color[0];
+		color2[1] = color[1];
+		color2[2] = color[2];
+	}
 }
 
 void clear_screen()
 {
 	Matrix m;
+	float color[3] = { 0.0f, 0.0f, 0.0f };
+	float color2[3];
 
+	shift_color(color2, color);
+	glClearColor(color2[0], color2[1], color2[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(floor_program.program);
 
 	matrix_identity(m);
 
+	color2[0] = colorshift;
+
 	u2gl_set_matrix(&floor_program, m);
+	u2gl_set_color(color2, &floor_program);
 	u2gl_draw_triangle_strip(&floor_program, floor_obj, 4);
 
 	glUseProgram(dot_program.program);
@@ -134,6 +161,7 @@ void draw_dot(struct dot *dot)
 	Matrix m;
 	float bp = ((dot->z * rotcos - dot->x * rotsin) / 0x10000) + 9000;
 	float a = (dot->z * rotsin + dot->x * rotcos) / 0x100;
+	float color2[3];
 
 	float x = (a + a / 8) / bp + 160;
 	if (x <= 319) {
@@ -142,7 +170,8 @@ void draw_dot(struct dot *dot)
 
 			/* shadow */
 
-			u2gl_set_color(shadow_color, &dot_program);
+			shift_color(color2, shadow_color);
+			u2gl_set_color(color2, &dot_program);
 
 			matrix_identity(m);
 			matrix_translate(m, x, 200 - shadow_y);
@@ -162,12 +191,13 @@ void draw_dot(struct dot *dot)
 
 			float y = (dot->y * 64) / bp + 100;
 			if (y <= 199) {
-
 				color[1] = 0.75f - (bp - 4000) / 16000;
 				color[2] = color[1] * 1.1f;
 				color[0] = color[1] / 3;
 
-				u2gl_set_color(color, &dot_program);
+				shift_color(color2, color);
+
+				u2gl_set_color(color2, &dot_program);
 
 				matrix_identity(m);
 				matrix_translate(m, x, 200 - y);
