@@ -4,13 +4,6 @@
 #include <GL/glu.h>
 #include "u2gl.h"
 
-Matrix identity = {
-	1.0f, 0.0f, 0.0f, 0.0f,
-	0.0f, 1.0f, 0.0f, 0.0f,
-	0.0f, 0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 0.0f, 1.0f
-};
-
 
 void u2gl_check_error(char *t)
 {
