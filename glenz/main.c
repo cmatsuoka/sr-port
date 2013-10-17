@@ -21,14 +21,14 @@ char *fcrow2[16];
 
 //char far *vram=(char far *)0xa0000000L;
 
-extern char lightshift;
+extern int lightshift;
 
 //extern int _ndebug1;
 
 //extern char asmtestmode;
 
 
-extern int demomode[];
+extern void (*demomode[])(int, int*);
 
 #if 0
 int    cubepoints[]={8,
@@ -268,10 +268,11 @@ int frame=0;
 //#pragma check_stack(off)
 void /*_loadds*/ copper(void)
 {
-	//int	a;
+	int	a;
 	repeat++;
         //outp(0x3c8,0);
         //for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
+        for(a=0;a<16;a++) setrgb(a, pal[a*3], pal[a*3+1], pal[a*3+2]);
 }
 //#pragma check_stack(on)
     
@@ -432,6 +433,7 @@ int main()
     {
 	poll_event();
 	clear_screen();
+	//copper();
 
         a=dis_musplus(); if(a<0 && a>-16) break;
         
@@ -638,10 +640,10 @@ int main()
             points2[0]=0; crotlist(points2,points2b);
             if(frame<800) ccliplist(points2);
             points3[0]=0; cprojlist((int *)points3,points2);
-            //ceasypolylist(polylist,epolys,points3);
+            ceasypolylist(polylist,epolys,points3);
             //cglenzpolylist(polylist);
 
-            draw_poly(epolys, points3);
+            draw_poly(polylist);
         }
 
         if(frame>800 && bscale>4)
@@ -662,10 +664,10 @@ int main()
             csetmatrix(matrix,0+oxb,ypos+1500+oyb,zpos+ozb);
             points2[0]=0; crotlist(points2,points2b);
             points3[0]=0; cprojlist((int *)points3,points2);
-            //ceasypolylist(polylist,epolysb,points3);
+            ceasypolylist(polylist,epolysb,points3);
             //cglenzpolylist(polylist);
 
-            draw_poly(epolysb, points3);
+            draw_poly(polylist);
         }
         
         cglenzdone();

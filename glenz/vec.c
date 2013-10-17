@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include "glenz.h"
 #include "vec.h"
@@ -119,7 +120,6 @@ int ccliplist(int *points)
 
 
 int *edgesoff = 0;
-int *pointsoff;
 //int cntoff = 0; 
 
 int checkhiddenbx(int *list)
@@ -131,7 +131,7 @@ int checkhiddenbx(int *list)
 	int x3 = list[4];
 	int y3 = list[5];
 
-	return (x1 - x2) * (y1 - y3) < (y1 - y2) * (x1 - x3);
+	return (x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3);
 }
 
 int cpolylist(int *polylist, int *polys, int *edges, int *points3)
@@ -224,7 +224,7 @@ l3:	out	dx,al
 	ENDM
 #endif
 
-int backpal[16 * 3] = {
+char backpal[16 * 3] = {
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
@@ -239,145 +239,82 @@ int rolcol[256];
 int rolused[256];
 
 
-void demo_norm()
-{
-}
-
-#if 0
-demo_norm PROC NEAR
-	ret
-demo_norm ENDP
-#endif
-
 void demo_glz2(int visible, int *polylist)
 {
+	if (visible >= 0) {
+		int color = polylist[-1] & 0xff;
+		polylist[-1] = (color >> 1) & 0x01;
+	}
 }
-
-#if 0
-demo_glz2 PROC NEAR
-	jc	@@1
-	mov	al,es:[bx-2]
-	shr	al,1
-	and	al,1
-	mov	es:[bx-2],al
-@@1:	ret
-demo_glz2 ENDP
-#endif
 
 void demo_glz(int visible, int *polylist)
 {
-	if (visible) {
-		int color = polylist[-2] & 0xff;
-		int al = rolcol[color];
+	int ax, i;
+	int color = polylist[-1] & 0xff;
+	int al = rolcol[color];
+	int bp = 0;
+	int r, g, b;
+
+	if (visible < 0) {
+		rolcol[color] = 0;
 		rolused[al] = 0;
-		polylist[-2] = ((color >> 1) & 0x01) << 2;
+		polylist[-1] = ((color >> 1) & 0x01) << 2;
 		return;
 	}
 
+	//@@7
 	if (lightshift != 9) {
-
+		ax = (visible >> 8) + (visible >> 9);
+	} else {
+		//@@x9
+		ax = visible >> 7;
 	}
+
+	//@@x10
+	if (ax < 0) {
+		ax = 0;
+	}
+
+	if (ax > 63) {
+		ax = 63;
+	}
+
+	//@@s2
+	if (al == 0) {
+		bp = 2;
+		for (i = 0; i < 15; i++) {
+			//@@rc3
+			if (rolused[bp] == 0)
+				break;
+			bp += 2;
+		}
+
+		//@rc4
+		rolcol[color] = bp;
+		rolused[bp] = 1;	
+	}
+
+	//@@rc1
+	polylist[-1] = rolcol[color] << 3;	// wtf
+
+	if (color & 0x02) {
+		printf("BLUE: %d (%d)\n", rolcol[color], ax);
+		r = 0;
+		g = ax / 2;
+		b = ax;
+	} else {
+		printf("GRAY: %d (%d)\n", rolcol[color], ax);
+		r = g = b = ax;
+	}
+
+	for (i = 0; i < 16; i++) {
+		r += backpal[i * 3 + 0];
+		g += backpal[i * 3 + 1];
+		b += backpal[i * 3 + 2];
+		setrgb(polylist[-1] + i, r, g, b);
+	}
+
 }
-
-#if 0
-demo_glz PROC NEAR
-	jnc	@@7 ;visible
-	mov	ax,es:[bx-2]
-	push	bx
-	push	ax
-	mov	bl,al
-	xor	bh,bh
-	mov	al,cs:rolcol[bx]
-	mov	byte ptr cs:rolcol[bx],0
-	mov	bl,al
-	mov	cs:rolused[bx],0
-	pop	ax
-	pop	bx
-	shr	al,1
-	and	al,1
-	shl	al,2
-	mov	es:[bx-2],ax
-	ret
-@@7:	mov	cl,cs:_lightshift
-	cmp	cl,9
-	je	@@x9
-	if (lightshift != 9) {
-	}
-	shrd	ax,dx,8
-	push	ax	
-	shrd	ax,dx,1
-	pop	dx
-	add	ax,dx
-	jmp	@@x10
-@@x9:	mov	cl,7
-	shrd	ax,dx,cl
-@@x10:	cmp	ax,0
-	jge	@@s1
-	mov	ax,0
-@@s1:	cmp	ax,63
-	jle	@@s2
-	mov	ax,63
-@@s2:	mov	ah,al
-	;
-	push	bx
-	movzx	bx,es:[bx-2]
-	mov	al,cs:rolcol[bx]
-	cmp	al,0
-	jne	@@rc1
-	mov	cx,15
-	mov	bp,2
-@@rc3:	cmp	cs:rolused[bp],0
-	je	@@rc4
-	add	bp,2
-	loop	@@rc3
-@@rc4:	mov	ax,bp
-@@rc2:	mov	cs:rolcol[bx],al
-	mov	cs:rolused[bp],1
-@@rc1:	pop	bx
-	mov	bp,es:[bx-2]
-	shl	al,3
-	mov	es:[bx-2],al
-	
-	mov	dx,3c8h
-	out	dx,al
-	inc	dx
-
-	test	bp,2
-	jz	@@b1	
-	mov	bh,ah ;B
-	shr	ah,1
-	mov	bl,ah ;G
-	jmp	@@b2
-@@b1:	mov	cl,ah ;R
-	mov	bl,ah ;G
-	mov	bh,ah ;B
-@@b2:	push	si
-	push	di
-	mov	si,cx
-	mov	di,bx
-	
-	zzz=0
-	REPT	16
-	mov	al,cs:_backpal[zzz*3+0]
-	shr	al,2
-	add	cl,al
-	mov	al,cs:_backpal[zzz*3+1]
-	shr	al,2
-	add	bl,al
-	mov	al,cs:_backpal[zzz*3+2]
-	shr	al,2
-	add	bh,al
-	setpalxxx
-	mov	bx,di
-	mov	cx,si
-	zzz=zzz+1
-	ENDM
-	
-	pop	di
-	pop	si
-@@xx:	ret
-demo_glz ENDP
-#endif
 
 void (*demomode[])(int, int *) = {
 	demo_glz,
@@ -391,11 +328,11 @@ int ceasypolylist(int *polylist, int *polys, int *points3)
 	int *cntoff;
 	int i, visible;
 
-	pointsoff = points3 + 2;
+	points3++;		// numv
 
 	while ((num = *polys++) != 0) {	// @@2
 
-		*polylist++ = num;
+		*polylist++ = num;	// number of vertices
 
 		c = *polys++;		// color
 		*polylist++ = c;
@@ -403,11 +340,11 @@ int ceasypolylist(int *polylist, int *polys, int *points3)
 		cntoff = polylist;
 
 		for (i = 0; i < num; i++) {	// @@3
-			int v = *polys++;
+			int v = *polys++;	// vertex index
 
 			// add dot
-			*polylist++ = pointsoff[v * 4];
-			*polylist++ = pointsoff[v * 4 + 1];
+			*polylist++ = points3[v * 4];
+			*polylist++ = points3[v * 4 + 1];
 		}
 
 		visible = checkhiddenbx(cntoff);
@@ -420,54 +357,6 @@ int ceasypolylist(int *polylist, int *polys, int *points3)
 
 	return 0;
 }
-
-#if 0
-PUBLIC _ceasypolylist
-_ceasypolylist PROC FAR ;polylist,polys,points3
-	CBEG
-	mov	di,[bp+6]
-	mov	es,word ptr [bp+8]	; es:di = polylist
-	mov	si,[bp+10]
-	mov	ds,word ptr [bp+12]	; ds:si = polys
-	mov	ax,[bp+14]
-	add	ax,4
-	mov	cs:pointsoff,ax
-	mov	gs,word ptr [bp+16]	; gs:ax = points3
-	mov	bp,-1
-
-@@2:	lodsw
-	cmp	ax,0
-	je	@@1
-	add	di,2
-	mov	cx,ax
-	movsw
-	mov	cs:cntoff,di
-
-@@3:	push	cx
-	mov	ax,ds:[si]
-	add	si,2
-	call	adddot
-	pop	cx
-	loop	@@3
-
-@@6:	mov	bx,cs:cntoff
-	mov	eax,es:[bx]
-	cmp	eax,es:[di-4]
-	jne	@@4
-	sub	di,4
-
-@@4:	mov	ax,di
-	sub	ax,cs:cntoff
-	shr	ax,2
-	mov	es:[bx-4],ax
-	call	checkhiddenbx
-	call	cs:_demomode ;sets colors etc / hidden faces flipped
-	jmp	@@2
-
-@@1:	mov	word ptr es:[di],0
-	CEND
-_ceasypolylist ENDP
-#endif
 
 void cglenzinit()
 {

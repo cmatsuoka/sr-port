@@ -45,14 +45,17 @@ static const char triangle_shader[] =
 
 
 
-static float color[256][3];
+static float color[256][4];
 
 void setrgb(int c, int r, int g, int b)
 {
-    color[c][0] = (float)r / 64;
-    color[c][1] = (float)g / 64;
-    color[c][2] = (float)b / 64;
+	color[c][0] = (float)r / 64;
+	color[c][1] = (float)g / 64;
+	color[c][2] = (float)b / 64;
+	color[c][3] = 0.5f;
 }
+
+//float xxx[4] = { 0.5, 0.7, 0.8, 0.5 };
 
 static void draw_triangle(float *f, int c)
 {
@@ -61,8 +64,6 @@ static void draw_triangle(float *f, int c)
 	u2gl_set_color(color[c], &triangle_program);
 
 	matrix_identity(m);
-	//matrix_translate(m, x, 200 - y);
-
 	u2gl_set_matrix(&triangle_program, m);
 
 	obj[0] = *f++;
@@ -77,30 +78,19 @@ static void draw_triangle(float *f, int c)
 	u2gl_draw_triangle_strip(&triangle_program, obj, 3);
 }
 
-void draw_poly(int *polys, int *points3)
+void draw_poly(int *polylist)
 {
-	int num, c, i, v;
+	int num_vertices, c, i;
 	float f[6];
-	int k = 0;
-	int ah = 60;
 
-	points3++;	/* numv */
+	while ((num_vertices = *polylist++) != 0) {
+		c = *polylist++ & 0xff;
 
-	while ((num = *polys++) != 0) {
-		c = *polys++ & 0xff;
-
-		for (i = 0; i < num; i++) {
-			v = *polys++;
-			f[i * 2    ] = points3[v * 4];
-	 		f[i * 2 + 1] = 200.0f - points3[v * 4 + 1];
+		for (i = 0; i < num_vertices; i++) {
+			f[i * 2 + 0] = *polylist++;
+	 		f[i * 2 + 1] = 200.0f - *polylist++;
 		}
 	
-		if (c & 2) {
-			setrgb(c, 0.0f, ah / 2, ah); 
-		} else {
-			setrgb(c, ah / 2, ah / 2, ah / 2); 
-		}
-
 		draw_triangle(f, c);
 	}
 }

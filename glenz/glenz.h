@@ -6,6 +6,7 @@ void zoomer2(void);
 void zoomer1(char *);
 
 void init_opengl(int, int);
-void draw_poly(int *, int *);
+void draw_poly(int *);
+void setrgb(int, int, int, int);
 
 #endif
