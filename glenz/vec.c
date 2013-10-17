@@ -118,76 +118,21 @@ int ccliplist(int *points)
 }
 
 
-int edgesoff = 0;
-int pointsoff = 0;
-int cntoff = 0; 
+int *edgesoff = 0;
+int *pointsoff;
+//int cntoff = 0; 
 
-void adddot(int *polylist, int *points3, int x)
+int checkhiddenbx(int *list)
 {
-	if (x == -1)
-		return;
+	int x1 = list[0];
+	int y1 = list[1];
+	int x2 = list[2];
+	int y2 = list[3];
+	int x3 = list[4];
+	int y3 = list[5];
 
-	//*polylist = points3[x * 3 + pointsoff];
+	return (x1 - x2) * (y1 - y3) < (y1 - y2) * (x1 - x3);
 }
-
-#if 0
-adddot PROC NEAR
-	cmp	ax,bp
-	je	@@3
-	mov	bp,ax
-	;add dot
-	push	bx
-	mov	bx,ax
-	shl	bx,1
-	add	bx,ax
-	shl	bx,2
-	add	bx,cs:pointsoff
-	mov	eax,gs:[bx]
-	stosd
-	pop	bx
-@@3:	ret
-adddot ENDP
-#endif
-
-void checkhiddenbx(int *src)
-{
-	(src[0] - src[2]) * (src[1] - src[4 + 1]);
-
-	(src[1] - src[2 + 1]) * (src[0] - src[4]);
-
-	
-}
-
-#if 0
-checkhiddenbx PROC NEAR
-	push	si
-	mov	ax,es:[bx]
-	mov	si,es:[bx+2]
-	sub	ax,es:[bx+4]
-	sub	si,es:[bx+8+2]
-	imul	si
-	push	ax
-	push	dx
-	mov	ax,es:[bx+2]
-	mov	si,es:[bx]
-	sub	ax,es:[bx+4+2]
-	sub	si,es:[bx+8]
-	imul	si
-	pop	cx
-	pop	si
-	xchg	si,ax
-	xchg	dx,cx
-	sub	ax,si
-	sbb	dx,cx
-	pop	si
-	cmp	dx,0
-	jl	@@1
-	clc
-	ret
-@@1:	stc
-	ret
-checkhiddenbx ENDP
-#endif
 
 int cpolylist(int *polylist, int *polys, int *edges, int *points3)
 {
@@ -304,11 +249,8 @@ demo_norm PROC NEAR
 demo_norm ENDP
 #endif
 
-void demo_glz2(int visible)
+void demo_glz2(int visible, int *polylist)
 {
-	if (visible) {
-		
-	}
 }
 
 #if 0
@@ -322,9 +264,18 @@ demo_glz2 PROC NEAR
 demo_glz2 ENDP
 #endif
 
-void demo_glz()
+void demo_glz(int visible, int *polylist)
 {
+	if (visible) {
+		int color = polylist[-2] & 0xff;
+		int al = rolcol[color];
+		rolused[al] = 0;
+		polylist[-2] = ((color >> 1) & 0x01) << 2;
+		return;
+	}
+
 	if (lightshift != 9) {
+
 	}
 }
 
@@ -428,7 +379,7 @@ demo_glz PROC NEAR
 demo_glz ENDP
 #endif
 
-void (*demomode[])() = {
+void (*demomode[])(int, int *) = {
 	demo_glz,
 	demo_glz,
 	demo_glz2
@@ -436,29 +387,36 @@ void (*demomode[])() = {
 
 int ceasypolylist(int *polylist, int *polys, int *points3)
 {
-	int *pointsoff = points3 + 1;
+	int num, c;
 	int *cntoff;
-	int i;
+	int i, visible;
 
-	while (*polys != 0) {	// @@2
-			
-		*polylist++ = *polys++;
+	pointsoff = points3 + 2;
+
+	while ((num = *polys++) != 0) {	// @@2
+
+		*polylist++ = num;
+
+		c = *polys++;		// color
+		*polylist++ = c;
+
 		cntoff = polylist;
 
-		for (i = 0; i < *polys; i++) {	// @@3
-			adddot(polylist++, points3, *polys++);
+		for (i = 0; i < num; i++) {	// @@3
+			int v = *polys++;
+
+			// add dot
+			*polylist++ = pointsoff[v * 4];
+			*polylist++ = pointsoff[v * 4 + 1];
 		}
 
-		if (*cntoff == polylist[-2]) {
-			polylist -= 2;
-		}
+		visible = checkhiddenbx(cntoff);
 
-		*(cntoff - 2) = (polylist - cntoff) / 4;
-		checkhiddenbx(*(cntoff - 2));
-
-		demomode[0]();  // sets colors etc / hidden faces flipped
+		// sets colors etc / hidden faces flipped
+		demomode[0](visible, cntoff);
 	}
 	
+	*polylist = 0;
 
 	return 0;
 }
