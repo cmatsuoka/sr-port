@@ -135,96 +135,6 @@ static int checkhiddenbx(int *list)
 	return (x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3);
 }
 
-int cpolylist(int *polylist, int *polys, int *edges, int *points3)
-{
-	return 0;
-}
-
-#if 0
-_cpolylist PROC FAR ;polylist,polys,edges,points3
-	CBEG
-	mov	di,[bp+6]
-	mov	es,word ptr [bp+8]
-	mov	si,[bp+10]
-	mov	ds,word ptr [bp+12]
-	mov	ax,[bp+14]
-	add	ax,4
-	mov	cs:edgesoff,ax
-	mov	fs,word ptr [bp+16]
-	mov	ax,[bp+18]
-	add	ax,4
-	mov	cs:pointsoff,ax
-	mov	gs,word ptr [bp+20]
-	mov	bp,-1
-@@2:	lodsw
-	cmp	ax,0
-	je	@@1
-	add	di,2
-	mov	cx,ax
-	movsw
-	mov	cs:cntoff,di
-@@3:	push	cx
-	mov	bx,ds:[si]
-	add	si,2
-	shl	bx,3
-	add	bx,cs:edgesoff
-	test	word ptr fs:[bx+4],8000h
-	jnz	@@7
-	mov	ax,fs:[bx+2]
-	cmp	ax,bp
-	je	@@5
-	mov	ax,fs:[bx]
-	call	adddot
-	mov	ax,fs:[bx+2]
-	call	adddot
-@@7:	pop	cx
-	loop	@@3
-	jmp	@@6
-@@5:	mov	ax,fs:[bx+2]
-	call	adddot
-	mov	ax,fs:[bx]
-	call	adddot
-	pop	cx
-	loop	@@3
-@@6:	mov	bx,cs:cntoff
-	mov	eax,es:[bx]
-	cmp	eax,es:[di-4]
-	jne	@@4
-	sub	di,4
-@@4:	mov	ax,di
-	sub	ax,cs:cntoff
-	shr	ax,2
-	mov	es:[bx-4],ax
-	call	checkhiddenbx
-	jnc	@@2
-	xor	word ptr es:[bx-2],8000h
-	jmp	@@2
-@@1:	mov	word ptr es:[di],0
-	CEND
-_cpolylist ENDP
-#endif
-
-#if 0
-setpalxxx MACRO
-	local	l1,l2,l3
-	mov	al,cl
-	cmp	al,64
-	jb	l1
-	mov	al,63
-l1:	out	dx,al
-	mov	al,bl
-	cmp	al,64
-	jb	l2
-	mov	al,63
-l2:	out	dx,al
-	mov	al,bh
-	cmp	al,64
-	jb	l3
-	mov	al,63
-l3:	out	dx,al
-	ENDM
-#endif
-
 char backpal[16 * 3] = {
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
@@ -238,8 +148,8 @@ int back3[] = { 7, 0, 0 };
 int back4[] = { 13, 0, 0 };
 #endif
 
-int rolcol[256];
-int rolused[256];
+static unsigned char rolcol[256];
+static unsigned char rolused[256];
 
 
 void demo_glz2(int normal, int *polylist)
@@ -301,13 +211,13 @@ void demo_glz(int normal, int *polylist)
 	polylist[-1] = rolcol[color] << 3;	// wtf
 
 	if (color & 0x02) {
-		printf("BLUE: %d (%d)\n", rolcol[color], ax);
+		//printf("BLUE: %d (%d)\n", rolcol[color], ax);
 		r = 0;
 		g = ax >> 1;
 		b = ax;
 	} else {
 		//@@b1
-		printf("GRAY: %d (%d)\n", rolcol[color], ax);
+		//printf("GRAY: %d (%d)\n", rolcol[color], ax);
 		r = g = b = ax;
 	}
 
@@ -330,7 +240,7 @@ int ceasypolylist(int *polylist, int *polys, int *points3)
 {
 	int num, c;
 	int *cntoff;
-	int i, visible;
+	int i, normal;
 
 	points3++;		// numv
 
@@ -351,10 +261,10 @@ int ceasypolylist(int *polylist, int *polys, int *points3)
 			*polylist++ = points3[v * 4 + 1];
 		}
 
-		visible = checkhiddenbx(cntoff);
+		normal = checkhiddenbx(cntoff);
 
 		// sets colors etc / hidden faces flipped
-		demomode[0](visible, cntoff);
+		demomode[0](normal, cntoff);
 	}
 	
 	*polylist = 0;
@@ -364,28 +274,11 @@ int ceasypolylist(int *polylist, int *polys, int *points3)
 
 void cglenzinit()
 {
-	//newgroup(0, rows);
+	//newgroup(0);
 }
 
 void cglenzdone()
 {
-	//newgroup(2, rows);
+	//newgroup(2);
 }
-
-void cglenzpolylist(int *polylist)
-{
-}
-
-#if 0
-PUBLIC _cglenzpolylist
-_cglenzpolylist PROC FAR
-	CBEG
-	LOADDS
-	movpar	di,0
-	movpar	es,1
-	mov	ax,1
-	call	__newgroup
-	CEND
-_cglenzpolylist ENDP
-#endif
 

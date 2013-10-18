@@ -405,7 +405,7 @@ int main()
     }
     for(a=0;a<768/3;a++)
     {
-	setrgb(a, tmppal[a*3], tmppal[a*3+1], tmppal[1*3+2]);
+	setrgb(a, tmppal[a*3], tmppal[a*3+1], tmppal[a*3+2]);
     }
     lightshift=9;
     rx=ry=rz=0;
@@ -425,7 +425,7 @@ int main()
     {
 	poll_event();
 	clear_screen();
-	//copper();
+	copper();
 
         a=dis_musplus(); if(a<0 && a>-16) break;
         
@@ -433,6 +433,8 @@ int main()
         //outp(0x3c8,0);
         //for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
         for(a=0;a<16;a++) setrgb(a, pal[a*3], pal[a*3+1], pal[a*3+2]);
+	setrgb(0, 8, 8, 8);	// XXX
+	setrgb(4, 12, 12, 12);
 	
 	while(repeat--)
         {
