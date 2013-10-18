@@ -296,7 +296,7 @@ int main()
 
     zoomer2();
 
-    if (init_graphics("Tunneli", window_width, window_height) < 0) {
+    if (init_graphics("Glenz", window_width, window_height) < 0) {
         fprintf(stderr, "Can't init graphics\n");
         return -1;
     };
