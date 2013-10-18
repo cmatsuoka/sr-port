@@ -122,7 +122,7 @@ int ccliplist(int *points)
 int *edgesoff = 0;
 //int cntoff = 0; 
 
-int checkhiddenbx(int *list)
+static int checkhiddenbx(int *list)
 {
 	int x1 = list[0];
 	int y1 = list[1];
@@ -131,6 +131,7 @@ int checkhiddenbx(int *list)
 	int x3 = list[4];
 	int y3 = list[5];
 
+	// normal in z direction
 	return (x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3);
 }
 
@@ -230,32 +231,33 @@ char backpal[16 * 3] = {
 	16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
 };
 
+#if 0
 int back1[] = { 0, 4, 8 };
 int back2[] = { 4, 0, 0 };
 int back3[] = { 7, 0, 0 };
 int back4[] = { 13, 0, 0 };
+#endif
 
 int rolcol[256];
 int rolused[256];
 
 
-void demo_glz2(int visible, int *polylist)
+void demo_glz2(int normal, int *polylist)
 {
-	if (visible >= 0) {
+	if (normal >= 0) {
 		int color = polylist[-1] & 0xff;
 		polylist[-1] = (color >> 1) & 0x01;
 	}
 }
 
-void demo_glz(int visible, int *polylist)
+void demo_glz(int normal, int *polylist)
 {
 	int ax, i;
 	int color = polylist[-1] & 0xff;
 	int al = rolcol[color];
-	int bp = 0;
 	int r, g, b;
 
-	if (visible < 0) {
+	if (normal < 0) {
 		rolcol[color] = 0;
 		rolused[al] = 0;
 		polylist[-1] = ((color >> 1) & 0x01) << 2;
@@ -264,13 +266,14 @@ void demo_glz(int visible, int *polylist)
 
 	//@@7
 	if (lightshift != 9) {
-		ax = (visible >> 8) + (visible >> 9);
+		ax = (normal >> 8) + (normal >> 9);
 	} else {
 		//@@x9
-		ax = visible >> 7;
+		ax = normal >> 7;
 	}
 
 	//@@x10
+	// Clamp color channel value
 	if (ax < 0) {
 		ax = 0;
 	}
@@ -281,7 +284,7 @@ void demo_glz(int visible, int *polylist)
 
 	//@@s2
 	if (al == 0) {
-		bp = 2;
+		int bp = 2;
 		for (i = 0; i < 15; i++) {
 			//@@rc3
 			if (rolused[bp] == 0)
@@ -300,20 +303,21 @@ void demo_glz(int visible, int *polylist)
 	if (color & 0x02) {
 		printf("BLUE: %d (%d)\n", rolcol[color], ax);
 		r = 0;
-		g = ax / 2;
+		g = ax >> 1;
 		b = ax;
 	} else {
+		//@@b1
 		printf("GRAY: %d (%d)\n", rolcol[color], ax);
 		r = g = b = ax;
 	}
 
+	//@@b2
 	for (i = 0; i < 16; i++) {
 		r += backpal[i * 3 + 0];
 		g += backpal[i * 3 + 1];
 		b += backpal[i * 3 + 2];
 		setrgb(polylist[-1] + i, r, g, b);
 	}
-
 }
 
 void (*demomode[])(int, int *) = {

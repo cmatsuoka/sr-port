@@ -49,10 +49,17 @@ static float color[256][4];
 
 void setrgb(int c, int r, int g, int b)
 {
-	color[c][0] = (float)r / 64;
-	color[c][1] = (float)g / 64;
-	color[c][2] = (float)b / 64;
+	color[c][0] = (float)r / 32;
+	color[c][1] = (float)g / 32;
+	color[c][2] = (float)b / 32;
 	color[c][3] = 0.5f;
+}
+
+void getrgb(int c, char *p)
+{
+	p[0] = color[c][0] * 32;
+	p[1] = color[c][1] * 32;
+	p[2] = color[c][2] * 32;
 }
 
 //float xxx[4] = { 0.5, 0.7, 0.8, 0.5 };

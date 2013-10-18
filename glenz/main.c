@@ -270,8 +270,6 @@ void /*_loadds*/ copper(void)
 {
 	int	a;
 	repeat++;
-        //outp(0x3c8,0);
-        //for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
         for(a=0;a<16;a++) setrgb(a, pal[a*3], pal[a*3+1], pal[a*3+2]);
 }
 //#pragma check_stack(on)
@@ -405,13 +403,10 @@ int main()
 	*pp++=g;
 	*pp++=b;
     }
-#if 0
-    outp(0x3c8,0);
-    for(a=0;a<768;a++)
+    for(a=0;a<768/3;a++)
     {
-        outp(0x3c9,tmppal[a]);
+	setrgb(a, tmppal[a*3], tmppal[a*3+1], tmppal[1*3+2]);
     }
-#endif
     lightshift=9;
     rx=ry=rz=0;
     ypos=-9000; yposa=0;
@@ -424,11 +419,8 @@ int main()
     dis_partstart();
     dis_waitb();
 
-#if 0
-    outp(0x3c7,0);
-    for(a=0;a<16*3;a++) pal[a]=inp(0x3c9);
-    dis_setcopper(0,copper);
-#endif
+    for(a=0;a<16;a++) getrgb(a, pal);
+    //dis_setcopper(0,copper);
     while(frame<7000 && !dis_exit())
     {
 	poll_event();
@@ -438,10 +430,9 @@ int main()
         a=dis_musplus(); if(a<0 && a>-16) break;
         
 	repeat=dis_waitb();
-#if 0
-        outp(0x3c8,0);
-        for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
-#endif
+        //outp(0x3c8,0);
+        //for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
+        for(a=0;a<16;a++) setrgb(a, pal[a*3], pal[a*3+1], pal[a*3+2]);
 	
 	while(repeat--)
         {
