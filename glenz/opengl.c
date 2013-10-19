@@ -10,15 +10,15 @@ static int view_width;
 static int view_height;
 
 static struct u2gl_program triangle_program;
+static struct u2gl_program fc_program;
 
-#define SQRT3 1.7320508075688772F
-#define SQRT3_3 0.5773502691896257F
+float obj[9];
 
-#define FF 5.0f
-float obj[9] = {
-	0.0f, FF * SQRT3_3, 0.0f,
-	-FF / 2, FF * -SQRT3_3 / 2, 0.0f,
-	FF / 2, FF * -SQRT3_3 / 2, 0.0f
+float fc_obj[12] = {
+	0.0f, 0.0f, 0.0f,
+	320.0f, 0.0f, 0.0f,
+	0.0f, 150.0f, 0.0f,
+	320.0f, 150.0f, 0.0f
 };
 
 static const char vertex_shader[] =
@@ -34,13 +34,39 @@ static const char vertex_shader[] =
 "    vPosition = vec3(position);\n"
 "}\n";
 
-static const char triangle_shader[] =
+static const char fragment_shader[] =
 "precision mediump float;\n"
 "uniform vec4 uColor;\n"
 "varying vec3 vPosition;\n"
 "\n"
 "void main() {\n"
 "    gl_FragColor = vec4(uColor.xyz, 0.5);\n"
+"}\n";
+
+static const char vertex_shader_texture[] =
+"uniform mat4 pMatrix;\n"
+"uniform mat4 uMatrix;\n"
+"attribute vec4 aPosition;\n"
+"attribute vec2 aTexPosition;\n"
+"varying vec2 vTexPosition;\n"
+"varying vec3 vPosition;\n"
+"\n"
+"void main() {\n"
+"    mat4 Matrix = pMatrix * uMatrix;\n"
+"    vec4 position = Matrix * aPosition;\n"
+"    gl_Position = position;\n"
+"    vTexPosition = aTexPosition;\n"
+"    vPosition = vec3(position);\n"
+"}\n";
+
+static const char fragment_shader_texture[] =
+"precision mediump float;\n"
+"uniform sampler2D uTexture;\n"
+"varying vec2 vTexPosition;\n"
+"varying vec3 vPosition;\n"
+"\n"
+"void main() {\n"
+"    gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
 "}\n";
 
 
@@ -69,7 +95,10 @@ void getrgb(int c, char *p)
 	p[2] = color[c][2] * CC;
 }
 
-//float xxx[4] = { 0.5, 0.7, 0.8, 0.5 };
+void draw_fc()
+{
+	u2gl_draw_triangle_strip(&fc_program, fc_obj, 4);
+}
 
 static void draw_triangle(float *f, int c)
 {
@@ -126,6 +155,45 @@ void draw_poly(int *polylist)
 #endif
 }
 
+static void init_texture()
+{
+	GLuint tex;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Black/white checkerboard
+	float pixels[] = {
+		0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
+	};
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
+
+	float vertices[] = {
+		//  Position      Color             Texcoords
+		-0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Top-left
+		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Top-right
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Bottom-right
+		-0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  // Bottom-left
+	};
+
+	GLint aPosition = glGetAttribLocation(fc_program.program, "aPosition");
+	glVertexAttribPointer(aPosition, 2, GL_FLOAT, GL_FALSE,
+                       7*sizeof(float), 0);
+
+	GLint aTexPosition = glGetAttribLocation(fc_program.program, "aTexPosition");
+	glEnableVertexAttribArray(aTexPosition);
+	glVertexAttribPointer(aTexPosition, 2, GL_FLOAT, GL_FALSE,
+                       7*sizeof(float), (void*)(5*sizeof(float)));
+}
+
 int init_opengl(int width, int height)
 {
 	Matrix m;
@@ -135,8 +203,12 @@ int init_opengl(int width, int height)
 	view_height = 200;
 
 	v = u2gl_compile_vertex_shader(vertex_shader);
-	f = u2gl_compile_fragment_shader(triangle_shader);
+	f = u2gl_compile_fragment_shader(fragment_shader);
 	u2gl_create_program(&triangle_program, f, v);
+
+	v = u2gl_compile_vertex_shader(vertex_shader_texture);
+	f = u2gl_compile_fragment_shader(fragment_shader_texture);
+	u2gl_create_program(&fc_program, f, v);
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -150,6 +222,8 @@ int init_opengl(int width, int height)
 	matrix_identity(m);
 	u2gl_set_matrix(&triangle_program, m);
 
+	init_texture();
+
 	return 0;
 }
 
@@ -161,4 +235,8 @@ void clear_screen()
 void projection()
 {
 	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
+	u2gl_projection(0, view_width, 0, view_height, &fc_program);
+
+	glUseProgram(triangle_program.program);
+
 }
