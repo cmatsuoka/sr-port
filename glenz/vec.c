@@ -170,7 +170,9 @@ void demo_glz(int normal, int *polylist)
 	if (normal < 0) {
 		rolcol[color] = 0;
 		rolused[al] = 0;
-		polylist[-1] = ((color >> 1) & 0x01) << 2;
+		//polylist[-1] = ((color >> 1) & 0x01) << 2;
+		polylist[-1] = 232 + (((color >> 1) & 0x01) << 2) * 2;
+		setrgb(232, 4, 4, 4);
 		return;
 	}
 

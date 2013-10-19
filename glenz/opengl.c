@@ -51,10 +51,11 @@ static float color[256][4];
 
 void setrgb(int c, int r, int g, int b)
 {
+#if 0
 	if (c == 0 || c == 4) {
 		printf("%d  %d %d %d\n", c, r, g, b);
-		//usleep(100000);
 	}
+#endif
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;
 	color[c][2] = (float)b / CC;
@@ -72,12 +73,7 @@ void getrgb(int c, char *p)
 
 static void draw_triangle(float *f, int c)
 {
-	Matrix m;
-
 	u2gl_set_color(color[c], &triangle_program);
-
-	matrix_identity(m);
-	u2gl_set_matrix(&triangle_program, m);
 
 	obj[0] = *f++;
 	obj[1] = *f++;
@@ -89,6 +85,24 @@ static void draw_triangle(float *f, int c)
 	obj[7] = *f++;
 
 	u2gl_draw_triangle_strip(&triangle_program, obj, 3);
+}
+
+void draw_palette()
+{
+	int i;
+
+	for (i = 0; i < 256; i++) {
+		u2gl_set_color(color[i], &triangle_program);
+	
+		obj[0] = 20 + (i - 64 * (i / 64)) * 4;
+		obj[1] = 45 -10 * (i / 64) ;
+		obj[3] = obj[0];
+		obj[4] = obj[1] - 10;
+		obj[6] = obj[0] + 4;
+		obj[7] = obj[1] - 10;
+	
+		u2gl_draw_triangle_strip(&triangle_program, obj, 3);
+	}
 }
 
 void draw_poly(int *polylist)
@@ -106,10 +120,15 @@ void draw_poly(int *polylist)
 	
 		draw_triangle(f, c);
 	}
+
+#if 0
+	draw_palette();
+#endif
 }
 
 int init_opengl(int width, int height)
 {
+	Matrix m;
 	GLuint v, f;
 
 	view_width = 320;
@@ -122,10 +141,14 @@ int init_opengl(int width, int height)
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(.0, .0, .0, 0);
 
 	glUseProgram(triangle_program.program);
+
+	matrix_identity(m);
+	u2gl_set_matrix(&triangle_program, m);
 
 	return 0;
 }
