@@ -419,7 +419,7 @@ int main()
     dis_partstart();
     dis_waitb();
 
-    for(a=0;a<16;a++) getrgb(a, pal);
+    for(a=0;a<16;a++) getrgb(a,&pal[a*3]);
     //dis_setcopper(0,copper);
     while(frame<7000 && !dis_exit())
     {
@@ -433,8 +433,8 @@ int main()
         //outp(0x3c8,0);
         //for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
         for(a=0;a<16;a++) setrgb(a, pal[a*3], pal[a*3+1], pal[a*3+2]);
-	setrgb(0, 8, 8, 8);	// XXX
-	setrgb(4, 12, 12, 12);
+	//setrgb(0, 8, 8, 8);	// XXX
+	//setrgb(4, 12, 12, 12);
 	
 	while(repeat--)
         {

@@ -2,7 +2,8 @@
 //#include <conio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include "..\dis\dis.h"
+#include "../dis/dis.h"
+#include "glenz.h"
 
 //static char *vram=(char *)0xa0000000L;
 
@@ -22,6 +23,7 @@ void	zoomer2()
 	int	frame=0;
 	int	zly,zy,zya;
 	int	zly2,zy2;
+	int	i;
 
 #if 0
 	_asm
@@ -33,6 +35,7 @@ void	zoomer2()
 	outp(0x3c7,0);
 	for(a=0;a<768;a++) pal1[a]=inp(0x3c9);
 #endif
+	for(a=0;a<256;a++) getrgb(a,&pal1[a*3]);
 
 	zy=0; zya=0; zly=0;
 	zy2=0; zly2=0;
@@ -68,6 +71,9 @@ void	zoomer2()
 		frame++;
 		dis_waitb();
 		//setpalarea(pal2,0,128);
+		for (i = 0; i < 128; i++) {
+			setrgb(0 + i, pal2[i*3], pal2[i*3+1], pal2[i*3+2]);
+		}
 	}
 
 	//v=vram+(194)*80;
@@ -77,6 +83,8 @@ void	zoomer2()
 	outp(0x3c9,0);
 	outp(0x3c9,0);
 #endif
+	setrgb(0, 0, 0, 0);
+
 	//v=vram+(0)*80;
 	for(y=0;y<=399;y++)
 	{

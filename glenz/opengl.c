@@ -51,6 +51,10 @@ static float color[256][4];
 
 void setrgb(int c, int r, int g, int b)
 {
+	if (c == 0 || c == 4) {
+		printf("%d  %d %d %d\n", c, r, g, b);
+		//usleep(100000);
+	}
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;
 	color[c][2] = (float)b / CC;
