@@ -636,10 +636,11 @@ int main()
             ceasypolylist(polylist,epolys,points3);
             //cglenzpolylist(polylist);
 
-draw_fc();
+	    blend_color();
+            draw_fc();
             draw_poly(polylist);
         }
-
+        
         if(frame>800 && bscale>4)
         {       
             demomode[0]=demomode[2];
@@ -661,9 +662,10 @@ draw_fc();
             ceasypolylist(polylist,epolysb,points3);
             //cglenzpolylist(polylist);
 
+	    blend_alpha();
             draw_poly(polylist);
         }
-        
+
         cglenzdone();
 
 	swap_buffers();

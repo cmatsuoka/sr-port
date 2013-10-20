@@ -217,7 +217,7 @@ void demo_glz(int normal, int *polylist)
 	if (color & 0x02) {
 		//printf("BLUE: %d (%d)\n", rolcol[color], ax);
 		r = 0;
-		g = ax >> 2;
+		g = ax / 3;
 		b = ax;
 	} else {
 		//@@b1

@@ -82,15 +82,15 @@ static float tex_coords[] = {
 
 static float color[256][4];
 
-#define CC 48
+#define CC 56
 
 void setrgb(int c, int r, int g, int b)
 {
 	float alpha = 0.5f;
 
 #if 0
-	if (c == 0 || c == 232) {
-		alpha = 1.5f;
+	if (c == 232 || c == 240) {
+		alpha = 0.75f;
 	}
 #endif
 	color[c][0] = (float)r / CC;
@@ -151,6 +151,7 @@ void draw_poly(int *polylist)
 {
 	int num_vertices, c, i;
 	float f[6];
+	int *p = polylist;
 
 	glUseProgram(triangle_program.program);
 	while ((num_vertices = *polylist++) != 0) {
@@ -160,8 +161,19 @@ void draw_poly(int *polylist)
 			f[i * 2 + 0] = *polylist++;
 	 		f[i * 2 + 1] = 200.0f - *polylist++;
 		}
-	
-		draw_triangle(f, c);
+		if (c == 232 || c == 240)
+			draw_triangle(f, c);
+	}
+
+	polylist = p;
+	while ((num_vertices = *polylist++) != 0) {
+		c = *polylist++ & 0xff;
+		for (i = 0; i < num_vertices; i++) {
+			f[i * 2 + 0] = *polylist++;
+	 		f[i * 2 + 1] = 200.0f - *polylist++;
+		}
+		if (c != 232 && c != 240)
+			draw_triangle(f, c);
 	}
 
 #if 0
@@ -212,8 +224,8 @@ int init_opengl(int width, int height)
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(.0, .0, .0, 0);
 
@@ -229,6 +241,16 @@ int init_opengl(int width, int height)
 	init_texture();
 
 	return 0;
+}
+
+void blend_alpha()
+{
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+}
+
+void blend_color()
+{
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void clear_screen()
