@@ -637,6 +637,7 @@ int main()
             //cglenzpolylist(polylist);
 
             draw_poly(polylist);
+draw_fc();
         }
 
         if(frame>800 && bscale>4)

@@ -4,6 +4,7 @@
 #include <math.h>
 #include <GLES2/gl2.h>
 #include <GL/glu.h>
+#include <SOIL/SOIL.h>
 #include "u2gl.h"
 
 static int view_width;
@@ -17,8 +18,8 @@ float obj[9];
 float fc_obj[12] = {
 	0.0f, 0.0f, 0.0f,
 	320.0f, 0.0f, 0.0f,
-	0.0f, 150.0f, 0.0f,
-	320.0f, 150.0f, 0.0f
+	0.0f, 50.0f, 0.0f,
+	320.0f, 50.0f, 0.0f
 };
 
 static const char vertex_shader[] =
@@ -47,9 +48,9 @@ static const char vertex_shader_texture[] =
 "uniform mat4 pMatrix;\n"
 "uniform mat4 uMatrix;\n"
 "attribute vec4 aPosition;\n"
+"varying vec3 vPosition;\n"
 "attribute vec2 aTexPosition;\n"
 "varying vec2 vTexPosition;\n"
-"varying vec3 vPosition;\n"
 "\n"
 "void main() {\n"
 "    mat4 Matrix = pMatrix * uMatrix;\n"
@@ -62,13 +63,21 @@ static const char vertex_shader_texture[] =
 static const char fragment_shader_texture[] =
 "precision mediump float;\n"
 "uniform sampler2D uTexture;\n"
-"varying vec2 vTexPosition;\n"
 "varying vec3 vPosition;\n"
+"varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
 "    gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
 "}\n";
 
+
+
+static float tex_coords[] = {
+	0.0f, 0.5f,
+	1.0f, 0.5f,
+	0.0f, 0.0f,
+	1.0f, 0.0f
+};
 
 
 static float color[256][4];
@@ -97,7 +106,8 @@ void getrgb(int c, char *p)
 
 void draw_fc()
 {
-	u2gl_draw_triangle_strip(&fc_program, fc_obj, 4);
+	glUseProgram(fc_program.program);
+	u2gl_draw_textured_triangle_strip(&fc_program, fc_obj, 4);
 }
 
 static void draw_triangle(float *f, int c)
@@ -120,6 +130,7 @@ void draw_palette()
 {
 	int i;
 
+	glUseProgram(triangle_program.program);
 	for (i = 0; i < 256; i++) {
 		u2gl_set_color(color[i], &triangle_program);
 	
@@ -139,6 +150,7 @@ void draw_poly(int *polylist)
 	int num_vertices, c, i;
 	float f[6];
 
+	glUseProgram(triangle_program.program);
 	while ((num_vertices = *polylist++) != 0) {
 		c = *polylist++ & 0xff;
 
@@ -161,37 +173,23 @@ static void init_texture()
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
+	u2gl_set_tex_coords(tex_coords);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+	int width, height;
+	unsigned char* image = SOIL_load_image("fc_2x.png",
+				&width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+				GL_UNSIGNED_BYTE, image);
+	SOIL_free_image_data(image);
+
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// Black/white checkerboard
-	float pixels[] = {
-		0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
-	};
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
-
-	float vertices[] = {
-		//  Position      Color             Texcoords
-		-0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // Top-left
-		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // Top-right
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // Bottom-right
-		-0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f  // Bottom-left
-	};
-
-	GLint aPosition = glGetAttribLocation(fc_program.program, "aPosition");
-	glVertexAttribPointer(aPosition, 2, GL_FLOAT, GL_FALSE,
-                       7*sizeof(float), 0);
-
-	GLint aTexPosition = glGetAttribLocation(fc_program.program, "aTexPosition");
-	glEnableVertexAttribArray(aTexPosition);
-	glVertexAttribPointer(aTexPosition, 2, GL_FLOAT, GL_FALSE,
-                       7*sizeof(float), (void*)(5*sizeof(float)));
+	u2gl_check_error("init_texture");
 }
 
 int init_opengl(int width, int height)
@@ -218,9 +216,13 @@ int init_opengl(int width, int height)
 	glClearColor(.0, .0, .0, 0);
 
 	glUseProgram(triangle_program.program);
-
 	matrix_identity(m);
 	u2gl_set_matrix(&triangle_program, m);
+
+	glUseProgram(fc_program.program);
+	u2gl_set_matrix(&fc_program, m);
+
+	u2gl_check_error("init_opengl");
 
 	init_texture();
 
@@ -236,7 +238,4 @@ void projection()
 {
 	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
 	u2gl_projection(0, view_width, 0, view_height, &fc_program);
-
-	glUseProgram(triangle_program.program);
-
 }

@@ -97,7 +97,7 @@ void	zoomer1(char *pic)
 {
 	int	dist=320,q;
 	int	y1,y2,z1,z2,yd;
-	int	y,z,f=0,frame=0;
+	int	y,__attribute__ ((unused)) z,f=0,frame=0;
 	int	rot;
 	bg=pic;
 	for(y=199;y>=0;y--)

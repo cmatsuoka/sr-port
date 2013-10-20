@@ -10,6 +10,7 @@ struct u2gl_program {
 	GLuint uMatrix_location;
 	GLuint aPosition_location;
 	GLuint uColor_location;
+	GLuint aTexPosition_location;
 };
 
 static inline void u2gl_set_color(GLfloat *c, struct u2gl_program *p) {
@@ -20,8 +21,10 @@ static inline void u2gl_set_matrix(struct u2gl_program *p, float *m) {
 	glUniformMatrix4fv(p->uMatrix_location, 1, 0, m);
 }
 
+void	u2gl_set_tex_coords(float *);
 void	u2gl_check_error(char *);
 void	u2gl_draw_triangle_strip(struct u2gl_program *, float *, int);
+void	u2gl_draw_textured_triangle_strip(struct u2gl_program *, float *, int);
 void	u2gl_projection(float, float, float, float, struct u2gl_program *);
 int	u2gl_create_program(struct u2gl_program *, GLuint, GLuint);
 GLuint	u2gl_compile_vertex_shader(const char *);

@@ -15,4 +15,4 @@ default-glenz:
 glenz-all: $(GLENZ_PATH)/$(GLENZ_BIN)
 
 $(GLENZ_PATH)/$(GLENZ_BIN): $(GLENZ_PATH_OBJS)
-	$(LD) -o $@ $(LDFLAGS) $(GLENZ_PATH_OBJS) $(LIBS)
+	$(LD) -o $@ $(LDFLAGS) $(GLENZ_PATH_OBJS) $(LIBS) -lSOIL

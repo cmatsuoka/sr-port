@@ -4,6 +4,12 @@
 #include <GL/glu.h>
 #include "u2gl.h"
 
+static float tex_coords[8];
+
+void u2gl_set_tex_coords(float *coords)
+{
+	memcpy(tex_coords, coords, 8 * sizeof(float));
+}
 
 void u2gl_check_error(char *t)
 {
@@ -17,10 +23,24 @@ void u2gl_draw_triangle_strip(struct u2gl_program *p, float *obj, int num)
 {
 	glEnableVertexAttribArray(p->aPosition_location);
 	glVertexAttribPointer(p->aPosition_location, 3, GL_FLOAT,
-					0, 3 * sizeof(float), obj);
+				GL_FALSE, 3 * sizeof(float), obj);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, num);
 	glDisableVertexAttribArray(p->aPosition_location);
-	//check_error("DRAW");
+}
+
+void u2gl_draw_textured_triangle_strip(struct u2gl_program *p, float *obj, int num)
+{
+	glEnableVertexAttribArray(p->aPosition_location);
+	glVertexAttribPointer(p->aPosition_location, 3, GL_FLOAT,
+					0, 3 * sizeof(float), obj);
+
+        glEnableVertexAttribArray(p->aTexPosition_location);
+        glVertexAttribPointer(p->aTexPosition_location, 2, GL_FLOAT,
+				GL_FALSE, 2 * sizeof(float), (void*)tex_coords);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, num);
+	glDisableVertexAttribArray(p->aPosition_location);
+	//u2gl_check_error("DRAW_TEXTURED");
 }
 
 void u2gl_projection(float left, float right, float bottom, float top, struct u2gl_program *p)
@@ -63,6 +83,7 @@ int u2gl_create_program(struct u2gl_program *p, GLuint v, GLuint f)
 	p->uMatrix_location = glGetUniformLocation(p->program, "uMatrix");
 	p->aPosition_location = glGetAttribLocation(p->program, "aPosition");
 	p->uColor_location = glGetUniformLocation(p->program, "uColor");
+	p->aTexPosition_location = glGetAttribLocation(p->program, "aTexPosition");
 
 	return 0;
 }
