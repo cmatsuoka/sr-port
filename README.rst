@@ -36,6 +36,6 @@ Tunneli
 
 Glenz
 """""
-Work in progress.
+(Work in progress)
 
-.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/tunnel-small.png
+.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/glenz-small.png
