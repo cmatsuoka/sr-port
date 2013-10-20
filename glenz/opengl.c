@@ -41,7 +41,7 @@ static const char fragment_shader[] =
 "varying vec3 vPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = vec4(uColor.xyz, 0.5);\n"
+"    gl_FragColor = uColor;\n"
 "}\n";
 
 static const char vertex_shader_texture[] =
@@ -86,15 +86,17 @@ static float color[256][4];
 
 void setrgb(int c, int r, int g, int b)
 {
+	float alpha = 0.5f;
+
 #if 0
-	if (c == 0 || c == 4) {
-		printf("%d  %d %d %d\n", c, r, g, b);
+	if (c == 0 || c == 232) {
+		alpha = 1.5f;
 	}
 #endif
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;
 	color[c][2] = (float)b / CC;
-	color[c][3] = 0.5f;
+	color[c][3] = alpha;
 }
 
 void getrgb(int c, char *p)

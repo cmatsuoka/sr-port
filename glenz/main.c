@@ -636,8 +636,8 @@ int main()
             ceasypolylist(polylist,epolys,points3);
             //cglenzpolylist(polylist);
 
-            draw_poly(polylist);
 draw_fc();
+            draw_poly(polylist);
         }
 
         if(frame>800 && bscale>4)
