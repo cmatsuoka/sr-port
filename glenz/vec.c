@@ -173,7 +173,7 @@ void demo_glz(int normal, int *polylist)
 		//polylist[-1] = ((color >> 1) & 0x01) << 2;
 
 		// Workaround for transparency, no planes in GL
-		polylist[-1] = 232 + (((color >> 1) & 0x01) << 2) * 2;
+		polylist[-1] = 240 - (((color >> 1) & 0x01) << 2) * 2;
 		setrgb(232, 4, 4, 4);
 		return;
 	}

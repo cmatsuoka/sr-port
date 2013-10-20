@@ -82,7 +82,7 @@ static float tex_coords[] = {
 
 static float color[256][4];
 
-#define CC 56
+#define CC 32
 
 void setrgb(int c, int r, int g, int b)
 {

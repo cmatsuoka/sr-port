@@ -15,7 +15,7 @@ Notes
 
 * Ported code should be resolution-independent.
 
-* IDEA: original bitmap art can be upscaled with 4xbrz.
+* Pixel art upscaled with 4xbrz.
 
 * IDEA: make ported DIS code interface to libxmp to get music information.
 
@@ -26,20 +26,16 @@ Screenshots
 
 Dots
 """"
-.. image:: https://raw.github.com/cmatsuoka/sr-dots/master/doc/dots-small.png
+.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/dots-small.png
 
 
 Tunneli
 """""""
-.. image:: https://raw.github.com/cmatsuoka/sr-dots/master/doc/tunnel-small.png
+.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/tunnel-small.png
 
 
 Glenz
 """""
+Work in progress.
 
-Work in progress. I always thought the polyhedron was an icosahedron, but
-it is in fact a `tetrakis hexahedron`_.
-
-
-
-.. _tetrakis hexahedron: http://mathworld.wolfram.com/TetrakisHexahedron.html
+.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/tunnel-small.png
