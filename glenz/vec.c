@@ -22,6 +22,8 @@ int wmaxx = 319;
 int wmaxy = 199;
 int framerate10 = 700;
 
+extern int frame;
+
 
 int csetmatrix(int *matrix, int x, int y, int z)
 {
@@ -172,9 +174,16 @@ void demo_glz(int normal, int *polylist)
 		rolused[al] = 0;
 		//polylist[-1] = ((color >> 1) & 0x01) << 2;
 
-		// Workaround for transparency, no planes in GL
-		polylist[-1] = 240 - (((color >> 1) & 0x01) << 2) * 2;
-		setrgb(232, 4, 4, 4);
+		// Workaround for transparency, no palettized blends in GL.
+		// We could simulate OR operations rendering in a texture,
+		// but this works well enough and it's much easier.
+		if (frame < 800) {
+			polylist[-1] = 240 - (((color >> 1) & 0x01) << 2) * 2;
+			setrgb(232, 13, 6, 13);
+		} else {
+			polylist[-1] = ((color >> 1) & 0x01) << 2;
+		}
+
 		return;
 	}
 
