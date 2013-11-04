@@ -161,7 +161,7 @@ void draw_poly(int *polylist)
 			f[i * 2 + 0] = *polylist++;
 	 		f[i * 2 + 1] = 200.0f - *polylist++;
 		}
-		if (c == 232 || c == 240)
+		if (c == 232 || c == 240 || c == 0 || c == 4)
 			draw_triangle(f, c);
 	}
 
@@ -172,7 +172,7 @@ void draw_poly(int *polylist)
 			f[i * 2 + 0] = *polylist++;
 	 		f[i * 2 + 1] = 200.0f - *polylist++;
 		}
-		if (c != 232 && c != 240)
+		if (c != 232 && c != 240 && c != 0 && c != 4)
 			draw_triangle(f, c);
 	}
 
