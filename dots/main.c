@@ -267,6 +267,7 @@ int main()
 		update_dots();
 		clear_screen();
 		draw_dots();
+		//dump_frame();
 		swap_buffers();
 	}
 

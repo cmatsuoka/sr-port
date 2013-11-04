@@ -197,3 +197,52 @@ void poll_event()
 		}
 	}
 }
+
+
+void dump_frame()
+{
+	static char *buffer = NULL;
+	static int num;
+	char name[80], *src, *dest;
+	FILE *f;
+	int i;
+
+	if (buffer == NULL) {
+		glReadBuffer(GL_BACK);
+		buffer = malloc(4 * window_width * window_height);
+		num = 0;
+	}
+
+	glReadPixels(0, 0, window_width, window_height, GL_RGBA,
+						GL_UNSIGNED_BYTE, buffer);
+	u2gl_check_error("glReadPixels");
+
+	snprintf(name, 80, "frame_%06d.raw", num++);
+	f = fopen(name, "wb");
+	if (f == NULL)
+		return;
+	
+	int bytes_in_row = window_width * 4;
+	int bytes_left = window_width * window_height * 4;
+	while (bytes_left > 0) {
+		int start_of_row = bytes_left - bytes_in_row;
+
+		src = dest = &buffer[start_of_row];
+
+		for (i = 0; i < window_width; i++) {
+			unsigned char r = *src++;
+			unsigned char g = *src++;
+			unsigned char b = *src++;
+			src++;
+
+			*dest++ = r;
+			*dest++ = g;
+			*dest++ = b;
+		}
+
+		fwrite (&buffer[start_of_row], 1, window_width * 3, f);
+		bytes_left -= bytes_in_row;
+	}
+	fclose (f);
+}
+
