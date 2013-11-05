@@ -209,10 +209,9 @@ int adjust_framerate()
 	adjust += deltaus;
 
 	num_frames = adjust / frameus;
-	//printf("deltaus=%ld  adjust=%ld  num_frames=%d\n", deltaus, adjust, num_frames);
+	//printf("deltaus=%ld  frameus=%ld  adjust=%ld  num_frames=%d\n", deltaus, frameus, adjust, num_frames);
 
-	while (adjust > frameus)
-		adjust -= frameus;
+	adjust -= frameus * num_frames;
 
 	return num_frames;
 }

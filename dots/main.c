@@ -121,6 +121,26 @@ static void setup_dots()
 
 }
 
+void update_gravity(struct dot *dot)
+{
+	float bp = ((dot->z * rotcos - dot->x * rotsin) / 0x10000) + 9000;
+	float a = (dot->z * rotsin + dot->x * rotcos) / 0x100;
+
+	float x = (a + a / 8) / bp + 160;
+	if (x <= 319) {
+		float shadow_y = (0x80000 / bp) + 100;
+		if (shadow_y <= 199) {
+			dot->yadd += gravity;
+			float b = dot->y + dot->yadd;
+			if (b >= gravitybottom) {
+				dot->yadd = (-dot->yadd * gravityd) / 0x10;
+				b += dot->yadd;
+			}
+
+			dot->y = b;
+		}
+	}
+}
 
 static void update_dots()
 {
@@ -232,6 +252,10 @@ if(dis_indemo())
 	f++;
 	gravity=grav;
 	gravityd=gravd;
+
+	for (i = 0; i < dotnum; i++) {
+		update_gravity(&dot[i]);
+	}
 }
 
 static void draw_dots()
@@ -273,7 +297,6 @@ int main()
 
 		clear_screen();
 		draw_dots();
-		//dump_frame();
 		swap_buffers();
 	}
 

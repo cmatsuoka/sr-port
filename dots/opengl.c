@@ -179,6 +179,7 @@ void draw_dot(struct dot *dot)
 			u2gl_set_matrix(&dot_program, m);
 			u2gl_draw_triangle_strip(&dot_program, shadow_obj, 3);
 
+#if 0
 			/* ball */
 
 			dot->yadd += gravity;
@@ -188,6 +189,7 @@ void draw_dot(struct dot *dot)
 				b += dot->yadd;
 			}
 			dot->y = b;
+#endif
 
 			float y = (dot->y * 64) / bp + 100;
 			if (y <= 199) {
