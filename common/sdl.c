@@ -166,27 +166,30 @@ int init_graphics(char *caption, int width, int height)
 	return 0;
 }
 
+static long frameus = 1000000 / 70;
+static long deltaus;
+
 void swap_buffers()
 {
-	static long frames, startms, oldms = -1;
+	static long frames, startus, oldus = -1;
 	struct timeval tv;
-	long delta, ms;
+	long us;
 	float fps, avg;
 
 	gettimeofday(&tv, NULL);
-	ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	us = tv.tv_sec * 1000000 + tv.tv_usec;
 
-	if (oldms < 0) {
-		startms = oldms = ms;
+	if (oldus < 0) {
+		startus = oldus = us;
 		frames = 0;
 	}
 
-	delta = ms - oldms;
-	oldms = ms;
+	deltaus = us - oldus;
+	oldus = us;
 
-	if (delta > 0) {
-		fps = 1000.0 / delta;
-		avg = 1000.0 * frames / (ms - startms);
+	if (deltaus > 0) {
+		fps = 1000000.0 / deltaus;
+		avg = 1000.0 * frames / ((us - startus) / 1000.0);
 	} else {
 		avg = fps = 0.0;
 	}
@@ -196,6 +199,22 @@ void swap_buffers()
 	printf("fps = %5.1f, avg = %5.1f\r", fps, avg);
 	
 	eglSwapBuffers(display, surface);
+}
+
+int adjust_framerate()
+{
+	static long adjust = 0;
+	int num_frames;
+
+	adjust += deltaus;
+
+	num_frames = adjust / frameus;
+	//printf("deltaus=%ld  adjust=%ld  num_frames=%d\n", deltaus, adjust, num_frames);
+
+	while (adjust > frameus)
+		adjust -= frameus;
+
+	return num_frames;
 }
 
 static void timer_delay()

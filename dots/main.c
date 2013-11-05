@@ -263,8 +263,14 @@ int main()
 	projection();
 
 	while(frame<2450) {
+		int num;
+
 		poll_event();
-		update_dots();
+
+		for (num = adjust_framerate(); num; num--) {
+			update_dots();
+		}
+
 		clear_screen();
 		draw_dots();
 		//dump_frame();

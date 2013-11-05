@@ -10,4 +10,6 @@ void swap_buffers(void);
 void clear_screen(void);
 void poll_event(void);
 
+int adjust_framerate(void);
+
 #endif
