@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <sys/time.h>
 #include <EGL/egl.h>
 #include <GLES2/gl2.h>
 #include <X11/Xlib.h>
@@ -166,6 +168,33 @@ int init_graphics(char *caption, int width, int height)
 
 void swap_buffers()
 {
+	static long frames, startms, oldms = -1;
+	struct timeval tv;
+	long delta, ms;
+	float fps, avg;
+
+	gettimeofday(&tv, NULL);
+	ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+
+	if (oldms < 0) {
+		startms = oldms = ms;
+		frames = 0;
+	}
+
+	delta = ms - oldms;
+	oldms = ms;
+
+	if (delta > 0) {
+		fps = 1000.0 / delta;
+		avg = 1000.0 * frames / (ms - startms);
+	} else {
+		avg = fps = 0.0;
+	}
+
+	frames++;
+
+	printf("fps = %5.1f, avg = %5.1f\r", fps, avg);
+	
 	eglSwapBuffers(display, surface);
 }
 
@@ -186,7 +215,7 @@ void poll_event()
 {
 	SDL_Event event;
 
-	timer_delay();
+	//timer_delay();
 
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
@@ -208,7 +237,7 @@ void dump_frame()
 	int i;
 
 	if (buffer == NULL) {
-		glReadBuffer(GL_BACK);
+		//glReadBuffer(GL_BACK);
 		buffer = malloc(4 * window_width * window_height);
 		num = 0;
 	}
