@@ -42,7 +42,7 @@ int dis_version()
  */
 int dis_waitb()
 {
-	return 1;		/* number of frames taken            ;TEMP! */
+	return adjust_framerate();		/* number of frames taken            ;TEMP! */
 }
 
 #if 0
