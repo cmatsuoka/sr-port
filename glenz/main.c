@@ -15,7 +15,7 @@ void zoomer1(char *pic);
 
 char bgpic[65535];
 
-extern char fc[];
+//extern char fc[];
 char *fcrow[100];
 char *fcrow2[16];
 
@@ -245,7 +245,9 @@ int matrix[9];
 extern  char    backpal[16*3];
 char    pal[768];
 
-static char fcpal[16*3]={
+static char fc[]={
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00,
 0x0d, 0x09, 0x0d,
 0x10, 0x0b, 0x10,
@@ -261,7 +263,8 @@ static char fcpal[16*3]={
 0x10, 0x0d, 0x13,
 0x0e, 0x0b, 0x11,
 0x0c, 0x0a, 0x0f,
-0x0b, 0x09, 0x0d
+//0x0b, 0x09, 0x0d
+0x20, 0x20, 0x20	// CM: Workaround for chessboard fadeout
 };
 
 #if 0
@@ -352,6 +355,9 @@ int main()
     outp(0x3c8,0);
     for(a=0;a<16*3;a++) outp(0x3c9,fc[a+16]);
 #endif
+
+    for(a=0;a<16;a++) setrgb(a,fc[(a+16)*3],fc[(a+16)*3+1],fc[(a+16)*3+2]);
+
     yy=0; ya=0;
     while(!dis_exit())
     {
@@ -681,7 +687,11 @@ int main()
             //cglenzpolylist(polylist);
 
 	    blend_color();
-            draw_fc();
+
+	    if (frame < 780) {
+            	draw_fc();
+	    }
+
             draw_poly(polylist);
         }
         

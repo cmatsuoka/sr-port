@@ -11,7 +11,7 @@ static volatile uint32_t tick_timer = 0;
 static EGLDisplay display;
 static EGLContext context;
 static EGLSurface surface;
-static Display *x11Disp = NULL;
+static Display *x11_display = NULL;
 
 #define configs_in 10
 
@@ -39,10 +39,10 @@ static void close_window()
 		display = 0;
 	}
 
-	if (x11Disp)
-		XCloseDisplay(x11Disp);
+	if (x11_display)
+		XCloseDisplay(x11_display);
 
-	x11Disp = NULL;
+	x11_display = NULL;
 }
 
 static EGLint s_configAttribs[] = {
@@ -95,13 +95,13 @@ int init_graphics(char *caption, int width, int height)
 		return -1;
 	}
 
-	x11Disp = XOpenDisplay(0);
-	if (x11Disp == NULL) {
+	x11_display = XOpenDisplay(0);
+	if (x11_display == NULL) {
 		fprintf(stderr, "Failed to open X display");
 		return -1;
 	}
 
-	display = eglGetDisplay((EGLNativeDisplayType) x11Disp);
+	display = eglGetDisplay((EGLNativeDisplayType) x11_display);
 	if (display == EGL_NO_DISPLAY) {
 		fprintf(stderr, "Failed to get EGL display");
 		close_window();
@@ -196,7 +196,7 @@ void swap_buffers()
 
 	frames++;
 
-	printf("fps = %5.1f, avg = %5.1f\r", fps, avg);
+	printf("fps = %5.1f, avg = %5.1f    \r", fps, avg);
 	
 	eglSwapBuffers(display, surface);
 }

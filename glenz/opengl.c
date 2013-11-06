@@ -63,11 +63,12 @@ static const char vertex_shader_texture[] =
 static const char fragment_shader_texture[] =
 "precision mediump float;\n"
 "uniform sampler2D uTexture;\n"
+"uniform vec4 uColor;\n"
 "varying vec3 vPosition;\n"
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
+"    gl_FragColor = texture2D(uTexture, vTexPosition).rgba * uColor.x;\n"
 "}\n";
 
 
@@ -109,6 +110,7 @@ void getrgb(int c, char *p)
 void draw_fc()
 {
 	glUseProgram(fc_program.program);
+	u2gl_set_color(color[15], &fc_program);
 	u2gl_draw_textured_triangle_strip(&fc_program, fc_obj, 4);
 }
 
