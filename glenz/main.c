@@ -633,6 +633,31 @@ int main()
 
         cglenzinit();
 
+        if(frame>800 && bscale>4)
+        {       
+            demomode[0]=demomode[2];
+            cmatrix_yxz(3600-rx/3,3600-ry/3,3600-rz/3,matrix);
+            csetmatrix(matrix,0,0,0);
+            points2b[0]=0; crotlist(points2b,pointsb);
+            matrix[0]=bscale*64;
+            matrix[1]=0;
+            matrix[2]=0;
+            matrix[3]=0;
+            matrix[4]=bscale*64;
+            matrix[5]=0;
+            matrix[6]=0;
+            matrix[7]=0;
+            matrix[8]=bscale*64;
+            csetmatrix(matrix,0+oxb,ypos+1500+oyb,zpos+ozb);
+            points2[0]=0; crotlist(points2,points2b);
+            points3[0]=0; cprojlist((int *)points3,points2);
+            ceasypolylist(polylist,epolysb,points3);
+            //cglenzpolylist(polylist);
+
+	    blend_alpha();
+            draw_poly(polylist);
+        }
+
         if(xscale>4)
         {
             demomode[0]=demomode[1];
@@ -660,31 +685,6 @@ int main()
             draw_poly(polylist);
         }
         
-        if(frame>800 && bscale>4)
-        {       
-            demomode[0]=demomode[2];
-            cmatrix_yxz(3600-rx/3,3600-ry/3,3600-rz/3,matrix);
-            csetmatrix(matrix,0,0,0);
-            points2b[0]=0; crotlist(points2b,pointsb);
-            matrix[0]=bscale*64;
-            matrix[1]=0;
-            matrix[2]=0;
-            matrix[3]=0;
-            matrix[4]=bscale*64;
-            matrix[5]=0;
-            matrix[6]=0;
-            matrix[7]=0;
-            matrix[8]=bscale*64;
-            csetmatrix(matrix,0+oxb,ypos+1500+oyb,zpos+ozb);
-            points2[0]=0; crotlist(points2,points2b);
-            points3[0]=0; cprojlist((int *)points3,points2);
-            ceasypolylist(polylist,epolysb,points3);
-            //cglenzpolylist(polylist);
-
-	    blend_alpha();
-            draw_poly(polylist);
-        }
-
         cglenzdone();
 
 	swap_buffers();
