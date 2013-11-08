@@ -1,0 +1,6 @@
+
+
+
+int getspl(int where)
+{
+}

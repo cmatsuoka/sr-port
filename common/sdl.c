@@ -185,6 +185,7 @@ void swap_buffers()
 	}
 
 	deltaus = us - oldus;
+	//deltaus = 1000000 / 60;
 	oldus = us;
 
 	if (deltaus > 0) {
@@ -198,6 +199,7 @@ void swap_buffers()
 
 	printf("fps = %5.1f, avg = %5.1f    \r", fps, avg);
 	
+	//dump_frame();
 	eglSwapBuffers(display, surface);
 }
 
@@ -244,7 +246,6 @@ void poll_event()
 		}
 	}
 }
-
 
 void dump_frame()
 {

@@ -6,7 +6,7 @@ LIBS	= -Lcommon -lcommon -Ldis -ldis -lm -lGL -lEGL -lGLU -lSDL -lX11
 RANLIB	= ranlib
 AR	= ar
 POVRAY	= povray
-PARTS	= dots/dots tunneli/tun10 glenz/glenz
+PARTS	= dots/dots tunneli/tun10 glenz/glenz plzpart/plzpart
 
 all: common-all dis-all $(PARTS)
 
@@ -16,6 +16,7 @@ include dots/Makefile
 include water/Makefile
 include tunneli/Makefile
 include glenz/Makefile
+include plzpart/Makefile
 include techno/Makefile
 
 .SUFFIXES: .c .o .a .pov .png
