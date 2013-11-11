@@ -18,6 +18,7 @@ include tunneli/Makefile
 include glenz/Makefile
 include plzpart/Makefile
 include techno/Makefile
+include visu/c/Makefile
 
 .SUFFIXES: .c .o .a .pov .png
 
