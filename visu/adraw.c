@@ -1,15 +1,15 @@
-/****************************************************************************
-** MODULE:	adraw.asm
-** AUTHOR:	Sami Tammilehto / Fennosoftec OY
-** DOCUMENT:	?
-** VERSION:	1.0
-** REFERENCE:	-
-** REVISED BY:	-
-*****************************************************************************
-**
-** Object drawing (and polygon calculations & clipping (included))
-**
-****************************************************************************/
+;/****************************************************************************
+;** MODULE:	adraw.asm
+;** AUTHOR:	Sami Tammilehto / Fennosoftec OY
+;** DOCUMENT:	?
+;** VERSION:	1.0
+;** REFERENCE:	-
+;** REVISED BY:	-
+;*****************************************************************************
+;**
+;** Object drawing (and polygon calculations & clipping (included))
+;**
+;****************************************************************************/
 
 #include "cd.h"
 //include a.inc
