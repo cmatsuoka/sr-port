@@ -5,6 +5,7 @@
 
 //unsigned char far *vram=(char far *)0xa0000000;
 unsigned char vram[320 * 200];
+unsigned char fr[320 * 200 * 3];
 
 int	blocksleft=999;
 
@@ -23,6 +24,31 @@ int	useownpal;
 int	savefcp;
 
 FILE	*out;
+
+static void write_frame(unsigned char *buf, int size, int num, FILE *f)
+{
+	static int n = 0;
+	char name[80], cmd[200];
+	FILE *ff;
+	int i;
+
+	for (i = 0; i < 64000; i++) {
+		int p = buf[i];
+		fr[i * 3] = palette[p * 3] << 2;
+		fr[i * 3 + 1] = palette[p * 3 + 1] << 2;
+		fr[i * 3 + 2] = palette[p * 3 + 2] << 2;
+	}
+	
+	snprintf(name, 80, "frame_%03d", n++);
+	ff = fopen(name, "wb");
+	fwrite(fr, size * 3, num, ff);
+	fclose(ff);
+
+	snprintf(cmd, 200, "convert -size 320x200 -depth 8 rgb:%s %s.png",
+								name, name);
+	system(cmd);
+	unlink(name);
+}
 
 main(int argc,char *argv[])
 {
@@ -45,12 +71,14 @@ main(int argc,char *argv[])
 	savefcp=1;
 	rewind(f1); readflic(f1,0);
 
+#if 0
 	ppp=fopen("pal.pal","wb");
 	if(ppp!=0)
 		{
 		fwrite(palette,1,768,ppp);
 		fclose(ppp);
 		}
+#endif
 
 	//_asm	mov	ax,3
 	//_asm	int	10h
@@ -120,7 +148,7 @@ int	readflic(FILE *f1,int flag)
 //						outportb(0x3c9,47);
 //						outportb(0x3c9,47);
 //						outportb(0x3c9,47);
-						fwrite(vram,1,64000,out);
+						write_frame(vram,1,64000,out);
 					}
 				}
 				//if(flag&1) getch();
@@ -170,7 +198,7 @@ int	doblock(FILE *f1,unsigned type)
 		a+=getc(f1);
 		//outportb(0x3c8,a);
 		//for(a=0;a<c;a++) outportb(0x3c9,palette[a]=getc(f1));
-		palette[a]=getc(f1);
+		for(a=0;a<c;a++) palette[a]=getc(f1);
 		if(oktoviewpal) viewpal();
 	}
 	else if(type==0x0004)
@@ -183,7 +211,7 @@ int	doblock(FILE *f1,unsigned type)
 		a+=getc(f1);
 		//outportb(0x3c8,a);
 		//for(a=0;a<c;a++) outportb(0x3c9,palette[a]=(getc(f1)>>2));
-		palette[a]=(getc(f1)>>2);
+		for(a=0;a<c;a++) palette[a]=(getc(f1)>>2);
 		if(oktoviewpal) viewpal();
 	}
 	else if(type==0x000c)
