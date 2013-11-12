@@ -11,9 +11,10 @@
 **
 ****************************************************************************/
 
+#include "cd.h"
 //include a.inc
 
-int framecounter = 0
+int framecounter = 0;
 
 //include avidm1.asm ;320x200x256 (tweak)
 //include avidm2.asm ;640x400x256 (tweak)
@@ -93,7 +94,13 @@ _vid_cameraangle PROC FAR
 	mov	ds:_projmuly,eax
 	CEND
 _vid_cameraangle ENDP
+*/
 
+void vid_cameraangle(angle a)
+{
+}
+
+/*
 ;北北北北 _vid_window(long x1,y1,x2,y2,z1,z2) 北北北北
 ;entry:	(see above)
 ; exit: -
@@ -123,7 +130,13 @@ _vid_window PROC FAR
 	mov	ds:_projclipz[CLIPMAX],eax
 	CEND
 _vid_window ENDP
+*/
 
+void vid_window(int x1,int y1,int x2,int y2,int z1,int z2)
+{
+}
+
+/*
 ;北北北北 _vid_init(int mode) 北北北北
 ;entry:	mode (see below)
 ; exit: -
@@ -155,7 +168,13 @@ _vid_init PROC FAR
 	call	m1o_init
 @@3:	CEND
 _vid_init ENDP
+*/
+
+void vid_init(int mode)
+{
+}
 	
+/*
 ;北北北北 _vid_deinit() 北北北北
 ;entry:	-
 ; exit: -
@@ -166,7 +185,13 @@ _vid_deinit PROC FAR
 	int	10h
 	CEND
 _vid_deinit ENDP
+*/
 
+void vid_deinit()
+{
+}
+
+/*
 ;北北北北 _vid_setpal(char far *pal) 北北北北
 ;entry:	pal=palette (768 bytes VGA RGB)
 ; exit: -
@@ -317,7 +342,9 @@ _vid_clear255 PROC FAR
 	call	ds:vr[CLEAR]
 	CEND
 _vid_clear255 ENDP
+*/
 
+/*
 ;北北北北 _vid_clearbg(char *bg) 北北北北
 ;entry: -
 ; exit: -
@@ -331,7 +358,13 @@ _vid_clearbg PROC FAR
 	call	ds:vr[CLEAR]
 	CEND
 _vid_clearbg ENDP
+*/
 
+void vid_clearbg(char *bg)
+{
+}
+
+/*
 ;北北北北 _vid_switch(void) 北北北北
 ;entry: -
 ; exit: -

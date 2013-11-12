@@ -14,7 +14,7 @@
 
 int	indemo=0;
 
-extern char bg[];
+char bg[320 * 200];
 char *bg2;
 
 char	scene[64]={"U2A"};
@@ -149,6 +149,7 @@ int main(int argc,char *argv[])
 	#endif
 	indemo=1;
 
+adjust_framerate();
 	dis_partstart();
 	sprintf(tmpname,"%s.00M",scene);
 	if(!indemo) printf("Loading materials %s...\n",tmpname);
@@ -226,7 +227,7 @@ int main(int argc,char *argv[])
 	if(!indemo) 
 	{
 		printf("Press any key to continue...");
-		getch();
+		//getch();
 	}	
 
 	resetscene();
