@@ -28,18 +28,18 @@
 
 struct s_rmatrix /* special matrix specifying position & rotation */
 {
-	long	m[9];
-	long	x;
-	long	y;
-	long	z;
+	int	m[9];
+	int	x;
+	int	y;
+	int	z;
 };
 #define rmatrix	struct s_rmatrix
 
 struct s_vlist
 {
-	long	x;
-	long	y;
-	long	z;
+	int	x;
+	int	y;
+	int	z;
 	int	normal;
 	int	RESERVED;
 };

@@ -140,14 +140,14 @@ void _loadds copper2(void)
 int main(int argc,char *argv[])
 {
 	//char huge *sptemp;
-	int	huge *ip;
+	short	huge *ip;
 	unsigned int u;
 	char	huge *cp;
 	int	a,b,c,d,e,f,g,x,y,z;
 	#ifdef DEBUG
 	fr=fopen("tmp","wt");
 	#endif
-	indemo=1;
+	//indemo=1;
 
 adjust_framerate();
 	dis_partstart();
@@ -173,7 +173,7 @@ adjust_framerate();
 
 	if(scene0[15]=='C') city=1;
 	if(scene0[15]=='R') city=2;
-	ip=(int huge *)(scene0+LONGAT(scene0+4));
+	ip=(short *)(scene0+LONGAT(scene0+4));
 	conum=d=*ip++;
 	for(f=-1,c=1;c<d;c++)
 	{	
@@ -504,29 +504,30 @@ char	*readfile(char *name)
 	fseek(f1,0L,SEEK_END);
 	p0=p=getmem(size=ftell(f1));
 	fseek(f1,0L,SEEK_SET);
+#if 0
 	if(size>128000)
 	{
 		fread(p,64000,1,f1);
 		size-=64000; 
-		//_asm add word ptr p[2],4000
+		_asm add word ptr p[2],4000
 		fread(p,64000,1,f1);
 		size-=64000; 
-		//_asm add word ptr p[2],4000
+		_asm add word ptr p[2],4000
 		fread(p,(size_t)size,1,f1);
 	}
 	else if(size>64000)
 	{
 		fread(p,64000,1,f1);
 		size-=64000; 
-#if 0
 		_asm
 		{
 			add word ptr p[2],4000
 		}
-#endif
 		fread(p,(size_t)size,1,f1);
 	}
-	else fread(p,(size_t)size,1,f1);
+	else
+#endif
+	fread(p,(size_t)size,1,f1);
 	fclose(f1);
 	return(p0);
 }

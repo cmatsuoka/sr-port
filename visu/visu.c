@@ -12,7 +12,7 @@
 
 static int gint(char *d)
 {
-	int val = *d++;
+	int val = *(unsigned char *)d++;
 	return (*d << 8) | val;
 }
 
@@ -93,7 +93,7 @@ object * vis_loadobject(char *fname)
 		{
 			printf("Unknown block: %c%c%c%c\n",d0[0],d0[1],d0[2],d0[3]);
 		}
-		l=*(long *)(d0+4);
+		l=*(int *)(d0+4);
 		d=d0+l+8;
 	}
 
