@@ -10,7 +10,6 @@
 #define	noDEBUG
 #define huge
 #define _loadds
-#define vid_setswitch(x,y)
 
 int	indemo=0;
 

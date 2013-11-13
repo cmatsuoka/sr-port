@@ -12,10 +12,13 @@
 ;****************************************************************************/
 
 #include <stdio.h>
+#include <string.h>
 #include "graphics.h"
 #include "opengl.h"
+#include "c.h"
 #include "cd.h"
-//include a.inc
+
+extern int avistan[];
 
 int framecounter = 0;
 
@@ -101,42 +104,43 @@ _vid_cameraangle ENDP
 
 void vid_cameraangle(angle a)
 {
+	int ax, bx = a >> 1;		/* divide by 2 for half of angle */
+
+	ax = projclipx[CLIPMAX] - projaddx;
+					/* ax=width of half of screen */
+
+	if (bx < 8 * 64)		/* about 3 degrees minimum */
+		bx = 8 * 64;
+
+	if (bx >= 16384)
+		bx = 16383;		/* 90 degrees maximum */
+
+	bx = (bx >> 5) & ~1;		/* bx=word index (0..255)*2 */
+
+	projmulx = (ax * avistan[bx]) >> 8;
+	projmuly = (projmulx * projaspect) >> 8;
 }
 
 /*
-;北北北北 _vid_window(long x1,y1,x2,y2,z1,z2) 北北北北
+;北北北北 _vid_window(long x1,x2,y1,y2,z1,z2) 北北北北
 ;entry:	(see above)
 ; exit: -
 ;descr: sets the video window (for clipping) and sets xadd/yadd to the
 ;	center of the window
-_vid_window PROC FAR
-	CBEG
-	movpar	eax,0
-	mov	edx,eax
-	mov	ds:_projclipx[CLIPMIN],eax
-	movpar	eax,2
-	add	edx,eax
-	mov	ds:_projclipx[CLIPMAX],eax
-	sar	edx,1
-	mov	ds:_projaddx,edx
-	movpar	eax,4
-	mov	edx,eax
-	mov	ds:_projclipy[CLIPMIN],eax
-	movpar	eax,6
-	add	edx,eax
-	mov	ds:_projclipy[CLIPMAX],eax
-	sar	edx,1
-	mov	ds:_projaddy,edx
-	movpar	eax,8
-	mov	ds:_projclipz[CLIPMIN],eax
-	movpar	eax,10
-	mov	ds:_projclipz[CLIPMAX],eax
-	CEND
-_vid_window ENDP
 */
 
-void vid_window(int x1,int y1,int x2,int y2,int z1,int z2)
+void vid_window(int x1,int x2,int y1,int y2,int z1,int z2)
 {
+	projclipx[CLIPMIN] = x1;
+	projclipx[CLIPMAX] = x2;
+	projaddx = (x1 + x2) >> 1;
+
+	projclipy[CLIPMIN] = y1;
+	projclipy[CLIPMAX] = y2;
+	projaddy = (y1 + y2) >> 1;
+
+	projclipz[CLIPMIN] = z1;
+	projclipz[CLIPMAX] = z2;
 }
 
 /*
@@ -173,16 +177,14 @@ _vid_init PROC FAR
 _vid_init ENDP
 */
 
-int vid_init(int mode)
+void vid_init(int mode)
 {
 	if (init_graphics("Visu", window_width, window_height) < 0) {
 		fprintf(stderr, "Can't init graphics\n");
-		return -1;
+		return;
 	};
 
 	init_opengl(window_width, window_height);
-
-	return 0;
 }
 	
 /*
@@ -190,16 +192,11 @@ int vid_init(int mode)
 ;entry:	-
 ; exit: -
 ;descr: resets screen to text mode
-_vid_deinit PROC FAR
-	CBEG
-	mov	ax,3
-	int	10h
-	CEND
-_vid_deinit ENDP
 */
 
 void vid_deinit()
 {
+	/* do nothing */
 }
 
 /*
@@ -207,32 +204,16 @@ void vid_deinit()
 ;entry:	pal=palette (768 bytes VGA RGB)
 ; exit: -
 ;descr: sets screen palette 
-_vid_setpal PROC FAR
-	CBEG
-	ldspar	si,0
-	mov	dx,3dah
-@@1:	in	al,dx
-	test	al,8
-	jnz	@@1
-@@2:	in	al,dx
-	test	al,8
-	jz	@@2
-	mov	dx,3c8h
-	xor	al,al
-	out	dx,al
-	inc	dx
-	mov	cx,256
-@@3:	mov	al,ds:[si+0]
-	out	dx,al
-	mov	al,ds:[si+1]
-	out	dx,al
-	mov	al,ds:[si+2]
-	out	dx,al
-	add	si,3
-	loop	@@3
-	CEND
-_vid_setpal ENDP
+*/
 
+char palette[768];
+
+void vid_setpal(char *pal)
+{
+	memcpy(palette, pal, 768);
+}
+
+/*
 ;北北北北 _vid_drawdots(int count,pvlist *pv) 北北北北
 ;entry:	count=number of points to draw
 ;	pv=pointer to projected vertex list
@@ -387,7 +368,9 @@ _vid_switch PROC FAR
 	call	ds:vr[SWITCH]
 	CEND
 _vid_switch ENDP
+*/
 
+/*
 ;北北北北 _vid_setswitch(int,int) 北北北北
 ;entry: -
 ; exit: -
@@ -410,7 +393,13 @@ _vid_setswitch PROC FAR
 	out	dx,ax
 @@2:	CEND
 _vid_setswitch ENDP
+*/
 
+void vid_setswitch(int a,int b)
+{
+}
+
+/*
 ;北北北北 _vid_waitb(void) 北北北北
 ;entry: -
 ; exit: -

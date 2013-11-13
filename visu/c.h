@@ -35,7 +35,7 @@ void	vis_drawobject(object *o); // visu.c
 /*####### Prototypes for asm routines ########*/
 
 void	vid_init(int mode);
-void	vid_window(long x1,long x2,long y1,long y2,long z1,long z2);
+void	vid_window(int x1,int x2,int y1,int y2,int z1,int z2);
 void	vid_cameraangle(angle a);
 void	vid_inittimer(void);
 void	vid_deinittimer(void);
@@ -68,7 +68,7 @@ void	calc_nrotate(int count,nlist *dest,nlist *source,rmatrix *matrix);
 void	calc_mulrmatrix(rmatrix *dest,rmatrix *source);
 int	calc_invrmatrix(rmatrix *dest);
 void	calc_applyrmatrix(rmatrix *dest,rmatrix *apply);
-long	calc_singlez(int vertexnum,vlist *vertexlist,rmatrix *matrix);
+int	calc_singlez(int vertexnum,vlist *vertexlist,rmatrix *matrix);
 void	calc_setrmatrix_camera(rmatrix *,long,long,long,long,long,long,int);
 
 void	draw_polylist(polylist *,polydata *,vlist *,pvlist *,nlist *,int);
@@ -80,18 +80,22 @@ void	draw_setfillroutine(void (*)(int *));
 #define UNIT 16384
 #define UNITSHR 14
 
+#define CLIPMIN 0
+#define CLIPMAX 1
+
 /*####### External Assembler variables ########*/
 
-extern	long	datanull;
+extern	int	datanull;
 extern	int	rows[MAXROWS];
 extern	int	vramseg;
-extern	long	projclipx[2];
-extern	long	projclipy[2];
-extern	long	projclipz[2];
-extern	long	projmulx;
-extern	long	projmuly;
-extern	long	projaddx;
-extern	long	projaddy;
+extern	int	projclipx[2];
+extern	int	projclipy[2];
+extern	int	projclipz[2];
+extern	int	projmulx;
+extern	int	projmuly;
+extern	int	projaddx;
+extern	int	projaddy;
+extern	int	projaspect;
 
 #define INCLUDED_CD
 #endif
