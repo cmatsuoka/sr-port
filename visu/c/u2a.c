@@ -232,10 +232,10 @@ adjust_framerate();
 
 	resetscene();
 
+#if 0
 	for(;;)
 	{
 		// DIS: muscode
-#if 0
 		_asm
 		{
 			mov	bx,6
@@ -243,10 +243,10 @@ adjust_framerate();
 			mov	a,cx	// ord
 			mov	b,bx	// row
 		}
-#endif
 		if(a>10 && b>46) break;
 		if(dis_exit()) return 1;
 	}
+#endif
 
  	vid_init(3); ////// oversample x 4
 	cp=(char *)(scenem+16);

@@ -1,5 +1,5 @@
 
-VISU_OBJS	= avid.o visu.o acalc.o adraw.o
+VISU_OBJS	= avid.o visu.o acalc.o adraw.o opengl.o
 
 VISU_PATH	= visu/c
 

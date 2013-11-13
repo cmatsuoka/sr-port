@@ -11,6 +11,9 @@
 ;**
 ;****************************************************************************/
 
+#include <stdio.h>
+#include "graphics.h"
+#include "opengl.h"
 #include "cd.h"
 //include a.inc
 
@@ -170,8 +173,16 @@ _vid_init PROC FAR
 _vid_init ENDP
 */
 
-void vid_init(int mode)
+int vid_init(int mode)
 {
+	if (init_graphics("Visu", window_width, window_height) < 0) {
+		fprintf(stderr, "Can't init graphics\n");
+		return -1;
+	};
+
+	init_opengl(window_width, window_height);
+
+	return 0;
 }
 	
 /*
