@@ -92,14 +92,12 @@ checkculling PROC NEAR
 	pop	bp
 	ret
 checkculling ENDP
+*/
 
-ALIGN 16
-poly1	LABEL WORD
-	db	POLYSIZE dup(0)
-ALIGN 16
-poly2	LABEL WORD
-	db	POLYSIZE dup(0)
+int poly1[POLYSIZE];
+int poly2[POLYSIZE];
 
+/*
 include adrawclp.asm
 
 ALIGN 16
@@ -607,4 +605,42 @@ _draw_polylist ENDP
 
 void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 {
+	if (f & 1)
+		return;
+
+	l += 2;		/* skip count - sort vertex */
+
+	//@@1
+	for (;;) {
+		int poly = *l;
+
+		if (poly == 0)		/* end of list */
+			break;
+
+		/* si points to polydata/polygon we are now drawing */
+		short *si = d[poly];
+
+		poly1[POLYFLAGS] = si[0] & (f | 0x0f00);
+		poly1[POLYSIDES] = si[0] & 0xff;
+
+		int normal = si[2];
+		int point = si[3];
+		int color = si[1];
+
+		if (color == -1)	/* check cull */
+			continue;
+
+		//@@nocl
+		/* lightsource */
+
+		if (poly1[POLYFLAGS] & F_GOURAUD) {
+
+		} else {
+
+		}
+		
+		//@@yosh
+
+
+	}
 }

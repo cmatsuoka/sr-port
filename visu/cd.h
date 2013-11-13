@@ -63,7 +63,7 @@ struct s_pvlist
 };
 #define pvlist	struct s_pvlist
 
-#define polylist int
+#define polylist short
 /* polylist contents:
 	word: number of words in list (including last 0)
 	word: sort polygon for this list
@@ -132,11 +132,17 @@ struct s_object
 
 #define INCLUDED_CD
 
-#define VF_UP		1
-#define VF_DOWN		2
-#define VF_LEFT		4
-#define VF_RIGHT	8
-#define VF_NEAR		16
-#define VF_FAR		32
+#define MAXSIDES	16
+
+#define POLYSIDES	0
+#define POLYCOLOR	1
+#define POLYFLAGS	2
+#define POLYVXSEG	3
+#define POLYX		4
+#define POLYY		5
+#define POLYVX		(4 + MAXSIDES * 2)
+#define POLYGR		(4 + 2 * MAXSIDES * 2)
+#define POLYTX		(4 + 2 * MAXSIDES * 2 + 1)
+#define POLYSIZE	(4 + 3 * MAXSIDES * 2)
 
 #endif
