@@ -131,4 +131,12 @@ struct s_object
 #define F_TEXTURE	0x2000
 
 #define INCLUDED_CD
+
+#define VF_UP		1
+#define VF_DOWN		2
+#define VF_LEFT		4
+#define VF_RIGHT	8
+#define VF_NEAR		16
+#define VF_FAR		32
+
 #endif

@@ -11,20 +11,14 @@
 ;**
 ;****************************************************************************/
 
+#include <string.h>
 #include <math.h>
+#include "c.h"
 #include "cd.h"
-
-//include a.inc
 
 /*
 ;entry: bx=angle (0..65535)
 ; exit: ax=sin(angle) [range -unit..unit]
-sin	PROC NEAR
-	shr	bx,4-1
-	and	bx,not 1
-	mov	ax,ds:_sintable[bx]
-	ret
-sin	ENDP
 */
 int isin(int a)
 {
@@ -35,13 +29,6 @@ int isin(int a)
 /*
 ;entry: bx=angle (0..65535)
 ; exit: ax=cos(angle) [range -unit..unit]
-cos	PROC NEAR
-	shr	bx,4-1
-	add	bx,1024*2
-	and	bx,not (8192 or 1)
-	mov	ax,ds:_sintable[bx]
-	ret
-cos	ENDP
 */
 
 int icos(int a)
@@ -121,47 +108,29 @@ mulmatrices PROC NEAR
 	pop	ds
 	ret
 mulmatrices ENDP
+*/
 
+/*
 ;entry:	fs:si=matrix1, es:di=matrix2
 ; exit: es:di=matrix1*matrix2 (matrix 2 overwritten)
-mulmatrices2 PROC NEAR
-	push	ds
-	mov	ax,fs
-	mov	ds,ax
-	
-	mulmacro 0,0
-	push	ebx
-	mulmacro 0,1
-	push	ebx
-	mulmacro 0,2
-	push	ebx
-	
-	mulmacro 1,0
-	push	ebx
-	mulmacro 1,1
-	push	ebx
-	mulmacro 1,2
-	push	ebx
-	
-	mulmacro 2,0
-	push	ebx
-	mulmacro 2,1
-	push	ebx
-	mulmacro 2,2
+*/
 
-	mov	          es:[di+8+24],ebx
-	pop	dword ptr es:[di+4+24]
-	pop	dword ptr es:[di+0+24]
-	pop	dword ptr es:[di+8+12]
-	pop	dword ptr es:[di+4+12]
-	pop	dword ptr es:[di+0+12]
-	pop	dword ptr es:[di+8]
-	pop	dword ptr es:[di+4]
-	pop	dword ptr es:[di+0]
-	pop	ds
-	ret
-mulmatrices2 ENDP
+void mulmatrices2(int *m1, int *m2)
+{
+	int m[9], i, j;
 
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) {
+			m[i * 3 + j] = (m1[i * 3 + 0] * m2[0 + j] +
+					m1[i * 3 + 1] * m2[3 + j] +
+					m1[i * 3 + 2] * m2[6 + j]) >> 14;
+		}
+	}
+
+	memcpy(m2, m, 9 * sizeof(int));
+}
+
+/*
 ;entry:	ax=rotx, bx=roty, cx=rotz, es:di=rmatrix.m
 ; exit: (writes rmatrix.m)
 calcmatrixsep PROC NEAR ;calc 3 separate matrices
@@ -433,7 +402,22 @@ _calc_applyrmatrix PROC FAR
 	add	fs:[si+rmatrix_z],eax
 @@x:	CEND
 _calc_applyrmatrix ENDP
+*/
 
+void rotatesingle(rmatrix *m, int *d);
+
+void calc_applyrmatrix(rmatrix *dest, rmatrix *apply)
+{
+	mulmatrices2(apply->m, dest->m);
+	/* dest now has the new rotation matrix, next rotate position */
+	rotatesingle(apply, &dest->x);
+	/* translate */
+	dest->m[9]  += apply->m[9];
+	dest->m[10] += apply->m[10];
+	dest->m[11] += apply->m[11];
+}
+
+/*
 rotatesingle PROC NEAR
 	;ds:si=rmatrix
 	;fs:bp=source[]: x,y,z (long)
@@ -488,7 +472,23 @@ rotatesingle PROC NEAR
 	pop	dword ptr es:[di+0]
 	ret
 rotatesingle ENDP
+*/
 
+void rotatesingle(rmatrix *matrix, int *d)
+{
+	int *m = matrix->m;
+	int v[3], i;
+
+	for (i = 0; i < 3; i++) {
+		v[i] = (m[i * 3 + 0] * d[0] +
+			m[i * 3 + 1] * d[1] +
+			m[i * 3 + 2] * d[2]) >> 14;
+	}
+
+	memcpy(d, v, 3 * sizeof(int));
+}
+
+/*
 ;北北北北 _calc_sftranslate(int count,vlist *dest,long tx,long ty,long tz) 北北北北
 ;entry:	count=number of vertices to sftranslate
 ;	dest=destination 3D list
@@ -525,10 +525,6 @@ _calc_sftranslate PROC FAR
 _calc_sftranslate ENDP
 */
 
-void calc_applyrmatrix(rmatrix *dest, rmatrix *apply)
-{
-}
-
 /*
 ;北北北北 _calc_rotate(int count,vlist *dest,vlist *source,rmatrix *matrix) 北北北北
 ;entry:	count=number of vertices to rotate/move
@@ -537,77 +533,28 @@ void calc_applyrmatrix(rmatrix *dest, rmatrix *apply)
 ;	matrix=rmatrix containing rotation / moving
 ; exit: -
 ;descr: Rotates (and moves) the given list
-_calc_rotate PROC FAR
-	CBEG
-	movpar	cx,0
-	jcxz	@@0
-	lespar	di,1 ;destination
-	ldspar	si,5 ;matrix - dataseg not used in procedure, so DS can be used
-	lfspar	bp,3 ;source - NOTE: bp/parameter pointer destroyed!
-@@1:	push	cx
-
-	movsx	eax,word ptr ds:[si+rmatrix_m+2*0]
-	imul	dword ptr fs:[bp+vlist_x]
-	mov	ebx,eax
-	mov	ecx,edx
-	movsx	eax,word ptr ds:[si+rmatrix_m+2*2]
-	imul	dword ptr fs:[bp+vlist_y]
-	add	ebx,eax
-	adc	ecx,edx
-	movsx	eax,word ptr ds:[si+rmatrix_m+2*4]
-	imul	dword ptr fs:[bp+vlist_z]
-	add	ebx,eax
-	adc	ecx,edx
-	shrd	ebx,ecx,unitshr
-	add	ebx,ds:[si+rmatrix_x]
-	mov	dword ptr es:[di+vlist_x],ebx
-	
-	movsx	eax,word ptr ds:[si+rmatrix_m+2*6]
-	imul	dword ptr fs:[bp+vlist_x]
-	mov	ebx,eax
-	mov	ecx,edx
-	movsx	eax,word ptr ds:[si+rmatrix_m+2*8]
-	imul	dword ptr fs:[bp+vlist_y]
-	add	ebx,eax
-	adc	ecx,edx
-	movsx	eax,word ptr ds:[si+rmatrix_m+2*10]
-	imul	dword ptr fs:[bp+vlist_z]
-	add	ebx,eax
-	adc	ecx,edx
-	shrd	ebx,ecx,unitshr
-	add	ebx,ds:[si+rmatrix_y]
-	mov	dword ptr es:[di+vlist_y],ebx
-	
-	movsx	eax,word ptr ds:[si+rmatrix_m+2*12]
-	imul	dword ptr fs:[bp+vlist_x]
-	mov	ebx,eax
-	mov	ecx,edx
-	movsx	eax,word ptr ds:[si+rmatrix_m+2*14]
-	imul	dword ptr fs:[bp+vlist_y]
-	add	ebx,eax
-	adc	ecx,edx
-	movsx	eax,word ptr ds:[si+rmatrix_m+2*16]
-	imul	dword ptr fs:[bp+vlist_z]
-	add	ebx,eax
-	adc	ecx,edx
-	shrd	ebx,ecx,unitshr
-	add	ebx,ds:[si+rmatrix_z]
-	mov	dword ptr es:[di+vlist_z],ebx
-
-	mov	ax,word ptr fs:[bp+vlist_normal]
-	mov	word ptr es:[di+vlist_normal],ax
-	
-	;next point
-	add	bp,vlist_size
-	add	di,vlist_size
-	pop	cx
-	loop	@@1
-@@0:	CEND
-_calc_rotate ENDP
 */
 
 void calc_rotate(int count,vlist *dest,vlist *source,rmatrix *matrix)
 {
+	int i;
+	int *m = matrix->m;
+
+	for (i = 0; i < count; i++) {
+		dest->x = ((m[0] * source->x + m[1] * source->y +
+					m[2] * source->z) >> 14) + matrix->x;
+
+		dest->y = ((m[3] * source->x + m[4] * source->y +
+					m[5] * source->z) >> 14) + matrix->y;
+
+		dest->z = ((m[6] * source->x + m[7] * source->y +
+					m[8] * source->z) >> 14) + matrix->z;
+
+		dest->normal = source->normal;
+
+		source++;
+		dest++;
+	}
 }
 
 /*
@@ -616,38 +563,14 @@ void calc_rotate(int count,vlist *dest,vlist *source,rmatrix *matrix)
 ;	vertexlist=list from which to pick the vertex
 ; exit: -
 ;descr: Rotates the single vertex and returns the resulting Z coordinate.
-_calc_singlez PROC FAR
-	CBEG
-	ldspar	si,3 ;matrix - dataseg not used in procedure, so DS can be used
-	movpar	ax,0
-	lfspar	bp,1 ;source - NOTE: bp/parameter pointer destroyed!
-	shl	ax,vlist_sizeshl
-	add	bp,ax
-
-	mov	eax,ds:[si+rmatrix_m+24]
-	imul	dword ptr fs:[bp+vlist_x]
-	mov	ebx,eax
-	mov	ecx,edx
-	mov	eax,ds:[si+rmatrix_m+28]
-	imul	dword ptr fs:[bp+vlist_y]
-	add	ebx,eax
-	adc	ecx,edx
-	mov	eax,ds:[si+rmatrix_m+32]
-	imul	dword ptr fs:[bp+vlist_z]
-	add	ebx,eax
-	adc	ecx,edx
-	shrd	ebx,ecx,unitshr
-	add	ebx,ds:[si+rmatrix_z]
-
-	mov	ax,bx
-	shr	ebx,16
-	mov	dx,bx
-	CEND
-_calc_singlez ENDP
 */
 
-void calc_singlez(int vertex,vlist *vertexlist,rmatrix *matrix)
+int calc_singlez(int vertex,vlist *vertexlist,rmatrix *matrix)
 {
+	vlist *v = &vertexlist[vertex];
+	int *m = matrix->m;
+
+	return ((m[6] * v->x + m[7] * v->y + m[8] * v->z) >> 14) + matrix->z;
 }
 
 /*
@@ -658,71 +581,26 @@ void calc_singlez(int vertex,vlist *vertexlist,rmatrix *matrix)
 ;	matrix=rmatrix containing rotation (moving part of rmatrix not used)
 ; exit: -
 ;descr: Rotates the given normal list
-_calc_nrotate PROC FAR
-	CBEG
-	movpar	cx,0
-	jcxz	@@0
-	lespar	di,1 ;destination
-	ldspar	si,5 ;matrix - dataseg not used in procedure, so DS can be used
-	lfspar	bp,3 ;source - NOTE: bp/parameter pointer destroyed!
-@@1:	push	cx
-
-	mov	ax,word ptr fs:[bp+nlist_x]
-	imul	word ptr ds:[si+rmatrix_m+2*0]
-	mov	bx,ax
-	mov	cx,dx
-	mov	ax,word ptr fs:[bp+nlist_y]
-	imul	word ptr ds:[si+rmatrix_m+2*2]
-	add	bx,ax
-	adc	cx,dx
-	mov	ax,word ptr fs:[bp+nlist_z]
-	imul	word ptr ds:[si+rmatrix_m+2*4]
-	add	bx,ax
-	adc	cx,dx
-	shrd	bx,cx,unitshr
-	mov	word ptr es:[di+nlist_x],bx
-	
-	mov	ax,word ptr fs:[bp+nlist_x]
-	imul	word ptr ds:[si+rmatrix_m+2*6]
-	mov	bx,ax
-	mov	cx,dx
-	mov	ax,word ptr fs:[bp+nlist_y]
-	imul	word ptr ds:[si+rmatrix_m+2*8]
-	add	bx,ax
-	adc	cx,dx
-	mov	ax,word ptr fs:[bp+nlist_z]
-	imul	word ptr ds:[si+rmatrix_m+2*10]
-	add	bx,ax
-	adc	cx,dx
-	shrd	bx,cx,unitshr
-	mov	word ptr es:[di+nlist_y],bx
-	
-	mov	ax,word ptr fs:[bp+nlist_x]
-	imul	word ptr ds:[si+rmatrix_m+2*12]
-	mov	bx,ax
-	mov	cx,dx
-	mov	ax,word ptr fs:[bp+nlist_y]
-	imul	word ptr ds:[si+rmatrix_m+2*14]
-	add	bx,ax
-	adc	cx,dx
-	mov	ax,word ptr fs:[bp+nlist_z]
-	imul	word ptr ds:[si+rmatrix_m+2*16]
-	add	bx,ax
-	adc	cx,dx
-	shrd	bx,cx,unitshr
-	mov	word ptr es:[di+nlist_z],bx
-
-	;next point
-	add	bp,nlist_size
-	add	di,nlist_size
-	pop	cx
-	loop	@@1
-@@0:	CEND
-_calc_nrotate ENDP
 */
 
 void calc_nrotate(int count,nlist *dest,nlist *source,rmatrix *matrix)
 {
+	int i;
+	int *m = matrix->m;
+
+	for (i = 0; i < count; i++) {
+		dest->x = (m[0] * source->x + m[1] * source->y +
+					m[2] * source->z) >> 14;
+
+		dest->y = (m[3] * source->x + m[4] * source->y +
+					m[5] * source->z) >> 14;
+
+		dest->z = (m[6] * source->x + m[7] * source->y +
+					m[8] * source->z) >> 14;
+
+		source++;
+		dest++;
+	}
 }
 
 /*
@@ -804,69 +682,45 @@ _calc_rotate16 ENDP
 ;	(_proj* variables in data segment define the projection)
 ; exit: logical and of visibility flags for all vertices (!=0 == object invis.)
 ;descr: Projects the given list = does perspective transformation
-_calc_project PROC FAR
-	CBEG
-	lfspar	si,3
-	lespar	di,1
-	mov	ax,0ffffh
-	movpar	cx,0
-	jcxz	@@0
-@@1:	push	cx
-	push	ax
-	
-	mov	ecx,fs:[si+vlist_x]
-	mov	eax,fs:[si+vlist_y]
-	mov	ebx,fs:[si+vlist_z]
-	
-	xor	bp,bp
-	cmp	ebx,ds:_projclipz[CLIPMIN]
-	jge	@@21
-	or	bp,VF_NEAR
-	mov	ebx,ds:_projclipz[CLIPMIN]
-	jmp	@@22
-@@21:	cmp	ebx,ds:_projclipz[CLIPMAX]
-	jle	@@22
-	or	bp,VF_FAR
-@@22:	;
-	imul	ds:_projmuly
-	idiv	ebx
-	add	eax,ds:_projaddy
-	cmp	eax,ds:_projclipy[CLIPMAX]
-	jng	@@41
-	or	bp,VF_DOWN
-@@41:	cmp	eax,ds:_projclipy[CLIPMIN]
-	jnl	@@42
-	or	bp,VF_UP
-@@42:	mov	es:[di+pvlist_y],ax ;store Y
-	;
-	mov	eax,ds:_projmulx
-	imul	ecx
-	idiv	ebx
-	add	eax,ds:_projaddx
-	cmp	eax,ds:_projclipx[CLIPMAX]
-	jng	@@43
-	or	bp,VF_RIGHT
-@@43:	cmp	eax,ds:_projclipx[CLIPMIN]
-	jnl	@@44
-	or	bp,VF_LEFT
-@@44:	mov	es:[di+pvlist_x],ax ;store X
-
-@@5:	mov	es:[di+pvlist_vf],bp ;store visiblity flags
-	
-	;next point
-	add	si,vlist_size
-	add	di,pvlist_size
-
-	pop	ax	
-	pop	cx
-	and	ax,bp
-	loop	@@1
-@@0:	CEND
-_calc_project ENDP
 */
 
-void calc_project(int count,pvlist *dest,vlist *source)
+int calc_project(int count,pvlist *dest,vlist *source)
 {
+	int i;
+	int ret = 0xffff;
+
+	for (i = 0; i < count; i++) {
+		int vf = 0;
+		int x = source->x;
+		int y = source->y;
+		int z = source->z;
+
+		if (z < projclipz[CLIPMIN]) {
+			vf |= VF_NEAR;
+			z = projclipz[CLIPMIN];
+		} else if (z > projclipz[CLIPMAX]) {
+			vf |= VF_FAR;
+		}
+
+		y = y * projmuly / z + projaddy;
+		if (y > projclipy[CLIPMAX])
+			vf |= VF_DOWN;
+		if (y < projclipy[CLIPMIN])
+			vf |= VF_UP;
+		dest->y = y;
+
+		x = x * projmulx / z + projaddx;
+		if (x > projclipx[CLIPMAX])
+			vf |= VF_RIGHT;
+		if (x < projclipx[CLIPMIN])
+			vf |= VF_LEFT;
+		dest->x = x;
+
+		dest->vf = vf;
+		ret &= vf;
+	}
+
+	return ret;
 }
 	
 /*
