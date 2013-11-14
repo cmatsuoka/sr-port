@@ -25,6 +25,7 @@
 #define VF_LEFT		4
 #define VF_RIGHT	8
 #define VF_NEAR		16	/* too close */
+#define VF_FAR		32
 
 struct s_rmatrix /* special matrix specifying position & rotation */
 {
@@ -97,7 +98,7 @@ struct s_object
 	polydata *pd;	/* polygon data block */
 	int	pdlen;	/* length of polygon data block in bytes */
 	int	plnum;	/* number of pl-lists */
-	int	*pl[16]; /* unsorted order (0) + precalculated polygon 
+	short	*pl[16]; /* unsorted order (0) + precalculated polygon 
 			   lists from max 16 directions (1..8). List contents:
 			   word: length in words
 			   word: closest vertex (for list 0, center vertex)

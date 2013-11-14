@@ -11,8 +11,8 @@
 ;**
 ;****************************************************************************/
 
+#include "c.h"
 #include "cd.h"
-//include a.inc
 
 int newlight[] = { 12118,10603,3030 };
 
@@ -605,14 +605,19 @@ _draw_polylist ENDP
 
 void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 {
+	int i;
+
+printf("draw_polylist: f=%x\n", f);
 	if (f & 1)
 		return;
 
 	l += 2;		/* skip count - sort vertex */
 
 	//@@1
-	for (;;) {
+	for ( ; *l; l++) {
 		int poly = *l;
+
+printf("poly=%d\n", poly);
 
 		if (poly == 0)		/* end of list */
 			break;
@@ -641,6 +646,24 @@ void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 		
 		//@@yosh
 
+		poly1[POLYSIDES];
+		
+		for (i = 0; i < MAXPOLYSIDES; i++) {
+			
+		}
+
+		//@@2
+
+		/* gouraud color calcs */
+
+		if (poly1[POLYFLAGS] & F_GOURAUD) {
+
+		}
+
+		//@@nogr
+
+
+		//@@cl4
 
 	}
 }

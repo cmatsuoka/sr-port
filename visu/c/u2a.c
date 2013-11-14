@@ -3,11 +3,12 @@
 #include <string.h>
 #include <stdlib.h>
 //#include <malloc.h>
+#include "graphics.h"
 #include "../dis/dis.h"
 #include "../cd.h"
 #include "../c.h"
 
-#define	noDEBUG
+#define	DEBUG
 #define huge
 #define _loadds
 
@@ -144,11 +145,11 @@ int main(int argc,char *argv[])
 	char	huge *cp;
 	int	a,b,c,d,e,f,g,x,y,z;
 	#ifdef DEBUG
-	fr=fopen("tmp","wt");
+	//fr=fopen("tmp","wt");
+	fr=stdout;
 	#endif
 	//indemo=1;
 
-adjust_framerate();
 	dis_partstart();
 	sprintf(tmpname,"%s.00M",scene);
 	if(!indemo) printf("Loading materials %s...\n",tmpname);
@@ -290,10 +291,13 @@ adjust_framerate();
 	        if(a>11 && b>54) break;
 		
 		deadlock=0;
+#if 0
 		while(cl[clw].ready)
 		{
 			if(deadlock>16) break;
 		}
+#endif
+
 		// Draw to free frame
 		vid_setswitch(clw,-1);
 		vid_clearbg(bg);
@@ -338,8 +342,11 @@ adjust_framerate();
 		}
 		// **** Drawing completed **** //
 		// calculate how many frames late of schedule
-		avgrepeat=(avgrepeat+(syncframe-currframe)+1)/2;
-		repeat=avgrepeat;
+		//avgrepeat=(avgrepeat+(syncframe-currframe)+1)/2;
+		//repeat=avgrepeat;
+		swap_buffers();
+
+		repeat=adjust_framerate();
 		if(repeat<1) repeat=1;
 		cl[clw].frames=repeat;
 		cl[clw].ready=1;
@@ -349,6 +356,7 @@ adjust_framerate();
 		currframe+=repeat;
 	    while(repeat-- && !xit)
 	    {
+printf("\nFRAME\n");
 		// parse animation stream for 1 frame
 		onum=0;
 		while(!xit)
@@ -419,7 +427,7 @@ adjust_framerate();
 			r->z+=l;
 			
 			#ifdef DEBUG
-			fprintf(fr," XYZ:(%li,%li,%li)",r->x,r->y,r->z);
+			fprintf(fr," XYZ:(%i,%i,%i)",r->x,r->y,r->z);
 			#endif
 
 			if(pflag&0x40)

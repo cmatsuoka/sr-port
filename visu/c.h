@@ -98,4 +98,6 @@ extern	int	projaddy;
 extern	int	projaspect;
 
 #define INCLUDED_CD
+
+#define MAXPOLYSIDES	16	/* maximum sides in a polygon */
 #endif
