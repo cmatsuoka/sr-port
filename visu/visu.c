@@ -114,11 +114,14 @@ void	vis_drawobject(object *o)
 	long	al,bl;
 	//nlist	*n;
 	//int	*ijp;
+
+printf("vis_drawobject: %s  flags:%x\n", o->name, o->flags);
 	if(!(o->flags&F_VISIBLE)) return;
 	calc_rotate(o->vnum,o->v,o->v0,o->r);
 	if(o->flags&F_GOURAUD) calc_nrotate(o->nnum,o->n,o->n0,o->r);
 	else calc_nrotate(o->nnum1,o->n,o->n0,o->r);
 	o->vf=calc_project(o->vnum,o->pv,o->v);
+printf("  vf=%x\n", o->vf);
 	if(o->vf) return; // object was completely out of screen
 	a=0; al=0x7fffffffL;
 	for(b=1;b<o->plnum;b++)

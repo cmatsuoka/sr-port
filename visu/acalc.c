@@ -689,6 +689,7 @@ int calc_project(int count,pvlist *dest,vlist *source)
 	int i;
 	int ret = 0xffff;
 
+printf("calc_project: %d points\n", count);
 	for (i = 0; i < count; i++) {
 		int vf = 0;
 		int x = source->x;
@@ -716,8 +717,13 @@ int calc_project(int count,pvlist *dest,vlist *source)
 			vf |= VF_LEFT;
 		dest->x = x;
 
+printf("  (%d,%d,%d) -> (%d,%d)\n", source->x, source->y, source->z, dest->x, dest->y);
+
 		dest->vf = vf;
 		ret &= vf;
+
+		source++;
+		dest++;
 	}
 
 	return ret;
