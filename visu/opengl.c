@@ -11,7 +11,6 @@ static int view_width;
 static int view_height;
 
 static struct u2gl_program triangle_program;
-static struct u2gl_program fc_program;
 
 float obj[9];
 
@@ -73,48 +72,34 @@ static const char fragment_shader_texture[] =
 
 
 
+#if 0
 static float tex_coords[] = {
 	0.0f, 0.5f,
 	1.0f, 0.5f,
 	0.0f, 0.0f,
 	1.0f, 0.0f
 };
+#endif
 
 
-static float color[256][4];
-
-#define CC 32
+static float color[256][3];
 
 void setrgb(int c, int r, int g, int b)
 {
-	float alpha = 0.5f;
-
-#if 0
-	if (c == 232 || c == 240) {
-		alpha = 0.75f;
-	}
-#endif
-	color[c][0] = (float)r / CC;
-	color[c][1] = (float)g / CC;
-	color[c][2] = (float)b / CC;
-	color[c][3] = alpha;
+	color[c][0] = (float)r / 64;
+	color[c][1] = (float)g / 64;
+	color[c][2] = (float)b / 64;
 }
 
 void getrgb(int c, char *p)
 {
-	p[0] = color[c][0] * CC;
-	p[1] = color[c][1] * CC;
-	p[2] = color[c][2] * CC;
+	p[0] = color[c][0] * 64;
+	p[1] = color[c][1] * 64;
+	p[2] = color[c][2] * 64;
 }
 
-void draw_fc()
-{
-	glUseProgram(fc_program.program);
-	u2gl_set_color(color[15], &fc_program);
-	u2gl_draw_textured_triangle_strip(&fc_program, fc_obj, 4);
-}
-
-static void draw_triangle(float *f, int c)
+#if 0
+static void draw_triangle(short *f, int c)
 {
 	u2gl_set_color(color[c], &triangle_program);
 
@@ -128,6 +113,22 @@ static void draw_triangle(float *f, int c)
 	obj[7] = *f++;
 
 	u2gl_draw_triangle_strip(&triangle_program, obj, 3);
+}
+#endif
+
+void draw_poly(short *f, int sides, int c)
+{
+	int i;
+
+	glUseProgram(triangle_program.program);
+	u2gl_set_color(color[c], &triangle_program);
+
+	for (i = 0; i < sides; i++) {
+		obj[i * 2 + 0] = *f++;
+		obj[i * 2 + 1] = *f++;
+	}
+
+	u2gl_draw_triangle_fan(&triangle_program, obj, sides);
 }
 
 void draw_palette()
@@ -149,6 +150,7 @@ void draw_palette()
 	}
 }
 
+#if 0
 void draw_poly(int *polylist)
 {
 	int num_vertices, c, i;
@@ -207,6 +209,7 @@ static void init_texture()
 	glGenerateMipmap(GL_TEXTURE_2D);
 	u2gl_check_error("init_texture");
 }
+#endif
 
 int init_opengl(int width, int height)
 {
@@ -222,7 +225,6 @@ int init_opengl(int width, int height)
 
 	v = u2gl_compile_vertex_shader(vertex_shader_texture);
 	f = u2gl_compile_fragment_shader(fragment_shader_texture);
-	u2gl_create_program(&fc_program, f, v);
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -235,12 +237,9 @@ int init_opengl(int width, int height)
 	matrix_identity(m);
 	u2gl_set_matrix(&triangle_program, m);
 
-	glUseProgram(fc_program.program);
-	u2gl_set_matrix(&fc_program, m);
-
 	u2gl_check_error("init_opengl");
 
-	init_texture();
+	//init_texture();
 
 	return 0;
 }
@@ -263,5 +262,4 @@ void clear_screen()
 void projection()
 {
 	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
-	u2gl_projection(0, view_width, 0, view_height, &fc_program);
 }

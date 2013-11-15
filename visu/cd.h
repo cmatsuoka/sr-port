@@ -19,7 +19,7 @@
 
 #define angle	unsigned	/* 0..65535, 65536=360 degrees */
 
-#define	visfl	int	
+#define	visfl	short	
 #define VF_UP		1	/* direction in which a vertex is out */
 #define VF_DOWN		2	/* of screen. */
 #define VF_LEFT		4
@@ -41,26 +41,26 @@ struct s_vlist
 	int	x;
 	int	y;
 	int	z;
-	int	normal;
-	int	RESERVED;
+	short	normal;
+	short	RESERVED;
 };
 #define vlist	struct s_vlist
 
 struct s_nlist
 {
-	int	x;
-	int	y;
-	int	z;
-	int	RESERVED;
+	short	x;
+	short	y;
+	short	z;
+	short	RESERVED;
 };
 #define nlist	struct s_nlist
 
 struct s_pvlist
 {
-	int	x;
-	int	y;
+	short	x;
+	short	y;
 	visfl	vf; // if vf&VF_NEAR, the x/y are undefined
-	int	RESERVED[5];
+	short	RESERVED[5];
 };
 #define pvlist	struct s_pvlist
 
@@ -145,5 +145,9 @@ struct s_object
 #define POLYGR		(4 + 2 * MAXSIDES * 2)
 #define POLYTX		(4 + 2 * MAXSIDES * 2 + 1)
 #define POLYSIZE	(4 + 3 * MAXSIDES * 2)
+
+void draw_palette(void);
+void draw_poly(short *, int, int);
+void setrgb(int, int, int, int);
 
 #endif

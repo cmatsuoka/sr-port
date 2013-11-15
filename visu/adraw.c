@@ -11,6 +11,7 @@
 ;**
 ;****************************************************************************/
 
+#include <stdio.h>
 #include "c.h"
 #include "cd.h"
 
@@ -606,9 +607,10 @@ _draw_polylist ENDP
 void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 {
 	int i;
+	short vertices[32];
 
 printf("draw_polylist: f=%x\n", f);
-	if (f & 1)
+	if (!(f & F_VISIBLE))
 		return;
 
 	l += 2;		/* skip count - sort vertex */
@@ -623,18 +625,36 @@ printf("poly=%d\n", poly);
 			break;
 
 		/* si points to polydata/polygon we are now drawing */
-		short *si = d[poly];
+		short *si = (short *)&d[poly];
+
+		short sides = *(unsigned char*)si;
 
 		poly1[POLYFLAGS] = si[0] & (f | 0x0f00);
-		poly1[POLYSIDES] = si[0] & 0xff;
+		poly1[POLYSIDES] = sides;
+printf("  flags=%x\n", poly1[POLYFLAGS]);
+printf("  sides=%d\n", poly1[POLYSIDES]);
 
-		int normal = si[2];
-		int point = si[3];
-		int color = si[1];
+		short normal = si[2];
+		short *point = &si[3];
+		short color = *((unsigned char *)si + 2);
+printf("  sides=%d\n", sides);
+printf("  normal=%d\n", normal);
+printf("  color=%d\n", color);
 
 		if (color == -1)	/* check cull */
 			continue;
 
+		for (i = 0; i < sides; i++) {
+			pvlist *pp = &pv[point[i]];
+			printf("  point %d: %d (%d,%d)\n", i, point[i],
+							pp->x, pp->y);
+			vertices[i * 2 + 0] = pp->x;
+			vertices[i * 2 + 1] = pp->y;
+		}
+
+		draw_poly(vertices, sides, color);
+
+#if 0
 		//@@nocl
 		/* lightsource */
 
@@ -646,7 +666,7 @@ printf("poly=%d\n", poly);
 		
 		//@@yosh
 
-		poly1[POLYSIDES];
+		//poly1[POLYSIDES];
 		
 		for (i = 0; i < MAXPOLYSIDES; i++) {
 			
@@ -664,6 +684,9 @@ printf("poly=%d\n", poly);
 
 
 		//@@cl4
+#endif
 
 	}
+
+	draw_palette();
 }

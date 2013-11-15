@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "graphics.h"
 #include "opengl.h"
 #include "c.h"
@@ -206,11 +207,16 @@ void vid_deinit()
 ;descr: sets screen palette 
 */
 
-char palette[768];
-
 void vid_setpal(char *pal)
 {
-	memcpy(palette, pal, 768);
+	int i;
+
+	for (i = 0; i < 256; i++) {
+		int p = i * 3;
+		setrgb(i, pal[p], pal[p + 1], pal[p + 2]);
+printf("%d: %02x %02x %02x\n", i, pal[p], pal[p + 1], pal[p + 2]);
+	}
+sleep(1);
 }
 
 /*

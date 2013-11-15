@@ -28,6 +28,15 @@ void u2gl_draw_triangle_strip(struct u2gl_program *p, float *obj, int num)
 	glDisableVertexAttribArray(p->aPosition_location);
 }
 
+void u2gl_draw_triangle_fan(struct u2gl_program *p, float *obj, int num)
+{
+	glEnableVertexAttribArray(p->aPosition_location);
+	glVertexAttribPointer(p->aPosition_location, 3, GL_FLOAT,
+				GL_FALSE, 3 * sizeof(float), obj);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, num);
+	glDisableVertexAttribArray(p->aPosition_location);
+}
+
 void u2gl_draw_textured_triangle_strip(struct u2gl_program *p, float *obj, int num)
 {
 	glEnableVertexAttribArray(p->aPosition_location);
