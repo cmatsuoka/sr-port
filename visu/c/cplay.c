@@ -17,14 +17,13 @@ int	indemo=0;
 char bg[320 * 200];
 char *bg2;
 
-char	scene[64]={"U2A"};
+char	scene[64]={"CITY"};
 char	tmpname[64];
 
 char huge *scene0;
 char huge *scenem;
 
 int	city=0;
-int	xit=0;
 
 #define LONGAT(zz) *((int huge *)(zz))
 #define INTAT(zz) *((short huge *)(zz))
@@ -92,84 +91,26 @@ void	resetscene(void)
 	}
 }
 
-struct
-{
-	int	frames;
-	int	ready; // 1=to be displayed, 0=displayed
-} cl[4];
-int	clr=0,clw=0;
-int	deadlock=0;
-int	coppercnt=0;
-int	syncframe=0;
-int	currframe=0;
-int	copperdelay=16;
-int	repeat,avgrepeat;
-
-//#pragma check_stack(off)
-
-void _loadds copper2(void)
-{
-	//int	a,c1,c2,c3,c4;
-	
-	syncframe++;
-
-	if(cl[0].ready==2) cl[0].ready=0;
-	if(cl[1].ready==2) cl[1].ready=0;
-	if(cl[2].ready==2) cl[2].ready=0;
-	if(cl[3].ready==2) cl[3].ready=0;
-
-	deadlock++;
-	coppercnt++;
-
-	if(copperdelay>0)
-	{
-		copperdelay--;
-	}
-	if(copperdelay>0) return;
-	copperdelay=0;
-	if(cl[clr].ready)
-	{
-		cl[(clr-1)&3].ready=2;
-		vid_setswitch(-1,clr);
-		copperdelay=cl[clr].frames;
-		clr++; clr&=3;
-	}
-	else avgrepeat++;
-}
-
 int main(int argc,char *argv[])
 {
 	//char huge *sptemp;
 	short	huge *ip;
-	unsigned int u;
 	char	huge *cp;
-	int	a,b,c,d,e,f,g,x,y,z;
+	int	a,b,c,d,e,f,g;
 	#ifdef DEBUG
 	//fr=fopen("tmp","wt");
 	fr=stdout;
 	#endif
-	//indemo=1;
-
-	dis_partstart();
+	if(argc>1)
+	{
+		strcpy(scene,argv[1]);
+		//strupr(scene);
+	}
+	else indemo=1;
+	
 	sprintf(tmpname,"%s.00M",scene);
 	if(!indemo) printf("Loading materials %s...\n",tmpname);
 	scene0=scenem=readfile(tmpname);
-
-	memcpy(scene0+16+192*3,bg+16,64*3);
-	bg2=calloc(16384,4);
-	for(u=z=0;z<4;z++)
-	{
-		for(y=0;y<200;y++)
-		{
-			for(x=z;x<320;x+=4)
-			{
-				a=bg[16+768+x+y*320];
-				bg2[u++]=a;
-			}
-		}
-	}
-	memcpy(bg,bg2,64000);
-	free(bg2);
 
 	if(scene0[15]=='C') city=1;
 	if(scene0[15]=='R') city=2;
@@ -232,44 +173,18 @@ int main(int argc,char *argv[])
 
 	resetscene();
 
-#if 0
-	for(;;)
-	{
-		// DIS: muscode
-		_asm
-		{
-			mov	bx,6
-			int	0fch
-			mov	a,cx	// ord
-			mov	b,bx	// row
-		}
-		if(a>10 && b>46) break;
-		if(dis_exit()) return 1;
-	}
-#endif
-
- 	vid_init(3); ////// oversample x 4
+	vid_init(1); ////// oversample x 4
 	cp=(char *)(scenem+16);
 	vid_setpal(cp);
-
 #if 0
 	outp(0x3c8,0);
-	for(a=0;a<768;a++) outp(0x3c9,cp[a]);
+	outp(0x3c9,0);
+	outp(0x3c9,0);
+	outp(0x3c9,0);
 #endif
-	vid_window(0L,319L,25L,174L,512L,9999999L);
 	
-	dis_setcopper(2,copper2);
-	dis_partstart();
-	xit=0;
-	coppercnt=0;
-	syncframe=0;
-	avgrepeat=1;
-	cl[0].ready=0;
-	cl[1].ready=0;
-	cl[2].ready=0;
-	cl[3].ready=1;
-	while(!dis_exit() && !xit)
-	{
+	while(1 /*!kbhit()*/)
+	{	
 		int fov;
 		int onum;
 		long pflag;
@@ -277,95 +192,33 @@ int main(int argc,char *argv[])
 		long l;
 		object *o;
 		rmatrix *r;
-
-		// DIS: muscode
-#if 0
-		_asm
-		{
-			mov	bx,6
-			int	0fch
-			mov	a,cx	// ord
-			mov	b,bx	// row
-		}
-#endif
-	        if(a>11 && b>54) break;
 		
-		deadlock=0;
-#if 0
-		while(cl[clw].ready)
-		{
-			if(deadlock>16) break;
-		}
-#endif
-
-		// Draw to free frame
-		vid_setswitch(clw,-1);
-		vid_clearbg(bg);
-		// Field of vision
-		vid_cameraangle(fov);
-		// Calc matrices and add to order list (only enabled objects)
-		ordernum=0;
-		/* start at 1 to skip camera */
-		for(a=1;a<conum;a++) if(co[a].on)
-		{
-			order[ordernum++]=a;
-			o=co[a].o;
-			memcpy(o->r,o->r0,sizeof(rmatrix));
-			calc_applyrmatrix(o->r,&cam);
-			b=o->pl[0][1]; // center vertex
-			co[a].dist=calc_singlez(b,o->v0,o->r);
-		}
-		// Zsort
-		if(city==1)
-		{
-			co[2].dist=1000000000L; // for CITY scene, test
-			co[7].dist=1000000000L; // for CITY scene, test
-			co[13].dist=1000000000L; // for CITY scene, test
-		}
-		if(city==2)
-		{
-			co[14].dist=1000000000L; // for CITY scene, test
-		}
-		for(a=0;a<ordernum;a++) 
-		{
-			dis=co[c=order[a]].dist;
-			for(b=a-1;b>=0 && dis>co[order[b]].dist;b--)
-				order[b+1]=order[b];
-			order[b+1]=c;
-		}
-		// Draw
-		for(a=0;a<ordernum;a++)
-		{
-			//int	x,y;
-			o=co[order[a]].o;
-			vis_drawobject(o);
-		}
-		// **** Drawing completed **** //
-		// calculate how many frames late of schedule
-		//avgrepeat=(avgrepeat+(syncframe-currframe)+1)/2;
-		//repeat=avgrepeat;
-		swap_buffers();
-
-		repeat=adjust_framerate();
-		if(repeat<1) repeat=1;
-		cl[clw].frames=repeat;
-		cl[clw].ready=1;
-		clw++; clw&=3;
-		// advance that many frames
-		repeat=repeat;
-		currframe+=repeat;
-	    while(repeat-- && !xit)
-	    {
-printf("\nFRAME\n");
-		// parse animation stream for 1 frame
+		//vid_switch();
+		//vid_waitb();
+		vid_clear();
+		// parse animation stream
+		
 		onum=0;
-		while(!xit)
+		for(;;)
 		{
+			/*
+			sptemp=sp;
+			_asm
+			{
+				mov	ax,word ptr sptemp[0]
+				cmp	ax,1000h
+				jb	l1
+				sub	word ptr sptemp[0],1000h
+				add	word ptr sptemp[2],100h
+			l1:
+			}
+			sp=sptemp;
+			*/
 			a=*sp++;
 			if(a==0xff)
 			{
 				a=*sp++;
-				if(a<=0x7f)
+				if(a<=0x7f) 
 				{
 					fov=a<<8;
 					break;
@@ -373,7 +226,6 @@ printf("\nFRAME\n");
 				else if(a==0xff) 
 				{
 					resetscene();
-					xit=1;
 					continue;
 				}
 			}
@@ -394,10 +246,7 @@ printf("\nFRAME\n");
 			if(b) fprintf(fr,"[%i (%s) ",onum,co[onum].on?"on":"off");
 			else fprintf(fr,"[%i (--) ",onum);
 			#endif
-			if(onum>=conum)
-			{
-				return(3);
-			}
+			if(onum>=conum) return(3);
 			
 			r=co[onum].o->r0;
 			
@@ -449,26 +298,58 @@ printf("\nFRAME\n");
 			fprintf(fr,"]\n");
 			#endif
 		}
-	    }
+		// Field of vision
+		vid_cameraangle(fov);
+		// Calc matrices and add to order list (only enabled objects)
+		ordernum=0;
+		/* start at 1 to skip camera */
+		for(a=1;a<conum;a++) if(co[a].on)
+		{
+			order[ordernum++]=a;
+			o=co[a].o;
+			memcpy(o->r,o->r0,sizeof(rmatrix));
+			calc_applyrmatrix(o->r,&cam);
+			b=o->pl[0][1]; // center vertex
+			if(co[a].o->name[1]=='_') co[a].dist=1000000000L;
+			else co[a].dist=calc_singlez(b,o->v0,o->r);
+		}
+		// Zsort
+		if(city==1)
+		{
+			co[2].dist=1000000000L; // for CITY scene, test
+			co[7].dist=1000000000L; // for CITY scene, test
+			co[13].dist=1000000000L; // for CITY scene, test
+		}
+		if(city==2)
+		{
+			co[14].dist=1000000000L; // for CITY scene, test
+		}
+		for(a=0;a<ordernum;a++) 
+		{
+			dis=co[c=order[a]].dist;
+			for(b=a-1;b>=0 && dis>co[order[b]].dist;b--)
+				order[b+1]=order[b];
+			order[b+1]=c;
+		}
+		// Draw
+		for(a=0;a<ordernum;a++)
+		{
+			//int	x,y;
+			o=co[order[a]].o;
+			#ifdef DEBUG
+			fprintf(fr,"%s (i:%i Z:%li)\n",o->name,order[a],co[order[a]].dist);
+			#endif
+			vis_drawobject(o);
+		}
+		#ifdef DEBUG
+		fprintf(fr,"\n");
+		#endif
 	}
-	dis_setcopper(2,NULL);
 
-	vid_setswitch(0,-1);
-	vid_clearbg(bg);
-	vid_setswitch(1,-1);
-	vid_clearbg(bg);
-	vid_setswitch(2,-1);
-	vid_clearbg(bg);
-	vid_setswitch(3,-1);
-	vid_clearbg(bg);
-	
-	if(!dis_indemo())
-	{
-		vid_deinit();
-	}
+	vid_deinit();
 
 	#ifdef DEBUG
-	fclose(fr);
+	fclose(fr);	
 	#endif
 	return(0);
 }

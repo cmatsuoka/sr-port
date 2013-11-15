@@ -717,7 +717,7 @@ printf("calc_project: %d points\n", count);
 			vf |= VF_LEFT;
 		dest->x = x;
 
-printf("  (%d,%d,%d) -> (%d,%d)\n", source->x, source->y, source->z, dest->x, dest->y);
+//printf("  (%d,%d,%d) -> (%d,%d)\n", source->x, source->y, source->z, dest->x, dest->y);
 
 		dest->vf = vf;
 		ret &= vf;

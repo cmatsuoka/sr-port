@@ -310,31 +310,29 @@ _vid_dotdisplay_zcolor PROC FAR
 	loop	@@1
 	CEND
 _vid_dotdisplay_zcolor ENDP
+*/
 
+/*
 ;北北北北 _vid_clear(void) 北北北北
 ;entry: -
 ; exit: -
 ;descr: Clears the current screen to black (color 0)
-_vid_clear PROC FAR
-	CBEG
-	call	vidstart
-	mov	ax,0 ;blackclear
-	call	ds:vr[CLEAR]
-	CEND
-_vid_clear ENDP
+*/
+void vid_clear()
+{
+	clear_screen();
+}
 
+/*
 ;北北北北 _vid_clear255(void) 北北北北
 ;entry: -
 ; exit: -
 ;descr: Clears the current screen to black (color 0)
-_vid_clear255 PROC FAR
-	CBEG
-	call	vidstart
-	mov	ax,9 ;255clear
-	call	ds:vr[CLEAR]
-	CEND
-_vid_clear255 ENDP
 */
+void vid_clear255()
+{
+	clear_screen();
+}
 
 /*
 ;北北北北 _vid_clearbg(char *bg) 北北北北
