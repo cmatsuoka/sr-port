@@ -652,39 +652,6 @@ void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 		}
 
 		draw_poly(vertices, sides, color);
-
-#if 0
-		//@@nocl
-		/* lightsource */
-
-		if (poly1[POLYFLAGS] & F_GOURAUD) {
-
-		} else {
-
-		}
-		
-		//@@yosh
-
-		//poly1[POLYSIDES];
-		
-		for (i = 0; i < MAXPOLYSIDES; i++) {
-			
-		}
-
-		//@@2
-
-		/* gouraud color calcs */
-
-		if (poly1[POLYFLAGS] & F_GOURAUD) {
-
-		}
-
-		//@@nogr
-
-
-		//@@cl4
-#endif
-
 	}
 
 	draw_palette();

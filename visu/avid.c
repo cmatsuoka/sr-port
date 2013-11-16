@@ -142,6 +142,8 @@ void vid_window(int x1,int x2,int y1,int y2,int z1,int z2)
 
 	projclipz[CLIPMIN] = z1;
 	projclipz[CLIPMAX] = z2;
+
+	set_window(x1, y1, (x2 - x1) + 1, (y2 - y1) + 1);
 }
 
 /*
@@ -187,6 +189,7 @@ void vid_init(int mode)
 
 	init_opengl(window_width, window_height);
 	projection();
+	set_fps(35);
 }
 	
 /*
@@ -215,9 +218,7 @@ void vid_setpal(char *pal)
 	for (i = 0; i < 256; i++) {
 		int p = i * 3;
 		setrgb(i, pal[p], pal[p + 1], pal[p + 2]);
-printf("%d: %02x %02x %02x\n", i, pal[p], pal[p + 1], pal[p + 2]);
 	}
-sleep(1);
 }
 
 /*

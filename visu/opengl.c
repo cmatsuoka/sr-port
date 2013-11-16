@@ -90,7 +90,7 @@ void setrgb(int c, int r, int g, int b)
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;
 	color[c][2] = (float)b / CC;
-	color[c][3] = 0.7f;
+	color[c][3] = 0.75f;
 }
 
 void getrgb(int c, char *p)
@@ -144,7 +144,7 @@ void draw_palette()
 		u2gl_set_color(color[i], &triangle_program);
 	
 		obj[0] = 20 + (i - 64 * (i / 64)) * 4;
-		obj[1] = 45 -10 * (i / 64) ;
+		obj[1] = 70 -10 * (i / 64) ;
 		obj[3] = obj[0];
 		obj[4] = obj[1] - 10;
 		obj[6] = obj[0] + 4;
@@ -214,6 +214,15 @@ static void init_texture()
 	u2gl_check_error("init_texture");
 }
 #endif
+
+extern int window_width;
+extern int window_height;
+
+void set_window(int x, int y, int width, int height)
+{
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(window_width * x / view_width, window_height * y / view_height, window_width * width / view_width, window_height * height / view_height);
+}
 
 int init_opengl(int width, int height)
 {

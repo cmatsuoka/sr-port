@@ -5,6 +5,7 @@
 //#include <malloc.h>
 #include "graphics.h"
 #include "../dis/dis.h"
+#include "../opengl.h"
 #include "../cd.h"
 #include "../c.h"
 
@@ -294,6 +295,8 @@ int main(int argc,char *argv[])
 		outp(0x3c7,0);
 		for(a=0;a<768;a++) fpal[a]=inp(0x3c9);
 #endif
+		for(a=0;a<256;a++) getrgb(a,&fpal[a*3]);
+		swap_buffers();
 	}
 	
 	for(b=0;b<33;b++)
@@ -308,6 +311,8 @@ int main(int argc,char *argv[])
 		outp(0x3c8,0);
 		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
 #endif
+		for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2]);
+		swap_buffers();
 	}
 
 	for(b=0;b<16;b++)
@@ -328,11 +333,13 @@ int main(int argc,char *argv[])
 		fadeset((char *)0xa4000000L);
 		fadeset((char *)0xa8000000L);
 		fadeset((char *)0xac000000L);
+		swap_buffers();
 	}
 
 	for(b=0;b<16;b++)
 	{
 		dis_waitb();
+		swap_buffers();
 	}
 	
 	for(b=0;b<33;b++)
@@ -348,10 +355,14 @@ int main(int argc,char *argv[])
 			if(fpal[a]>63) fpal[a]=63;
 		}
 		dis_waitb();
+
+		
 #if 0
 		outp(0x3c8,0);
 		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
 #endif
+		for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2]);
+		swap_buffers();
 	}
 	vid_init(11);
 	cp=(char *)(scenem+16);
@@ -368,7 +379,7 @@ int main(int argc,char *argv[])
 	cp[254*3+1]=63;
 	cp[254*3+2]=63;
 	vid_setpal(cp);
-	vid_window(0L,319L,25L,174L,512L,9999999L);
+	vid_window(0,319,25,174,512,9999999);
 	
 	dis_setcopper(2,copper2);
 	dis_partstart();
@@ -463,12 +474,12 @@ int main(int argc,char *argv[])
 
 		repeat=adjust_framerate();
 		if(repeat<0) repeat=0;
-		if(repeat==0) cl[clw].frames=1;
-		else cl[clw].frames=repeat;
+		/*if(repeat==0) cl[clw].frames=1;
+		else*/ cl[clw].frames=repeat;
 		cl[clw].ready=1;
 		clw++; clw&=3;
 		// advance that many frames
-		repeat=(repeat+1)/2;
+		//repeat=(repeat+1)/2;
 		currframe+=repeat*2;
 	    while(repeat-- && !xit)
 	    {

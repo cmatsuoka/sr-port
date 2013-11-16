@@ -11,5 +11,6 @@ void clear_screen(void);
 void poll_event(void);
 
 int adjust_framerate(void);
+void set_fps(float);
 
 #endif

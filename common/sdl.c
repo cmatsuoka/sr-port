@@ -169,6 +169,11 @@ int init_graphics(char *caption, int width, int height)
 static long frameus = 1000000 / 70;
 static long deltaus;
 
+void set_fps(float fps)
+{
+	frameus = 1000000 / fps;
+}
+
 void swap_buffers()
 {
 	static long frames, startus, oldus = -1;
