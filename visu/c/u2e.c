@@ -63,6 +63,7 @@ void border(int r,int g,int b)
 	outp(0x3c9,g);
 	outp(0x3c9,b);
 #endif
+	setrgb(255, r, g, b);
 }
 
 long lsget(unsigned char f)
@@ -583,6 +584,7 @@ int main(int argc,char *argv[])
 	outp(0x3c7,0);
 	for(a=0;a<768;a++) fpal[a]=inp(0x3c9);
 #endif
+	for(a=0;a<256;a++) getrgb(a,&fpal[a*3]);
 	for(b=0;b<16;b++)
 	{
 		for(a=0;a<768;a++) 
@@ -595,6 +597,7 @@ int main(int argc,char *argv[])
 		outp(0x3c8,255);
 		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
 #endif
+		for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2]);
 	}
 	if(!dis_indemo())
 	{

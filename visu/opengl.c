@@ -239,6 +239,8 @@ int init_opengl(int width, int height)
 	v = u2gl_compile_vertex_shader(vertex_shader_texture);
 	f = u2gl_compile_fragment_shader(fragment_shader_texture);
 
+	/*glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);*/
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);

@@ -116,7 +116,7 @@ void vid_cameraangle(angle a)
 	if (bx >= 16384)
 		bx = 16383;		/* 90 degrees maximum */
 
-	bx = (bx >> 5) & ~1;		/* bx=word index (0..255)*2 */
+	bx >>= 6;			/* bx= index (0..255) */
 
 	projmulx = (ax * avistan[bx]) >> 8;
 	projmuly = (projmulx * projaspect) >> 8;
