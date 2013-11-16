@@ -90,7 +90,7 @@ void setrgb(int c, int r, int g, int b)
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;
 	color[c][2] = (float)b / CC;
-	color[c][3] = 0.75f;
+	color[c][3] = 1.0f;
 }
 
 void getrgb(int c, char *p)

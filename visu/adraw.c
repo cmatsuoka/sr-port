@@ -12,65 +12,59 @@
 ;****************************************************************************/
 
 #include <stdio.h>
+#include "opengl.h"
 #include "c.h"
 #include "cd.h"
 
 int newlight[] = { 12118,10603,3030 };
 
+int normallight(nlist *normal)
+{
+	int x = normal->x;
+	int y = normal->y;
+	int z = normal->z;
+	int ax;
+
+	ax = (x * newlight[0] + y * newlight[1] + z * newlight[2]) >> 16;
+	ax >>= (28-7-16);
+	ax += 128;
+
+	if (ax > 255)
+		ax = 255;
+	else if (ax < 0)
+		ax = 0;
+
+	return ax;
+}
+
 
 /*
 ;entry: AX=polyflags,ES:DI=normal for which to calculate light
 ; exit:	AX=colorshade (based 0)
-calclight PROC NEAR
-	and	ax,F_SHADE32 ;=F_SHADE* orred together)
-	jz	@@nc
-	;lightsource
-	push	ax
-	call	normallight
-	pop	dx
-	shr	dx,10
-	mov	cx,6
-	sub	cx,dx
-	shr	ax,cl ;0400=5, 0800=4, 0C00=3
-@@mm:	cmp	ax,1
-	jg	@@m1
-	mov	ax,1
-@@m1:	cmp	ax,30
-	jl	@@m2
-	mov	ax,30
-@@m2:	ret
-@@nc:	xor	ax,ax
-	jmp	@@mm
-calclight ENDP
+*/
+int calclight(int flags, nlist *normal)
+{
+	int f = flags & F_SHADE32;
 
-normallight PROC NEAR
-	;return: ax=relative brightness 0..255
-	push	bp
-	mov	ax,es:[di+nlist_x]
-	imul	cs:newlight[0]
-	mov	bp,ax
-	mov	cx,dx
-	mov	ax,es:[di+nlist_y]
-	imul	cs:newlight[2]
-	add	bp,ax
-	adc	cx,dx
-	mov	ax,es:[di+nlist_z]
-	imul	cs:newlight[4]
-	add	ax,bp
-	adc	dx,cx
-	mov	ax,dx
-	sar	ax,2*unitshr-7-16
-	add	ax,128
-	cmp	ax,255
-	jle	@@1
-	mov	ax,255
-@@1:	cmp	ax,0
-	jge	@@2
-	mov	ax,0
-@@2:	pop	bp
-	ret ;ax=0..255
-normallight ENDP
+	if (f == 0)
+		return 0;
 
+	/* lightsource */
+
+	int light = normallight(normal);
+	int cx = 6 - (f >> 10);
+
+	light >>= cx;		/* 0400=5, 0800=4, 0C00=3 */
+
+	if (light < 1)
+		light = 1;
+	else if (light > 30)
+		light = 30;
+
+	return light;
+}
+
+/*
 checkculling PROC NEAR
 	;es:di=normal
 	;fs:si=vertex
@@ -628,8 +622,10 @@ void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 		short *si = (short *)&d[poly];
 
 		short sides = *(unsigned char*)si;
+		short flags = *((unsigned char*)si + 1);
+		flags = (flags << 8) & (f | 0x0f00);
 
-		poly1[POLYFLAGS] = si[0] & (f | 0x0f00);
+		poly1[POLYFLAGS] = flags;
 		poly1[POLYSIDES] = sides;
 //printf("  flags=%x\n", poly1[POLYFLAGS]);
 //printf("  sides=%d\n", poly1[POLYSIDES]);
@@ -642,6 +638,9 @@ void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 
 		if (color == -1)	/* check cull */
 			continue;
+
+		nlist *np = &n[normal];
+		color += calclight(flags, np);
 
 		for (i = 0; i < sides; i++) {
 			pvlist *pp = &pv[point[i]];
