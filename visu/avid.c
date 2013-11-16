@@ -186,6 +186,7 @@ void vid_init(int mode)
 	};
 
 	init_opengl(window_width, window_height);
+	projection();
 }
 	
 /*

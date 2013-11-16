@@ -146,8 +146,4 @@ struct s_object
 #define POLYTX		(4 + 2 * MAXSIDES * 2 + 1)
 #define POLYSIZE	(4 + 3 * MAXSIDES * 2)
 
-void draw_palette(void);
-void draw_poly(short *, int, int);
-void setrgb(int, int, int, int);
-
 #endif
