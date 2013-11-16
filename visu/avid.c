@@ -359,6 +359,7 @@ _vid_clearbg ENDP
 
 void vid_clearbg(char *bg)
 {
+	clear_screen();
 }
 
 /*

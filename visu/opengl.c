@@ -12,7 +12,7 @@ static int view_height;
 
 static struct u2gl_program triangle_program;
 
-float obj[9];
+float obj[16 * 3];
 
 float fc_obj[12] = {
 	0.0f, 0.0f, 0.0f,
@@ -82,20 +82,22 @@ static float tex_coords[] = {
 #endif
 
 
-static float color[256][3];
+static float color[256][4];
+#define CC 63
 
 void setrgb(int c, int r, int g, int b)
 {
-	color[c][0] = (float)r / 64;
-	color[c][1] = (float)g / 64;
-	color[c][2] = (float)b / 64;
+	color[c][0] = (float)r / CC;
+	color[c][1] = (float)g / CC;
+	color[c][2] = (float)b / CC;
+	color[c][3] = 0.7f;
 }
 
 void getrgb(int c, char *p)
 {
-	p[0] = color[c][0] * 64;
-	p[1] = color[c][1] * 64;
-	p[2] = color[c][2] * 64;
+	p[0] = color[c][0] * CC;
+	p[1] = color[c][1] * CC;
+	p[2] = color[c][2] * CC;
 }
 
 #if 0
@@ -120,12 +122,14 @@ void draw_poly(short *f, int sides, int c)
 {
 	int i;
 
+//printf("draw_poly (%d sides, color=%d)\n", sides, c);
 	glUseProgram(triangle_program.program);
 	u2gl_set_color(color[c], &triangle_program);
 
 	for (i = 0; i < sides; i++) {
-		obj[i * 2 + 0] = *f++;
-		obj[i * 2 + 1] = *f++;
+		obj[i * 3 + 0] = *f++;
+		obj[i * 3 + 1] = *f++;
+//printf("  (%f,%f)\n", obj[i * 3 + 0], obj[i * 3 + 1]);
 	}
 
 	u2gl_draw_triangle_fan(&triangle_program, obj, sides);

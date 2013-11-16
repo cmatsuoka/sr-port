@@ -11,6 +11,7 @@
 ;**
 ;****************************************************************************/
 
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include "c.h"
@@ -50,22 +51,6 @@ sincos	PROC NEAR
 	mov	bx,ds:_sintable[bx]
 	ret
 sincos	ENDP
-*/
-
-/*
-;used for matrix multiply EXPECTS the matrices to be of integer size
-mulmacro MACRO	row,col
-	mov	eax,ds:[si+0+row*12]
-	imul	dword ptr es:[di+0+col*4]
-	mov	ebx,eax
-	mov	eax,ds:[si+4+row*12]
-	imul	dword ptr es:[di+12+col*4]
-	add	ebx,eax
-	mov	eax,ds:[si+8+row*12]
-	imul	dword ptr es:[di+24+col*4]
-	add	ebx,eax
-	sar	ebx,unitshr
-	ENDM
 */
 
 /*
@@ -404,17 +389,32 @@ _calc_applyrmatrix PROC FAR
 _calc_applyrmatrix ENDP
 */
 
+static void showmatrix(char *name, rmatrix *matrix)
+{
+int i;
+int *m = matrix->m;
+printf("  MATRIX: %s\n", name);
+for(i = 0; i < 3; i++) {
+  printf("    [ %d %d %d ]\n", m[i*3+0], m[i*3+1], m[i*3+2]);
+}
+printf("    x=%d y=%d z=%d\n", matrix->x, matrix->y, matrix->z);
+}
+
 void rotatesingle(rmatrix *m, int *d);
 
 void calc_applyrmatrix(rmatrix *dest, rmatrix *apply)
 {
+//showmatrix("apply", apply);
+//showmatrix("dest", dest);
 	mulmatrices2(apply->m, dest->m);
 	/* dest now has the new rotation matrix, next rotate position */
 	rotatesingle(apply, &dest->x);
+//printf("    ROT: x=%d y=%d z=%d\n", dest->x, dest->y, dest->z);
 	/* translate */
 	dest->m[9]  += apply->m[9];
 	dest->m[10] += apply->m[10];
 	dest->m[11] += apply->m[11];
+//showmatrix("--> dest", dest);
 }
 
 /*
@@ -689,7 +689,7 @@ int calc_project(int count,pvlist *dest,vlist *source)
 	int i;
 	int ret = 0xffff;
 
-printf("calc_project: %d points\n", count);
+//printf("calc_project: %d points\n", count);
 	for (i = 0; i < count; i++) {
 		int vf = 0;
 		int x = source->x;

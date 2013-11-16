@@ -609,7 +609,7 @@ void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 	int i;
 	short vertices[32];
 
-printf("draw_polylist: f=%x\n", f);
+//printf("draw_polylist: f=%x\n", f);
 	if (!(f & F_VISIBLE))
 		return;
 
@@ -619,7 +619,7 @@ printf("draw_polylist: f=%x\n", f);
 	for ( ; *l; l++) {
 		int poly = *l;
 
-printf("poly=%d\n", poly);
+//printf("poly=%d\n", poly);
 
 		if (poly == 0)		/* end of list */
 			break;
@@ -631,25 +631,24 @@ printf("poly=%d\n", poly);
 
 		poly1[POLYFLAGS] = si[0] & (f | 0x0f00);
 		poly1[POLYSIDES] = sides;
-printf("  flags=%x\n", poly1[POLYFLAGS]);
-printf("  sides=%d\n", poly1[POLYSIDES]);
+//printf("  flags=%x\n", poly1[POLYFLAGS]);
+//printf("  sides=%d\n", poly1[POLYSIDES]);
 
 		short normal = si[2];
 		short *point = &si[3];
 		short color = *((unsigned char *)si + 2);
-printf("  sides=%d\n", sides);
-printf("  normal=%d\n", normal);
-printf("  color=%d\n", color);
+//printf("  normal=%d\n", normal);
+//printf("  color=%d\n", color);
 
 		if (color == -1)	/* check cull */
 			continue;
 
 		for (i = 0; i < sides; i++) {
 			pvlist *pp = &pv[point[i]];
-			printf("  point %d: %d (%d,%d)\n", i, point[i],
-							pp->x, pp->y);
+			/*printf("  point %d: %d (%d,%d)\n", i, point[i],
+							pp->x, pp->y);*/
 			vertices[i * 2 + 0] = pp->x;
-			vertices[i * 2 + 1] = pp->y;
+			vertices[i * 2 + 1] = 200 - pp->y;
 		}
 
 		draw_poly(vertices, sides, color);

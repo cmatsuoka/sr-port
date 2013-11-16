@@ -8,7 +8,7 @@
 #include "../cd.h"
 #include "../c.h"
 
-#define	DEBUG
+#define	noDEBUG
 #define huge
 #define _loadds
 
@@ -177,6 +177,7 @@ int main(int argc,char *argv[])
 	conum=d=*ip++;
 	for(f=-1,c=1;c<d;c++)
 	{	
+printf("c=%d\n", c);
 		e=*ip++;
 		if(e>f)
 		{
@@ -356,7 +357,6 @@ int main(int argc,char *argv[])
 		currframe+=repeat;
 	    while(repeat-- && !xit)
 	    {
-printf("\nFRAME\n");
 		// parse animation stream for 1 frame
 		onum=0;
 		while(!xit)
