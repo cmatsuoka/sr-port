@@ -65,29 +65,15 @@ int calclight(int flags, nlist *normal)
 }
 
 /*
-checkculling PROC NEAR
 	;es:di=normal
 	;fs:si=vertex
 	;ret: carry=1=hidden
-	push	bp
-	movsx	eax,word ptr es:[di+nlist_x]
-	imul	dword ptr fs:[si+vlist_x]
-	mov	ebp,eax
-	mov	ecx,edx
-	movsx	eax,word ptr es:[di+nlist_y]
-	imul	dword ptr fs:[si+vlist_y]
-	add	ebp,eax
-	adc	ecx,edx
-	movsx	eax,word ptr es:[di+nlist_z]
-	imul	dword ptr fs:[si+vlist_z]
-	add	ebp,eax
-	adc	ecx,edx
-	rcl	ecx,1 ;if cx<0, carry=1=visible
-	cmc	;now carry=1 when invisible
-	pop	bp
-	ret
-checkculling ENDP
 */
+
+int checkculling(nlist *n, vlist *v)
+{
+	return (n->x * v->x + n->y * v->y + n->z * v->z >= 0);
+}
 
 int poly1[POLYSIZE];
 int poly2[POLYSIZE];
@@ -603,7 +589,6 @@ void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 	int i;
 	short vertices[32];
 
-//printf("draw_polylist: f=%x\n", f);
 	if (!(f & F_VISIBLE))
 		return;
 
@@ -612,8 +597,6 @@ void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 	//@@1
 	for ( ; *l; l++) {
 		int poly = *l;
-
-//printf("poly=%d\n", poly);
 
 		if (poly == 0)		/* end of list */
 			break;
@@ -627,25 +610,26 @@ void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 
 		poly1[POLYFLAGS] = flags;
 		poly1[POLYSIDES] = sides;
-//printf("  flags=%x\n", poly1[POLYFLAGS]);
-//printf("  sides=%d\n", poly1[POLYSIDES]);
 
 		short normal = si[2];
 		short *point = &si[3];
 		short color = *((unsigned char *)si + 2);
-//printf("  normal=%d\n", normal);
-//printf("  color=%d\n", color);
 
 		if (color == -1)	/* check cull */
 			continue;
 
 		nlist *np = &n[normal];
+		vlist *vp = &v[point[0]];
+
+		if (~flags & F_2SIDE) {
+			if (checkculling(np, vp))
+				continue;
+		}
+
 		color += calclight(flags, np);
 
 		for (i = 0; i < sides; i++) {
 			pvlist *pp = &pv[point[i]];
-			/*printf("  point %d: %d (%d,%d)\n", i, point[i],
-							pp->x, pp->y);*/
 			vertices[i * 2 + 0] = pp->x;
 			vertices[i * 2 + 1] = 200 - pp->y;
 		}
