@@ -588,6 +588,7 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 {
 	int i;
 	short vertices[32];
+	int normals[48];
 
 	if (!(f & F_VISIBLE))
 		return;
@@ -626,15 +627,24 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 				continue;
 		}
 
-		color += calclight(flags, np);
-
 		for (i = 0; i < sides; i++) {
 			pvlist *pp = &pv[point[i]];
 			vertices[i * 2 + 0] = pp->x;
 			vertices[i * 2 + 1] = 200 - pp->y;
 		}
 
-		draw_poly(vertices, sides, color);
+		if (flags & F_GOURAUD) {
+			for (i = 0; i < sides; i++) {
+				//XXX
+				normals[i * 3 + 0] = np->x;
+				normals[i * 3 + 1] = np->y;
+				normals[i * 3 + 2] = np->z;
+			}
+			draw_poly_diffuse(vertices, normals, sides, color);
+		} else {
+			color += calclight(flags, np);
+			draw_poly(vertices, sides, color);
+		}
 	}
 
 	draw_palette();
