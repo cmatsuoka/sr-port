@@ -535,20 +535,20 @@ _calc_sftranslate ENDP
 ;descr: Rotates (and moves) the given list
 */
 
-void calc_rotate(int count,vlist *dest,vlist *source,rmatrix *matrix)
+void calc_rotate(int count,fvlist *dest,vlist *source,rmatrix *matrix)
 {
 	int i;
 	int *m = matrix->m;
 
 	for (i = 0; i < count; i++) {
-		dest->x = ((m[0] * source->x + m[1] * source->y +
-					m[2] * source->z) >> 14) + matrix->x;
+		dest->x = (1.0f * (m[0] * source->x + m[1] * source->y +
+					m[2] * source->z) / 16384) + matrix->x;
 
-		dest->y = ((m[3] * source->x + m[4] * source->y +
-					m[5] * source->z) >> 14) + matrix->y;
+		dest->y = (1.0f * (m[3] * source->x + m[4] * source->y +
+					m[5] * source->z) / 16384) + matrix->y;
 
-		dest->z = ((m[6] * source->x + m[7] * source->y +
-					m[8] * source->z) >> 14) + matrix->z;
+		dest->z = (1.0f * (m[6] * source->x + m[7] * source->y +
+					m[8] * source->z) / 16384) + matrix->z;
 
 		dest->normal = source->normal;
 
@@ -684,7 +684,7 @@ _calc_rotate16 ENDP
 ;descr: Projects the given list = does perspective transformation
 */
 
-int calc_project(int count,pvlist *dest,vlist *source)
+int calc_project(int count,pvlist *dest,fvlist *source)
 {
 	int i;
 	int ret = 0xffff;
@@ -692,9 +692,9 @@ int calc_project(int count,pvlist *dest,vlist *source)
 //printf("calc_project: %d points\n", count);
 	for (i = 0; i < count; i++) {
 		int vf = 0;
-		int x = source->x;
-		int y = source->y;
-		int z = source->z;
+		float x = source->x;
+		float y = source->y;
+		float z = source->z;
 
 		if (z < projclipz[CLIPMIN]) {
 			vf |= VF_NEAR;

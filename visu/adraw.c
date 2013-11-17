@@ -70,7 +70,7 @@ int calclight(int flags, nlist *normal)
 	;ret: carry=1=hidden
 */
 
-int checkculling(nlist *n, vlist *v)
+int checkculling(nlist *n, fvlist *v)
 {
 	return (n->x * v->x + n->y * v->y + n->z * v->z >= 0);
 }
@@ -584,7 +584,7 @@ _draw_polylist PROC FAR
 _draw_polylist ENDP
 */
 
-void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
+void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 {
 	int i;
 	short vertices[32];
@@ -619,7 +619,7 @@ void draw_polylist(polylist *l,polydata *d,vlist *v,pvlist *pv, nlist *n,int f)
 			continue;
 
 		nlist *np = &n[normal];
-		vlist *vp = &v[point[0]];
+		fvlist *vp = &v[point[0]];
 
 		if (~flags & F_2SIDE) {
 			if (checkculling(np, vp))

@@ -55,14 +55,14 @@ void	vid_dotdisplay_pvlist(int count,pvlist *list);
 void	vid_dotdisplay_zcolor(int count,pvlist *list1,vlist *list2);
 void	vid_poly(int color,int sides,...);
 
-int	calc_project(int count,pvlist *dest,vlist *source);
+int	calc_project(int count,pvlist *dest,fvlist *source);
 int	calc_project16(int count,pvlist *dest,vlist *source); // for 16 bits
 void	calc_setrmatrix_rotyxz(rmatrix *matrix,angle rotx,angle roty,angle rotz);
 void	calc_setrmatrix_rotxyz(rmatrix *matrix,angle rotx,angle roty,angle rotz);
 void	calc_setrmatrix_rotzyx(rmatrix *matrix,angle rotx,angle roty,angle rotz);
 void	calc_setrmatrix_ident(rmatrix *matrix);
 void	calc_sftranslate(int count,vlist *dest,long xt,long yt,long zt);
-void	calc_rotate(int count,vlist *dest,vlist *source,rmatrix *matrix);
+void	calc_rotate(int count,fvlist *dest,vlist *source,rmatrix *matrix);
 void	calc_rotate16(int count,vlist *dest,vlist *source,rmatrix *matrix);
 void	calc_nrotate(int count,nlist *dest,nlist *source,rmatrix *matrix);
 void	calc_mulrmatrix(rmatrix *dest,rmatrix *source);
@@ -71,7 +71,7 @@ void	calc_applyrmatrix(rmatrix *dest,rmatrix *apply);
 int	calc_singlez(int vertexnum,vlist *vertexlist,rmatrix *matrix);
 void	calc_setrmatrix_camera(rmatrix *,long,long,long,long,long,long,int);
 
-void	draw_polylist(polylist *,polydata *,vlist *,pvlist *,nlist *,int);
+void	draw_polylist(polylist *,polydata *,fvlist *,pvlist *,nlist *,int);
 void	draw_setfillroutine(void (*)(int *));
 
 /*####### Constants ########*/

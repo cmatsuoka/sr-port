@@ -55,12 +55,22 @@ struct s_nlist
 };
 #define nlist	struct s_nlist
 
+struct s_fvlist
+{
+	float	x;
+	float	y;
+	float	z;
+	short	normal;
+	short	RESERVED;
+};
+#define fvlist	struct s_fvlist
+
 struct s_pvlist
 {
-	short	x;
-	short	y;
+	float	x;
+	float	y;
 	visfl	vf; // if vf&VF_NEAR, the x/y are undefined
-	short	RESERVED[5];
+	short	RESERVED[3];
 };
 #define pvlist	struct s_pvlist
 
@@ -112,7 +122,7 @@ struct s_object
 			   are for gouraud shading */
 	vlist	*v0;	/* original vertices. */
 	nlist	*n0;	/* original normals */
-	vlist	*v;	/* calced: rotated vertices */
+	fvlist	*v;	/* calced: rotated vertices */
 	nlist	*n;	/* calced: rotated normals */
 	pvlist	*pv;	/* calced: projected vertices */
 	visfl	vf;	/* calced: visibility flag for entire pointlist (log.and) */
