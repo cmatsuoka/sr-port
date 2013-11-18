@@ -49,10 +49,10 @@ static const char fragment_shader[] =
 static const char vertex_shader_diffuse[] =
 "uniform mat4 pMatrix;\n"
 "uniform mat4 uMatrix;\n"
-"attribute vec4 aPosition;\n"
+"attribute vec4 aPosition;\n"		// projected vertex coordinates
 "attribute vec3 aNormal;\n"
 "attribute vec3 aLight;\n"
-"attribute vec3 aVertex;\n"
+"attribute vec3 aVertex;\n"		// 3D vertex coordinates
 "varying vec3 vPosition;\n"
 "varying vec3 vNormal;\n"
 "varying vec3 vLight;\n"
@@ -72,7 +72,6 @@ static const char fragment_shader_diffuse[] =
 "varying vec3 vPosition;\n"
 "varying vec3 vNormal;\n"
 "varying vec3 vLight;\n"
-"uniform vec4 uPal[32];\n"
 "\n"
 "void main() {\n"
 "    float d = dot(vNormal, vLight);\n"
@@ -157,7 +156,6 @@ void draw_poly_diffuse(short *f, float *v, int *n, int sides, int c)
 	int i;
 
 	glUseProgram(diffuse_triangle_program.program);
-	//u2gl_set_palette(&diffuse_triangle_program, &color[c][0], 32);
 	u2gl_set_color(color[c], &diffuse_triangle_program);
 
 	for (i = 0; i < sides; i++) {
@@ -255,8 +253,6 @@ int init_opengl(int width, int height)
 		glGetAttribLocation(diffuse_triangle_program.program, "aVertex");
 	diffuse_triangle_program.aLight_location =
 		glGetAttribLocation(diffuse_triangle_program.program, "aLight");
-	diffuse_triangle_program.uPal_location =
-		glGetUniformLocation(diffuse_triangle_program.program, "uPal");
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);

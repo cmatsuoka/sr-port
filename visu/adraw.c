@@ -651,7 +651,8 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 				normals[i * 3 + 1] = nn->y;
 				normals[i * 3 + 2] = nn->z;
 			}
-			draw_poly_diffuse(projvert, vert, normals, sides, color + 28);
+			color += 15;
+			draw_poly_diffuse(projvert, vert, normals, sides, color);
 		} else {
 			color += calclight(flags, np);
 			draw_poly(projvert, sides, color);

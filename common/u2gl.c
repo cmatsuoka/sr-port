@@ -44,11 +44,6 @@ void u2gl_set_light_position(struct u2gl_program *p, float *pos)
 				GL_FALSE, 3 * sizeof(float), pos);
 }
 
-void u2gl_set_palette(struct u2gl_program *p, float *pal, int num)
-{
-	glUniform4fv(p->uPal_location, num, pal);
-}
-
 void u2gl_draw_diffuse_triangle_fan(struct u2gl_program *p, float *obj, float *vert, float *norm, int num)
 {
 	glEnableVertexAttribArray(p->aPosition_location);
