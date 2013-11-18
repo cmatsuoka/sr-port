@@ -29,10 +29,10 @@
 
 struct s_rmatrix /* special matrix specifying position & rotation */
 {
-	int	m[9];
-	int	x;
-	int	y;
-	int	z;
+	float	m[9];
+	float	x;
+	float	y;
+	float	z;
 };
 #define rmatrix	struct s_rmatrix
 

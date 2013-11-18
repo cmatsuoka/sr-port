@@ -24,19 +24,20 @@
 ; exit: es:di=matrix1*matrix2 (matrix 2 overwritten)
 */
 
-void mulmatrices2(int *m1, int *m2)
+void mulmatrices2(float *m1, float *m2)
 {
-	int m[9], i, j;
+	float m[9];
+	int i, j;
 
 	for (i = 0; i < 3; i++) {
 		for (j = 0; j < 3; j++) {
 			m[i * 3 + j] = (m1[i * 3 + 0] * m2[0 + j] +
 					m1[i * 3 + 1] * m2[3 + j] +
-					m1[i * 3 + 2] * m2[6 + j]) >> 14;
+					m1[i * 3 + 2] * m2[6 + j]) / 16384;
 		}
 	}
 
-	memcpy(m2, m, 9 * sizeof(int));
+	memcpy(m2, m, 9 * sizeof(float));
 }
 
 /*
@@ -46,18 +47,19 @@ void mulmatrices2(int *m1, int *m2)
 	;destination and source can be same
 */
 
-void rotatesingle(rmatrix *matrix, int *d)
+void rotatesingle(rmatrix *matrix, float *d)
 {
-	int *m = matrix->m;
-	int v[3], i;
+	float *m = matrix->m;
+	float v[3];
+	int i;
 
 	for (i = 0; i < 3; i++) {
 		v[i] = (m[i * 3 + 0] * d[0] +
 			m[i * 3 + 1] * d[1] +
-			m[i * 3 + 2] * d[2]) >> 14;
+			m[i * 3 + 2] * d[2]) / 16384;
 	}
 
-	memcpy(d, v, 3 * sizeof(int));
+	memcpy(d, v, 3 * sizeof(float));
 }
 
 /*
@@ -94,7 +96,7 @@ void calc_applyrmatrix(rmatrix *dest, rmatrix *apply)
 void calc_rotate(int count,fvlist *dest,vlist *source,rmatrix *matrix)
 {
 	int i;
-	int *m = matrix->m;
+	float *m = matrix->m;
 
 	for (i = 0; i < count; i++) {
 		dest->x = (1.0f * (m[0] * source->x + m[1] * source->y +
@@ -124,9 +126,9 @@ void calc_rotate(int count,fvlist *dest,vlist *source,rmatrix *matrix)
 int calc_singlez(int vertex,vlist *vertexlist,rmatrix *matrix)
 {
 	vlist *v = &vertexlist[vertex];
-	int *m = matrix->m;
+	float *m = matrix->m;
 
-	return ((m[6] * v->x + m[7] * v->y + m[8] * v->z) >> 14) + matrix->z;
+	return ((m[6] * v->x + m[7] * v->y + m[8] * v->z) / 16384) + matrix->z;
 }
 
 /*
@@ -142,17 +144,17 @@ int calc_singlez(int vertex,vlist *vertexlist,rmatrix *matrix)
 void calc_nrotate(int count,nlist *dest,nlist *source,rmatrix *matrix)
 {
 	int i;
-	int *m = matrix->m;
+	float *m = matrix->m;
 
 	for (i = 0; i < count; i++) {
 		dest->x = (m[0] * source->x + m[1] * source->y +
-					m[2] * source->z) >> 14;
+					m[2] * source->z) / 16384;
 
 		dest->y = (m[3] * source->x + m[4] * source->y +
-					m[5] * source->z) >> 14;
+					m[5] * source->z) / 16384;
 
 		dest->z = (m[6] * source->x + m[7] * source->y +
-					m[8] * source->z) >> 14;
+					m[8] * source->z) / 16384;
 
 		source++;
 		dest++;
