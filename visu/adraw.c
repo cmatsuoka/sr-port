@@ -587,7 +587,8 @@ _draw_polylist ENDP
 void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 {
 	int i;
-	short vertices[32];
+	short projvert[32];
+	float vert[48];
 	int normals[48];
 
 	if (!(f & F_VISIBLE))
@@ -598,6 +599,7 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 	//@@1
 	for ( ; *l; l++) {
 		int poly = *l;
+		int nnidx;
 
 		if (poly == 0)		/* end of list */
 			break;
@@ -619,6 +621,7 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 		if (color == -1)	/* check cull */
 			continue;
 
+		/* for this face */
 		nlist *np = &n[normal];
 		fvlist *vp = &v[point[0]];
 
@@ -629,21 +632,29 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 
 		for (i = 0; i < sides; i++) {
 			pvlist *pp = &pv[point[i]];
-			vertices[i * 2 + 0] = pp->x;
-			vertices[i * 2 + 1] = 200 - pp->y;
+
+			projvert[i * 2 + 0] = pp->x;
+			projvert[i * 2 + 1] = 200 - pp->y;
 		}
 
 		if (flags & F_GOURAUD) {
 			for (i = 0; i < sides; i++) {
-				//XXX
-				normals[i * 3 + 0] = np->x;
-				normals[i * 3 + 1] = np->y;
-				normals[i * 3 + 2] = np->z;
+				/* for each vertex */
+				fvlist *ff = &v[point[i]];
+				nlist *nn = &n[ff->normal];
+				
+				vert[i * 3 + 0] = ff->x;
+				vert[i * 3 + 1] = ff->y;
+				vert[i * 3 + 2] = ff->z;
+
+				normals[i * 3 + 0] = nn->x;
+				normals[i * 3 + 1] = nn->y;
+				normals[i * 3 + 2] = nn->z;
 			}
-			draw_poly_diffuse(vertices, normals, sides, color);
+			draw_poly_diffuse(projvert, vert, normals, sides, color + 28);
 		} else {
 			color += calclight(flags, np);
-			draw_poly(vertices, sides, color);
+			draw_poly(projvert, sides, color);
 		}
 	}
 

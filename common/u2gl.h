@@ -11,6 +11,7 @@ struct u2gl_program {
 	GLuint aPosition_location;
 	GLuint aNormal_location;
 	GLuint aLight_location;
+	GLuint aVertex_location;
 	GLuint uColor_location;
 	GLuint uPal_location;
 	GLuint aTexPosition_location;
@@ -29,7 +30,7 @@ void	u2gl_check_error(char *);
 void	u2gl_draw_triangle_strip(struct u2gl_program *, float *, int);
 void	u2gl_draw_triangle_fan(struct u2gl_program *, float *, int);
 void	u2gl_draw_textured_triangle_strip(struct u2gl_program *, float *, int);
-void	u2gl_draw_diffuse_triangle_fan(struct u2gl_program *, float *, float *, int);
+void	u2gl_draw_diffuse_triangle_fan(struct u2gl_program *, float *, float *, float *, int);
 void	u2gl_set_palette(struct u2gl_program *, float *, int);
 void	u2gl_set_light_position(struct u2gl_program *, float *);
 void	u2gl_projection(float, float, float, float, struct u2gl_program *);

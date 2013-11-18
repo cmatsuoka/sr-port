@@ -14,6 +14,7 @@ static struct u2gl_program triangle_program;
 static struct u2gl_program diffuse_triangle_program;
 
 float obj[16 * 3];
+float vert[16 * 3];
 float norm[16 * 3];
 
 float fc_obj[12] = {
@@ -49,8 +50,9 @@ static const char vertex_shader_diffuse[] =
 "uniform mat4 pMatrix;\n"
 "uniform mat4 uMatrix;\n"
 "attribute vec4 aPosition;\n"
-"attribute vec4 aNormal;\n"
+"attribute vec3 aNormal;\n"
 "attribute vec3 aLight;\n"
+"attribute vec3 aVertex;\n"
 "varying vec3 vPosition;\n"
 "varying vec3 vNormal;\n"
 "varying vec3 vLight;\n"
@@ -59,9 +61,9 @@ static const char vertex_shader_diffuse[] =
 "    mat4 Matrix = pMatrix * uMatrix;\n"
 "    vec4 position = Matrix * aPosition;\n"
 "    gl_Position = position;\n"
-"    vLight = normalize(aLight - position.xyz);\n"
 "    vPosition = vec3(position);\n"
-"    vNormal = normalize(vec3(Matrix * aNormal));\n"
+"    vNormal = normalize(aNormal);\n"
+"    vLight = normalize(aLight - aVertex);\n"
 "}\n";
 
 static const char fragment_shader_diffuse[] =
@@ -74,8 +76,8 @@ static const char fragment_shader_diffuse[] =
 "\n"
 "void main() {\n"
 "    float d = dot(vNormal, vLight);\n"
-"    int c = int(abs(d * 31.0f));\n"
-"    gl_FragColor = vec4(uPal[c].xyz, 1.0f);\n"
+"    vec4 c = 0.3f + (0.7f * uColor * abs(d));\n"
+"    gl_FragColor = vec4(c.xyz, 1.0);\n"
 "}\n";
 
 static const char vertex_shader_texture[] =
@@ -150,23 +152,28 @@ void draw_poly(short *f, int sides, int c)
 	u2gl_draw_triangle_fan(&triangle_program, obj, sides);
 }
 
-void draw_poly_diffuse(short *f, int *n, int sides, int c)
+void draw_poly_diffuse(short *f, float *v, int *n, int sides, int c)
 {
 	int i;
-	float xxx[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
 
 	glUseProgram(diffuse_triangle_program.program);
-	u2gl_set_palette(&diffuse_triangle_program, &color[c][0], 32);
+	//u2gl_set_palette(&diffuse_triangle_program, &color[c][0], 32);
+	u2gl_set_color(color[c], &diffuse_triangle_program);
 
 	for (i = 0; i < sides; i++) {
 		obj[i * 3 + 0] = *f++;
 		obj[i * 3 + 1] = *f++;
+
+		vert[i * 3 + 0] = *v++;
+		vert[i * 3 + 1] = *v++;
+		vert[i * 3 + 2] = *v++;
+
 		norm[i * 3 + 0] = *n++;
 		norm[i * 3 + 1] = *n++;
 		norm[i * 3 + 2] = *n++;
 	}
 
-	u2gl_draw_diffuse_triangle_fan(&diffuse_triangle_program, obj, norm, sides);
+	u2gl_draw_diffuse_triangle_fan(&diffuse_triangle_program, obj, vert, norm, sides);
 }
 
 void draw_palette()
@@ -244,6 +251,8 @@ int init_opengl(int width, int height)
 	u2gl_create_program(&diffuse_triangle_program, f, v);
 	diffuse_triangle_program.aNormal_location =
 		glGetAttribLocation(diffuse_triangle_program.program, "aNormal");
+	diffuse_triangle_program.aVertex_location =
+		glGetAttribLocation(diffuse_triangle_program.program, "aVertex");
 	diffuse_triangle_program.aLight_location =
 		glGetAttribLocation(diffuse_triangle_program.program, "aLight");
 	diffuse_triangle_program.uPal_location =

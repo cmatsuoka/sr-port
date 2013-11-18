@@ -4,7 +4,7 @@ void set_window(int, int, int, int);
 void projection(void);
 void draw_palette(void);
 void draw_poly(short *, int, int);
-void draw_poly_diffuse(short *, int *, int, int);
+void draw_poly_diffuse(short *, float *, int *, int, int);
 void setrgb(int, int, int, int);
 void getrgb(int, char *);
 
