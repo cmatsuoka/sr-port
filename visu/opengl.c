@@ -51,8 +51,8 @@ static const char vertex_shader_diffuse[] =
 "uniform mat4 uMatrix;\n"
 "attribute vec4 aPosition;\n"		// projected vertex coordinates
 "attribute vec3 aNormal;\n"
-"attribute vec3 aLight;\n"
 "attribute vec3 aVertex;\n"		// 3D vertex coordinates
+"uniform vec3 uLight;\n"		// light source position
 "varying vec3 vPosition;\n"
 "varying vec3 vNormal;\n"
 "varying vec3 vLight;\n"
@@ -63,7 +63,7 @@ static const char vertex_shader_diffuse[] =
 "    gl_Position = position;\n"
 "    vPosition = vec3(position);\n"
 "    vNormal = normalize(aNormal);\n"
-"    vLight = normalize(aLight - aVertex);\n"
+"    vLight = normalize(uLight - aVertex);\n"
 "}\n";
 
 static const char fragment_shader_diffuse[] =
@@ -75,7 +75,7 @@ static const char fragment_shader_diffuse[] =
 "\n"
 "void main() {\n"
 "    float d = dot(vNormal, vLight);\n"
-"    vec4 c = 0.3f + (0.7f * uColor * abs(d));\n"
+"    vec4 c = 0.1 + 0.6 * uColor * (1.0 + d);\n"
 "    gl_FragColor = vec4(c.xyz, 1.0);\n"
 "}\n";
 
@@ -251,8 +251,8 @@ int init_opengl(int width, int height)
 		glGetAttribLocation(diffuse_triangle_program.program, "aNormal");
 	diffuse_triangle_program.aVertex_location =
 		glGetAttribLocation(diffuse_triangle_program.program, "aVertex");
-	diffuse_triangle_program.aLight_location =
-		glGetAttribLocation(diffuse_triangle_program.program, "aLight");
+	diffuse_triangle_program.uLight_location =
+		glGetUniformLocation(diffuse_triangle_program.program, "uLight");
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);

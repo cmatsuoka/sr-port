@@ -10,8 +10,8 @@ struct u2gl_program {
 	GLuint uMatrix_location;
 	GLuint aPosition_location;
 	GLuint aNormal_location;
-	GLuint aLight_location;
 	GLuint aVertex_location;
+	GLuint uLight_location;
 	GLuint uColor_location;
 	GLuint uPal_location;
 	GLuint aTexPosition_location;
