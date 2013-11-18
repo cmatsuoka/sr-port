@@ -137,12 +137,21 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 				continue;
 		}
 
+		int near = 0;
+
 		for (i = 0; i < sides; i++) {
 			pvlist *pp = &pv[point[i]];
 
 			projvert[i * 2 + 0] = pp->x;
 			projvert[i * 2 + 1] = 200 - pp->y;
+
+			if (pp->vf & VF_NEAR)
+				near++;
 		}
+
+		// Check near clipping
+		if (near == sides)
+			continue;
 
 		// Workaround: disable shading for windows
 		if (color == 208)
