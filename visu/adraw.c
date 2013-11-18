@@ -143,7 +143,7 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 			pvlist *pp = &pv[point[i]];
 
 			projvert[i * 2 + 0] = pp->x;
-			projvert[i * 2 + 1] = 200 - pp->y;
+			projvert[i * 2 + 1] = 199 - pp->y;
 
 			if (pp->vf & VF_NEAR)
 				near++;

@@ -217,6 +217,8 @@ extern int window_height;
 
 void set_window(int x, int y, int width, int height)
 {
+	y = 199 - y - height;
+
 	glEnable(GL_SCISSOR_TEST);
 	glScissor(window_width * x / view_width, window_height * y / view_height, window_width * width / view_width, window_height * height / view_height);
 }
