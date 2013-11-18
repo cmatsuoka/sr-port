@@ -40,7 +40,6 @@ object * vis_loadobject(char *fname)
 	o->pv=NULL;
 	o->plnum=1;
 	
-printf("vis_loadobject:%s\n", fname);
 	for(;;)
 	{
 		error=0;
@@ -58,7 +57,6 @@ printf("vis_loadobject:%s\n", fname);
 		else if(!memcmp(d0,"NAME",4)) 
 		{
 			o->name=(char *)d;
-printf("  NAME:%s\n", o->name);
 		}
 		else if(!memcmp(d0,"VERT",4)) 
 		{
@@ -67,9 +65,6 @@ printf("  NAME:%s\n", o->name);
 			o->v0=(vlist *)d;
 			o->v=getmem(sizeof(vlist)*o->vnum);
 			o->pv=getmem(sizeof(pvlist)*o->vnum);
-printf("  VERT:%d (v=%p, pv=%p)\n", o->vnum, o->v, o->pv);
-int i;
-for(i = 0; i < o->vnum;i++) printf("    %d: (%d,%d,%d)\n", i, o->v0[i].x, o->v0[i].y, o->v0[i].z);
 		}
 		else if(!memcmp(d0,"NORM",4))
 		{
@@ -77,22 +72,10 @@ for(i = 0; i < o->vnum;i++) printf("    %d: (%d,%d,%d)\n", i, o->v0[i].x, o->v0[
 			o->nnum1=GINT;
 			o->n0=(nlist *)d;
 			o->n=getmem(sizeof(vlist)*o->nnum);
-printf("  NORM:%d %d\n", o->nnum, o->nnum1);
 		}
 		else if(!memcmp(d0,"POLY",4)) 
 		{
 			o->pd=(polydata *)d;
-printf("  POLY:%p\n", o->pd);
-#if 0
-int i,j;
-polydata *kk = o->pd;
-for(;kk[0]==0 && kk[1] == 0;) {
-printf("    sides=%d\n", kk[2]);
-printf("    normal=%d\n", kk[6] + kk[7] * 256);
-for(j=0;j<kk[2];j++) printf("      vertex %d=%d\n", j, kk[8+j*2] + kk[8+j*2+1]*256);
-kk+=4+kk[2]*2;
-}
-#endif
 		}
 		else if(!memcmp(d0,"ORD",3)) 
 		{
@@ -103,7 +86,6 @@ kk+=4+kk[2]*2;
 			if(!error)
 			{
 				o->pl[b]=(polylist *)d;
-printf("  ORD:%p\n", o->pl[b]);
 			}
 		}
 		else error=1;
@@ -133,13 +115,11 @@ void	vis_drawobject(object *o)
 	//nlist	*n;
 	//int	*ijp;
 
-//printf("vis_drawobject: %s  flags:%x\n", o->name, o->flags);
 	if(!(o->flags&F_VISIBLE)) return;
 	calc_rotate(o->vnum,o->v,o->v0,o->r);
 	if(o->flags&F_GOURAUD) calc_nrotate(o->nnum,o->n,o->n0,o->r);
 	else calc_nrotate(o->nnum1,o->n,o->n0,o->r);
 	o->vf=calc_project(o->vnum,o->pv,o->v);
-//printf("  vf=%x\n", o->vf);
 	if(o->vf) return; // object was completely out of screen
 	a=0; al=0x7fffffffL;
 	for(b=1;b<o->plnum;b++)
