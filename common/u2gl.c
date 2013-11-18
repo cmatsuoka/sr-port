@@ -39,17 +39,23 @@ void u2gl_draw_triangle_fan(struct u2gl_program *p, float *obj, int num)
 
 void u2gl_set_light_position(struct u2gl_program *p, float *pos)
 {
-	glUniform3fv(p->uLight_location, 1, pos);
+	// Normalize position
+	float vec[3];
+	float size = sqrt(pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2]);
+
+	vec[0] = pos[0] / size;
+	vec[1] = pos[1] / size;
+	vec[2] = pos[2] / size;
+
+
+	glUniform3fv(p->uLight_location, 1, vec);
 }
 
-void u2gl_draw_diffuse_triangle_fan(struct u2gl_program *p, float *obj, float *vert, float *norm, int num)
+void u2gl_draw_diffuse_triangle_fan(struct u2gl_program *p, float *obj, float *norm, int num)
 {
 	glEnableVertexAttribArray(p->aPosition_location);
 	glVertexAttribPointer(p->aPosition_location, 3, GL_FLOAT,
 				GL_FALSE, 3 * sizeof(float), obj);
-	glEnableVertexAttribArray(p->aVertex_location);
-	glVertexAttribPointer(p->aVertex_location, 3, GL_FLOAT,
-				GL_FALSE, 3 * sizeof(float), vert);
 	glEnableVertexAttribArray(p->aNormal_location);
 	glVertexAttribPointer(p->aNormal_location, 3, GL_FLOAT,
 				GL_FALSE, 3 * sizeof(float), norm);

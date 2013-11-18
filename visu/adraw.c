@@ -588,7 +588,6 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 {
 	int i;
 	short projvert[32];
-	float vert[48];
 	int normals[48];
 
 	if (!(f & F_VISIBLE))
@@ -599,7 +598,6 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 	//@@1
 	for ( ; *l; l++) {
 		int poly = *l;
-		int nnidx;
 
 		if (poly == 0)		/* end of list */
 			break;
@@ -637,22 +635,37 @@ void draw_polylist(polylist *l,polydata *d,fvlist *v,pvlist *pv, nlist *n,int f)
 			projvert[i * 2 + 1] = 200 - pp->y;
 		}
 
+		// Workaround: disable shading for windows
+		if (color == 208)
+			flags &= ~F_GOURAUD;
+
 		if (flags & F_GOURAUD) {
+			int light = 255;
+			int f = flags & F_SHADE32;
+
 			for (i = 0; i < sides; i++) {
 				/* for each vertex */
 				fvlist *ff = &v[point[i]];
 				nlist *nn = &n[ff->normal];
 				
-				vert[i * 3 + 0] = ff->x;
-				vert[i * 3 + 1] = ff->y;
-				vert[i * 3 + 2] = ff->z;
-
 				normals[i * 3 + 0] = nn->x;
 				normals[i * 3 + 1] = nn->y;
 				normals[i * 3 + 2] = nn->z;
 			}
-			color += 15;
-			draw_poly_diffuse(projvert, vert, normals, sides, color);
+
+			if (f != 0) {
+				int cx = 6 - (f >> 10);
+				light >>= cx;
+			}
+
+			if (light < 1)
+				light = 1;
+			else if (light > 30)
+				light = 30;
+
+			color += light;
+
+			draw_poly_diffuse(projvert, normals, sides, color);
 		} else {
 			color += calclight(flags, np);
 			draw_poly(projvert, sides, color);
