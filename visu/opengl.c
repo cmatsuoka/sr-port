@@ -268,6 +268,8 @@ int init_opengl(int width, int height)
 
 	//init_texture();
 
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	return 0;
 }
 

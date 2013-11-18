@@ -174,7 +174,6 @@ int calc_project(int count,pvlist *dest,fvlist *source)
 	int i;
 	int ret = 0xffff;
 
-//printf("calc_project: %d points\n", count);
 	for (i = 0; i < count; i++) {
 		int vf = 0;
 		float x = source->x;
