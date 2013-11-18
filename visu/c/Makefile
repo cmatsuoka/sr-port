@@ -22,3 +22,5 @@ $(VISU_PATH)/u2e: $(VISU_PATH)/u2e.o $(VISU_PATH_OBJS)
 
 $(VISU_PATH)/cplay: $(VISU_PATH)/cplay.o $(VISU_PATH_OBJS)
 	$(LD) -o $@ $(LDFLAGS) $+ $(LIBS) -lSOIL
+
+$(VISU_PATH_OBJS): visu/c.h visu/cd.h
