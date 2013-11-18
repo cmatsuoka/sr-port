@@ -11,6 +11,8 @@
 ;**
 ;****************************************************************************/
 
+/* Rewritten in C and OpenGL by Claudio Matsuoka, Nov 2013 */
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
