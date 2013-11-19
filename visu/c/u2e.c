@@ -346,7 +346,7 @@ int main(int argc,char *argv[])
 	setrgb(1, 63, 63, 63, r1a);
 	setrgb(2, 63, 63, 63, r2a);
 
-	for(b=0;b<32;b++)
+	for(b=0;b<32 + 16;b++)
 	{
 		int repeat = adjust_framerate();
 		if (repeat == 0) b--;
@@ -392,6 +392,18 @@ int main(int argc,char *argv[])
 
 		setrgb(1, 63, 63, 63, r1a);
 		setrgb(2, 63, 63, 63, r2a);
+		swap_buffers();
+	}
+
+	// Wait a little bit -- not needed when music in place
+	for(b=0;b<32 + 16;b++)
+	{
+		int repeat = adjust_framerate();
+		if (repeat == 0) b--;
+		else while (--repeat > 0) b++;
+
+		clear_screen();
+		draw_rectangle2();
 		swap_buffers();
 	}
 
@@ -622,20 +634,32 @@ int main(int argc,char *argv[])
 	outp(0x3c7,0);
 	for(a=0;a<768;a++) fpal[a]=inp(0x3c9);
 #endif
-	for(a=0;a<256;a++) getrgb(a,&fpal[a*3]);
+	//for(a=0;a<256;a++) getrgb(a,&fpal[a*3]);
+
+
 	for(b=0;b<16;b++)
 	{
+#if 0
 		for(a=0;a<768;a++) 
 		{
 			fpal[a]+=4;
 			if(fpal[a]>63) fpal[a]=63;
 		}
 		dis_waitb();
-#if 0
 		outp(0x3c8,255);
 		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
 #endif
-		for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2],1.0f);
+		int repeat = adjust_framerate();
+		if (repeat == 0) b--;
+		else while (--repeat > 0) b++;
+
+		for(a=0;a<ordernum;a++)
+			vis_drawobject(co[order[a]].o);
+
+		setrgb(255, 63, 63, 63, 1.0 * b / 15);
+
+		draw_rectangle3();
+		swap_buffers();
 	}
 	if(!dis_indemo())
 	{

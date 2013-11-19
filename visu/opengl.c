@@ -37,6 +37,13 @@ float rectangle2_obj[12] = {
 	320.0f, 174.0f, 0.0f
 };
 
+float rectangle3_obj[12] = {
+	0.0f, 0.0f, 0.0f,
+	320.0f, 9.0f, 0.0f,
+	0.0f, 200.0f, 0.0f,
+	320.0f, 200.0f, 0.0f
+};
+
 static const char vertex_shader[] =
 "uniform mat4 pMatrix;\n"
 "uniform mat4 uMatrix;\n"
@@ -211,6 +218,13 @@ void draw_rectangle2()
 	glUseProgram(triangle_program.program);
 	u2gl_set_color(color[2], &triangle_program);
 	u2gl_draw_triangle_strip(&triangle_program, rectangle2_obj, 4);
+}
+
+void draw_rectangle3()
+{
+	glUseProgram(triangle_program.program);
+	u2gl_set_color(color[255], &triangle_program);
+	u2gl_draw_triangle_strip(&triangle_program, rectangle3_obj, 4);
 }
 
 #if 0
