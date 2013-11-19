@@ -283,6 +283,7 @@ int main(int argc,char *argv[])
 
 	resetscene();
 
+#if 0
     	if(!jellywas) 
 	{
 		vid_init(1);
@@ -291,11 +292,8 @@ int main(int argc,char *argv[])
 	}
 	else
 	{
-#if 0
 		outp(0x3c7,0);
 		for(a=0;a<768;a++) fpal[a]=inp(0x3c9);
-#endif
-		//for(a=0;a<256;a++) getrgb(a,&fpal[a*3]);
 	}
 	
 	for(b=0;b<33;b++)
@@ -306,14 +304,20 @@ int main(int argc,char *argv[])
 			if(fpal[a]>63) fpal[a]=63;
 		}
 		dis_waitb();
-#if 0
 		outp(0x3c8,0);
 		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
+	}
 #endif
+
+	if (!jellywas) {
+		vid_init(1);
 	}
 
 	// tall rectangle
+	// start white, we can't reuse image from previous part
+	// (jelly has to fade to white rectangle at end)
 
+#if 0
 	for(b=0;b<16;b++)
 	{
 		dis_waitb();
@@ -322,21 +326,19 @@ int main(int argc,char *argv[])
 	{
 		fadeset((char *)0xa0000000L);
 		dis_waitb();
-#if 0
 		outp(0x3d4,9);
 		a=inp(0x3d5);
 		a=(a&0xf0)|0x80;
 		outp(0x3d5,a);
-#endif
 		dis_waitb();
 		fadeset((char *)0xa4000000L);
 		fadeset((char *)0xa8000000L);
 		fadeset((char *)0xac000000L);
 		//swap_buffers();
 	}
+#endif
 
 #define RMAX 0.93f
-#define RDELTA 0.02f
 
 	float r1a = RMAX;
 	float r2a = 0.0f;
@@ -346,7 +348,10 @@ int main(int argc,char *argv[])
 
 	for(b=0;b<32;b++)
 	{
-		dis_waitb();
+		int repeat = adjust_framerate();
+		if (repeat == 0) b--;
+		else while (--repeat > 0) b++;
+
 		clear_screen();
 		draw_rectangle1();
 		swap_buffers();
@@ -354,9 +359,13 @@ int main(int argc,char *argv[])
 
 	// cross-fade to wide rectangle
 	
-	//for(b=0;b<33;b++)
-	while (r1a > 0.0f)
+	for(b=0;b<33;b++)
 	{
+		int repeat = adjust_framerate();
+		if (repeat == 0) b--;
+		else while (--repeat > 0) b++;
+
+#if 0
 		for(a=3;a<768-9;a++) 
 		{
 			fpal[a]-=2;
@@ -369,24 +378,17 @@ int main(int argc,char *argv[])
 		}
 		dis_waitb();
 
+		outp(0x3c8,0);
+		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
+#endif
 		
 		clear_screen();
 
 		draw_rectangle1();
 		draw_rectangle2();
 		
-#if 0
-		outp(0x3c8,0);
-		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
-#endif
-
-		if (r1a > 0.0f)
-			r1a -= RDELTA;
-		else r1a = 0.0f;
-
-		if (r2a < RMAX)
-			r2a += RDELTA;
-		else r2a = RMAX;
+		r1a = RMAX * (32 - b) / 32;
+		r2a = RMAX * b / 32;
 
 		setrgb(1, 63, 63, 63, r1a);
 		setrgb(2, 63, 63, 63, r2a);
