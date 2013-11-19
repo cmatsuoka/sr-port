@@ -131,15 +131,7 @@ static float tex_coords[] = {
 static float color[256][4];
 #define CC 63
 
-void setrgb(int c, int r, int g, int b)
-{
-	color[c][0] = (float)r / CC;
-	color[c][1] = (float)g / CC;
-	color[c][2] = (float)b / CC;
-	color[c][3] = 1.0f;
-}
-
-void setrgba(int c, int r, int g, int b, float a)
+void setrgb(int c, int r, int g, int b, float a)
 {
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;

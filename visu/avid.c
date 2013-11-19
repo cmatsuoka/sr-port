@@ -144,7 +144,7 @@ void vid_setpal(char *pal)
 
 	for (i = 0; i < 256; i++) {
 		int p = i * 3;
-		setrgb(i, pal[p], pal[p + 1], pal[p + 2]);
+		setrgb(i, pal[p], pal[p + 1], pal[p + 2], 1.0f);
 	}
 }
 

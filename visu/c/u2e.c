@@ -63,7 +63,6 @@ void border(int r,int g,int b)
 	outp(0x3c9,g);
 	outp(0x3c9,b);
 #endif
-	setrgb(255, r, g, b);
 }
 
 long lsget(unsigned char f)
@@ -296,7 +295,7 @@ int main(int argc,char *argv[])
 		outp(0x3c7,0);
 		for(a=0;a<768;a++) fpal[a]=inp(0x3c9);
 #endif
-		for(a=0;a<256;a++) getrgb(a,&fpal[a*3]);
+		//for(a=0;a<256;a++) getrgb(a,&fpal[a*3]);
 	}
 	
 	for(b=0;b<33;b++)
@@ -311,7 +310,6 @@ int main(int argc,char *argv[])
 		outp(0x3c8,0);
 		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
 #endif
-		for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2]);
 	}
 
 	// tall rectangle
@@ -343,8 +341,8 @@ int main(int argc,char *argv[])
 	float r1a = RMAX;
 	float r2a = 0.0f;
 
-	setrgba(1, 63, 63, 63, r1a);
-	setrgba(2, 63, 63, 63, r2a);
+	setrgb(1, 63, 63, 63, r1a);
+	setrgb(2, 63, 63, 63, r2a);
 
 	for(b=0;b<32;b++)
 	{
@@ -390,13 +388,13 @@ int main(int argc,char *argv[])
 			r2a += RDELTA;
 		else r2a = RMAX;
 
-		setrgba(1, 63, 63, 63, r1a);
-		setrgba(2, 63, 63, 63, r2a);
+		setrgb(1, 63, 63, 63, r1a);
+		setrgb(2, 63, 63, 63, r2a);
 		swap_buffers();
 	}
 
 	clear_screen();
-	for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2]);
+	for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2], 1.0f);
 
 	//vid_init(11);
 
@@ -635,7 +633,7 @@ int main(int argc,char *argv[])
 		outp(0x3c8,255);
 		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
 #endif
-		for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2]);
+		for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2],1.0f);
 	}
 	if(!dis_indemo())
 	{
