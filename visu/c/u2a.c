@@ -130,7 +130,7 @@ void _loadds copper2(void)
 	if(cl[clr].ready)
 	{
 		cl[(clr-1)&3].ready=2;
-		vid_setswitch(-1,clr);
+		//vid_setswitch(-1,clr);
 		copperdelay=cl[clr].frames;
 		clr++; clr&=3;
 	}
@@ -300,7 +300,7 @@ printf("c=%d\n", c);
 #endif
 
 		// Draw to free frame
-		vid_setswitch(clw,-1);
+		//vid_setswitch(clw,-1);
 		vid_clearbg(bg);
 		// Field of vision
 		vid_cameraangle(fov);
@@ -453,13 +453,13 @@ printf("c=%d\n", c);
 	}
 	dis_setcopper(2,NULL);
 
-	vid_setswitch(0,-1);
+	//vid_setswitch(0,-1);
 	vid_clearbg(bg);
-	vid_setswitch(1,-1);
+	//vid_setswitch(1,-1);
 	vid_clearbg(bg);
-	vid_setswitch(2,-1);
+	//vid_setswitch(2,-1);
 	vid_clearbg(bg);
-	vid_setswitch(3,-1);
+	//vid_setswitch(3,-1);
 	vid_clearbg(bg);
 	
 	if(!dis_indemo())

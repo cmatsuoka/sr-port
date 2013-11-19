@@ -276,7 +276,7 @@ int main(int argc,char *argv[])
 			r->z+=l;
 			
 			#ifdef DEBUG
-			fprintf(fr," XYZ:(%i,%i,%i)",r->x,r->y,r->z);
+			fprintf(fr," XYZ:(%f,%f,%f)",r->x,r->y,r->z);
 			#endif
 
 			if(pflag&0x40)
