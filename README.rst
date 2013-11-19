@@ -13,7 +13,7 @@ Notes
 
 * Original file layout used when possible.
 
-* Ported code should be resolution-independent.
+* Ported code should be resolution-independent and framerate-independent.
 
 * Pixel art upscaled with 4xbrz.
 
@@ -36,6 +36,8 @@ Tunneli
 
 Glenz
 """""
-(Work in progress)
-
 .. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/glenz-small.png
+
+U2E
+"""
+.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/u2e-small.png

@@ -116,7 +116,7 @@ void vid_init(int mode)
 
 	init_opengl(window_width, window_height);
 	projection();
-	set_fps(35);
+	set_fps(36);
 }
 	
 /*
