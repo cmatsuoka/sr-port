@@ -144,7 +144,7 @@ void _loadds copper2(void)
 	if(cl[clr].ready)
 	{
 		cl[(clr-1)&3].ready=2;
-		vid_setswitch(-1,clr);
+		//vid_setswitch(-1,clr);
 		copperdelay=cl[clr].frames;
 		clr++; clr&=3;
 	}
@@ -297,7 +297,6 @@ int main(int argc,char *argv[])
 		for(a=0;a<768;a++) fpal[a]=inp(0x3c9);
 #endif
 		for(a=0;a<256;a++) getrgb(a,&fpal[a*3]);
-		swap_buffers();
 	}
 	
 	for(b=0;b<33;b++)
@@ -313,8 +312,9 @@ int main(int argc,char *argv[])
 		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
 #endif
 		for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2]);
-		swap_buffers();
 	}
+
+	// tall rectangle
 
 	for(b=0;b<16;b++)
 	{
@@ -334,16 +334,30 @@ int main(int argc,char *argv[])
 		fadeset((char *)0xa4000000L);
 		fadeset((char *)0xa8000000L);
 		fadeset((char *)0xac000000L);
+		//swap_buffers();
+	}
+
+#define RMAX 0.93f
+#define RDELTA 0.02f
+
+	float r1a = RMAX;
+	float r2a = 0.0f;
+
+	setrgba(1, 63, 63, 63, r1a);
+	setrgba(2, 63, 63, 63, r2a);
+
+	for(b=0;b<32;b++)
+	{
+		dis_waitb();
+		clear_screen();
+		draw_rectangle1();
 		swap_buffers();
 	}
 
-	for(b=0;b<16;b++)
-	{
-		dis_waitb();
-		swap_buffers();
-	}
+	// cross-fade to wide rectangle
 	
-	for(b=0;b<33;b++)
+	//for(b=0;b<33;b++)
+	while (r1a > 0.0f)
 	{
 		for(a=3;a<768-9;a++) 
 		{
@@ -358,14 +372,34 @@ int main(int argc,char *argv[])
 		dis_waitb();
 
 		
+		clear_screen();
+
+		draw_rectangle1();
+		draw_rectangle2();
+		
 #if 0
 		outp(0x3c8,0);
 		for(a=0;a<768;a++) outp(0x3c9,fpal[a]);
 #endif
-		for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2]);
+
+		if (r1a > 0.0f)
+			r1a -= RDELTA;
+		else r1a = 0.0f;
+
+		if (r2a < RMAX)
+			r2a += RDELTA;
+		else r2a = RMAX;
+
+		setrgba(1, 63, 63, 63, r1a);
+		setrgba(2, 63, 63, 63, r2a);
 		swap_buffers();
 	}
-	vid_init(11);
+
+	clear_screen();
+	for(a=0;a<256;a++) setrgb(a,fpal[a*3],fpal[a*3+1],fpal[a*3+2]);
+
+	//vid_init(11);
+
 	cp=(char *)(scenem+16);
 	cp[255*3+0]=0;
 	cp[255*3+1]=0;
@@ -408,6 +442,8 @@ int main(int argc,char *argv[])
 	cl[2].ready=0;
 	cl[3].ready=1;
 	
+	int first = 2;
+
 	while(!dis_exit() && !xit)
 	{
 		int fov;
@@ -428,7 +464,7 @@ int main(int argc,char *argv[])
 		}
 #endif
 		// Draw to free frame
-		vid_setswitch(clw,-1);
+		//vid_setswitch(clw,-1);
 		vid_clear255();
 		// Field of vision
 		vid_cameraangle(fov);
@@ -471,7 +507,9 @@ int main(int argc,char *argv[])
 		// calculate how many frames late of schedule
 		//a=(syncframe-currframe);
 		//repeat=a+1;
-		swap_buffers();
+		if (!first)
+			swap_buffers();
+		if (first > 0) first--;
 
 		repeat=adjust_framerate();
 		if(repeat<0) repeat=0;

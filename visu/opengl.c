@@ -23,6 +23,20 @@ float fc_obj[12] = {
 	320.0f, 50.0f, 0.0f
 };
 
+float rectangle1_obj[12] = {
+	70.0f, 0.0f, 0.0f,
+	250.0f, 0.0f, 0.0f,
+	70.0f, 200.0f, 0.0f,
+	250.0f, 200.0f, 0.0f
+};
+
+float rectangle2_obj[12] = {
+	0.0f, 24.0f, 0.0f,
+	320.0f, 24.0f, 0.0f,
+	0.0f, 174.0f, 0.0f,
+	320.0f, 174.0f, 0.0f
+};
+
 static const char vertex_shader[] =
 "uniform mat4 pMatrix;\n"
 "uniform mat4 uMatrix;\n"
@@ -125,6 +139,14 @@ void setrgb(int c, int r, int g, int b)
 	color[c][3] = 1.0f;
 }
 
+void setrgba(int c, int r, int g, int b, float a)
+{
+	color[c][0] = (float)r / CC;
+	color[c][1] = (float)g / CC;
+	color[c][2] = (float)b / CC;
+	color[c][3] = a;
+}
+
 void getrgb(int c, char *p)
 {
 	p[0] = color[c][0] * CC;
@@ -183,6 +205,20 @@ void draw_palette()
 	
 		u2gl_draw_triangle_strip(&triangle_program, obj, 3);
 	}
+}
+
+void draw_rectangle1()
+{
+	glUseProgram(triangle_program.program);
+	u2gl_set_color(color[1], &triangle_program);
+	u2gl_draw_triangle_strip(&triangle_program, rectangle1_obj, 4);
+}
+
+void draw_rectangle2()
+{
+	glUseProgram(triangle_program.program);
+	u2gl_set_color(color[2], &triangle_program);
+	u2gl_draw_triangle_strip(&triangle_program, rectangle2_obj, 4);
 }
 
 #if 0

@@ -42,6 +42,7 @@ void	vid_deinittimer(void);
 void	vid_deinit(void);
 void	vid_setpal(char *pal);
 void	vid_clear(void);
+void	vid_clear255(void);
 void	vid_clearbg(char *);
 void	vid_skyclear(char *sky);
 void	vid_switch(void);
