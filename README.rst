@@ -21,23 +21,4 @@ Notes
 
 
 
-Screenshots
------------
-
-Dots
-""""
-.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/dots-small.png
-
-
-Tunneli
-"""""""
-.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/tunnel-small.png
-
-
-Glenz
-"""""
-.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/glenz-small.png
-
-U2E
-"""
-.. image:: https://raw.github.com/cmatsuoka/sr-port/master/doc/u2e-small.png
+See https://github.com/cmatsuoka/sr-port/wiki for further information.
