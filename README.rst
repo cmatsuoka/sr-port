@@ -21,4 +21,5 @@ Notes
 
 
 
-See https://github.com/cmatsuoka/sr-port/wiki for further information.
+See https://github.com/cmatsuoka/sr-port/wiki/Second-Reality-port-notes
+for further information.
