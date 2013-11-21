@@ -41,23 +41,26 @@ static const char fragment_shader_texture[] =
 "precision mediump float;\n"
 "uniform sampler2D uTexture;\n"
 "uniform vec4 uColor;\n"
+"uniform vec2 uPos;\n"
+"uniform vec2 uTexPos;\n"
+"uniform float uRadius;\n"
 "varying vec3 vPosition;\n"
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    const float r = 150.0;\n"
-"    vec2 pos = vec2(320.0, 240.0);\n"
-"    vec2 tpos = vec2(0.5, 0.5);\n"
-"    float d = distance(gl_FragCoord.xy, pos);\n"
-"    float new = pow(d,0.69) / 32.0;\n"
+"    float d = 50.0 * distance(gl_FragCoord.xy, uPos) / uRadius;\n"
 "    if (d < 1.0) d = 1.0;\n"
-"    if (d < r) {\n"
-"       vec2 p = tpos + (vTexPosition - tpos) * new;\n"
+"    if (d < 50.0) {\n"
+"       float new = pow(d,0.69) / 32.0;\n"
+"       vec2 p = uTexPos + (vTexPosition - uTexPos) * new;\n"
 "       gl_FragColor = texture2D(uTexture, p) + vec4(0.0, 0.0, 0.3, 0.0);\n"
 "    } else gl_FragColor = texture2D(uTexture, vTexPosition);\n"
 "}\n";
 
 
+int uPos_location;
+int uTexPos_location;
+int uRadius_location;
 
 static float tex_coords[] = {
 	0.0f, 1.0f,
@@ -75,11 +78,6 @@ void setrgb(int c, int r, int g, int b)
 {
 	float alpha = 0.5f;
 
-#if 0
-	if (c == 232 || c == 240) {
-		alpha = 0.75f;
-	}
-#endif
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;
 	color[c][2] = (float)b / CC;
@@ -124,6 +122,29 @@ static void init_texture()
 	u2gl_check_error("init_texture");
 }
 
+extern int window_width;
+extern int window_height;
+
+void set_radius(float r)
+{
+	glUseProgram(bg_program.program);
+	r = r * window_width / view_width;
+	glUniform1fv(uRadius_location, 1, &r);
+}
+
+void set_pos(float x, float y)
+{
+	float vec[2];
+
+	vec[0] = x * window_width / view_width;
+	vec[1] = y * window_height / view_height;
+	glUniform2fv(uPos_location, 1, vec);
+
+	vec[0] = x / view_width;
+	vec[1] = y / view_height;
+	glUniform2fv(uTexPos_location, 1, vec);
+}
+
 int init_opengl(int width, int height)
 {
 	Matrix m;
@@ -135,6 +156,10 @@ int init_opengl(int width, int height)
 	v = u2gl_compile_vertex_shader(vertex_shader_texture);
 	f = u2gl_compile_fragment_shader(fragment_shader_texture);
 	u2gl_create_program(&bg_program, f, v);
+
+	uPos_location = glGetUniformLocation(bg_program.program, "uPos");
+	uTexPos_location = glGetUniformLocation(bg_program.program, "uTexPos");
+	uRadius_location = glGetUniformLocation(bg_program.program, "uRadius");
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);

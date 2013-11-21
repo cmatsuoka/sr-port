@@ -56,6 +56,7 @@ int	waitb()
 
 void	drawlens(int x0,int y0)
 {
+#if 0
 	int	y,ys,ye;
 	long int u1,u2;
 	u1=(x0-lensxs)+(long)(y0-lensys)*320L;
@@ -64,7 +65,6 @@ void	drawlens(int x0,int y0)
 	ye=lenshig-1;
 	for(y=0;y<ys;y++)
 	{
-#if 0
 		if(u1>=0 && u1<=64000)
 		{
 			dorow(lens1,(unsigned)u1,y,0x40);
@@ -81,8 +81,10 @@ void	drawlens(int x0,int y0)
 			dorow3(lens4,(unsigned)u2,ye-y,0);
 		}
 		u2-=320;
-#endif
 	}
+#endif
+
+	set_pos(x0, 199 - y0);
 }
 
 int	setvmode(int m)
@@ -166,16 +168,22 @@ void	part2(void)
 	uframe=frame=0;
 	while(!dis_exit() && uframe<715)
 	{
+		int ff;
+
 		if(uframe<96)
 		{
 			a=(uframe-32)/2;
 			if(a<0) a=0;
 			//setpalarea(fade2+a*3*192,64,192);
 		}
+		ff=a=waitb();
+
 		#ifdef SAVEPATH
 		//putw(x/64,fp);
 		//putw(y/64,fp);
 		drawlens(x/64,y/64);
+
+		while (ff--) {
 		x+=xa; y+=ya;
 		if(x>256*64 || x<60*64) xa=-xa;
 		if(y>150*64 && frame<600) 
@@ -189,12 +197,17 @@ void	part2(void)
 			else ya=-ya*9/10;
 		}
 		ya+=2;
+		}
 		#else
 		x=pathdata1[frame*2+0];
 		y=pathdata1[frame*2+1];
 		drawlens(x,y);
 		#endif
-		a=waitb();
+
+		clear_screen();
+		draw_bg();
+		swap_buffers();
+
 		uframe+=a;
 		if(a>3) a=3;
 		frame+=a;
@@ -405,10 +418,12 @@ int main()
 	//putw(0,fp);
 	#endif
 
+	set_radius(0);
 	if(!dis_exit()) part1();
 	while(!dis_exit() && dis_musplus()<-20) ;
 	dis_waitb();
-	//if(!dis_exit()) part2();
+	set_radius(64);
+	if(!dis_exit()) part2();
 	#ifdef SAVEPATH
 	//pathstart2=(ftell(fp)-4)/2;
 	#endif
