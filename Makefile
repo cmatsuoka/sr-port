@@ -11,14 +11,15 @@ PARTS	= dots/dots tunneli/tun10 glenz/glenz plzpart/plzpart visu/c/u2e
 all: common-all dis-all $(PARTS)
 
 include common/Makefile
+include visu/c/Makefile
 include dis/Makefile
+include glenz/Makefile
+include tunneli/Makefile
+include techno/Makefile
+#include lens/Makefile
+include plzpart/Makefile
 include dots/Makefile
 include water/Makefile
-include tunneli/Makefile
-include glenz/Makefile
-include plzpart/Makefile
-include techno/Makefile
-include visu/c/Makefile
 
 .SUFFIXES: .c .o .a .pov .png
 
