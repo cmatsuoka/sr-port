@@ -16,7 +16,7 @@ include dis/Makefile
 include glenz/Makefile
 include tunneli/Makefile
 include techno/Makefile
-#include lens/Makefile
+include lens/Makefile
 include plzpart/Makefile
 include dots/Makefile
 include water/Makefile

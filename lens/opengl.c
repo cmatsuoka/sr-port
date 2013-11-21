@@ -14,11 +14,11 @@ static struct u2gl_program bg_program;
 
 float obj[9];
 
-float fc_obj[12] = {
+float bg_obj[12] = {
 	0.0f, 0.0f, 0.0f,
 	320.0f, 0.0f, 0.0f,
-	0.0f, 50.0f, 0.0f,
-	320.0f, 50.0f, 0.0f
+	0.0f, 200.0f, 0.0f,
+	320.0f, 200.0f, 0.0f
 };
 
 static const char vertex_shader_texture[] =
@@ -45,14 +45,23 @@ static const char fragment_shader_texture[] =
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = texture2D(uTexture, vTexPosition).rgba * uColor.x;\n"
+"    const float r = 150.0;\n"
+"    vec2 pos = vec2(320.0, 240.0);\n"
+"    vec2 tpos = vec2(0.5, 0.5);\n"
+"    float d = distance(gl_FragCoord.xy, pos);\n"
+"    float new = pow(d,0.69) / 32.0;\n"
+"    if (d < 1.0) d = 1.0;\n"
+"    if (d < r) {\n"
+"       vec2 p = tpos + (vTexPosition - tpos) * new;\n"
+"       gl_FragColor = texture2D(uTexture, p) + vec4(0.0, 0.0, 0.3, 0.0);\n"
+"    } else gl_FragColor = texture2D(uTexture, vTexPosition);\n"
 "}\n";
 
 
 
 static float tex_coords[] = {
-	0.0f, 0.5f,
-	1.0f, 0.5f,
+	0.0f, 1.0f,
+	1.0f, 1.0f,
 	0.0f, 0.0f,
 	1.0f, 0.0f
 };
@@ -87,8 +96,7 @@ void getrgb(int c, char *p)
 void draw_bg()
 {
 	glUseProgram(bg_program.program);
-	u2gl_set_color(color[15], &bg_program);
-	u2gl_draw_textured_triangle_strip(&bg_program, fc_obj, 4);
+	u2gl_draw_textured_triangle_strip(&bg_program, bg_obj, 4);
 }
 
 static void init_texture()
@@ -106,7 +114,7 @@ static void init_texture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height;
-	unsigned char* image = SOIL_load_image("fc_2x.png",
+	unsigned char* image = SOIL_load_image("lenspic.png",
 				&width, &height, 0, SOIL_LOAD_RGB);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
 				GL_UNSIGNED_BYTE, image);
@@ -135,12 +143,13 @@ int init_opengl(int width, int height)
 
 	glClearColor(.0, .0, .0, 0);
 
+	matrix_identity(m);
 	glUseProgram(bg_program.program);
 	u2gl_set_matrix(&bg_program, m);
-
 	u2gl_check_error("init_opengl");
 
 	init_texture();
+	u2gl_check_error("init_texture");
 
 	return 0;
 }

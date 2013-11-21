@@ -51,7 +51,6 @@ int	waitb()
 	return(1);
 #endif
 
-	swap_buffers();
 	return adjust_framerate();
 }
 
@@ -91,7 +90,7 @@ int	setvmode(int m)
 	//_asm mov ax,m
 	//_asm int 10h
 
-	if (init_graphics("Glenz", window_width, window_height) < 0) {
+	if (init_graphics("Lens", window_width, window_height) < 0) {
 		fprintf(stderr, "Can't init graphics\n");
 		return -1;
 	};
@@ -122,7 +121,7 @@ void	part1(void)
 		firfade1[b]=170*64+(100-b)*50;
 		firfade2[b]=170*64+(100-b)*50;
 	}
-	if(dis_musplus>-30) while(!dis_exit() && dis_musplus()<-6) ;
+	if(dis_musplus()>-30) while(!dis_exit() && dis_musplus()<-6) ;
 	dis_waitb();
 	dis_setmframe(0);
 	while(!dis_exit() && frame<300)
@@ -146,6 +145,9 @@ void	part1(void)
 				}
 			}
 		}
+		clear_screen();
+		draw_bg();
+		swap_buffers();
 		a=waitb();
 		frame+=a;
 	}
@@ -168,7 +170,7 @@ void	part2(void)
 		{
 			a=(uframe-32)/2;
 			if(a<0) a=0;
-			setpalarea(fade2+a*3*192,64,192);
+			//setpalarea(fade2+a*3*192,64,192);
 		}
 		#ifdef SAVEPATH
 		//putw(x/64,fp);
@@ -203,6 +205,7 @@ void	part2(void)
 	}
 }
 
+#if 0
 void	part3(void)
 {
 	int	x,y,xa,ya;
@@ -295,6 +298,7 @@ void	part3(void)
 	for(a=0;a<768;a++) palette[a]=63;
 	setpalarea(palette,0,256);
 }
+#endif
 
 int main()
 {
@@ -304,8 +308,8 @@ int main()
 	char	*cp,*dp;
 	//FILE	*f1;
 	dis_partstart();
-	rotpic=calloc(16384,4);
-	if(!rotpic) exit(1);
+	//rotpic=calloc(16384,4);
+	//if(!rotpic) exit(1);
 	fade=calloc(16000,1);
 	if(!fade) exit(1);
 	fade2=calloc(20000,1);
@@ -320,6 +324,7 @@ int main()
 	pathdata1=(int *)(lensexp+4);
 	pathdata2=(int *)(lensexp+4+2*a);
 	#endif
+#if 0
 	memcpy(palette,lensexb+16,768);
 	back=(char *)((long)lensexb+((768+16)/16)*65536L);
 	memcpy(back+64000,back+64000-1536,1536);
@@ -389,9 +394,10 @@ int main()
 			rotpic[x+y*256]=a;
 		}
 	}
+#endif
 
 	waitb();
-	setpalarea(palette,0,256);
+	//setpalarea(palette,0,256);
 
 	#ifdef SAVEPATH
 	//fp=fopen("lens.exp","wb");
@@ -402,11 +408,11 @@ int main()
 	if(!dis_exit()) part1();
 	while(!dis_exit() && dis_musplus()<-20) ;
 	dis_waitb();
-	if(!dis_exit()) part2();
+	//if(!dis_exit()) part2();
 	#ifdef SAVEPATH
 	//pathstart2=(ftell(fp)-4)/2;
 	#endif
-	if(!dis_exit()) part3();
+	//if(!dis_exit()) part3();
 	
 	#ifdef SAVEPATH
 	//rewind(fp);
