@@ -6,7 +6,8 @@ LIBS	= -Lcommon -lcommon -Ldis -ldis -lm -lGL -lEGL -lGLU -lSDL -lX11
 RANLIB	= ranlib
 AR	= ar
 POVRAY	= povray
-PARTS	= dots/dots tunneli/tun10 glenz/glenz plzpart/plzpart visu/c/u2e
+PARTS	= dots/dots tunneli/tun10 glenz/glenz plzpart/plzpart visu/c/u2e \
+	  lens/lens
 
 all: common-all dis-all $(PARTS)
 
