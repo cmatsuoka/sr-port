@@ -49,11 +49,10 @@ static const char fragment_shader_texture[] =
 "\n"
 "void main() {\n"
 "    float d = distance(gl_FragCoord.xy, uPos) / uRadius;\n"
-"    if (d < 0.1) d = 0.1;\n"
 "    if (d < 1.0) {\n"
-"       float new = 0.7 + 0.2 * pow(d*d, 0.69);\n"
-"       vec2 p = uTexPos + (vTexPosition - uTexPos) * new;\n"
-"       gl_FragColor = texture2D(uTexture, p) + vec4(0.0, 0.0, 0.3, 0.0);\n"
+"       float new = 0.5 + 0.5 * pow(d * d, 0.69);\n"
+"       vec2 p = uTexPos + (vec2(vTexPosition.x, 1.0 - vTexPosition.y) - uTexPos) * new;\n"
+"       gl_FragColor = texture2D(uTexture, vec2(p.x, 1.0 - p.y)) + vec4(0.0, 0.0, 0.3, 0.0);\n"
 "    } else gl_FragColor = texture2D(uTexture, vTexPosition);\n"
 "}\n";
 
