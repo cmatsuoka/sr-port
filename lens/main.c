@@ -206,6 +206,7 @@ void	part2(void)
 
 		clear_screen();
 		draw_bg();
+		draw_lens();
 		swap_buffers();
 
 		uframe+=a;
