@@ -56,7 +56,7 @@ static const char fragment_shader_texture[] =
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = vec4(texture2D(uTexture, vTexPosition).xyz, 0.5);\n"
+"    gl_FragColor = vec4(texture2D(uTexture, vTexPosition).xyz, 0.5) * 0.6;\n"
 "}\n";
 
 static const char fragment_shader_lens[] =
@@ -74,7 +74,7 @@ static const char fragment_shader_lens[] =
 "    if (d < 1.0) {\n"
 "       float new = 0.5 + 0.5 * pow(d * d, 0.69);\n"
 "       vec2 p = uTexPos + (vec2(vTexPosition.x, 1.0 - vTexPosition.y) - uTexPos) * new;\n"
-"       gl_FragColor = texture2D(uTexture, vec2(p.x, 1.0 - p.y)) + vec4(0.0, 0.0, 0.3, 0.0);\n"
+"       gl_FragColor = texture2D(uTexture, vec2(p.x, 1.0 - p.y)) * 0.8 + vec4(0.0, 0.0, 0.2, 0.0);\n"
 "    } else gl_FragColor = texture2D(uTexture, vTexPosition);\n"
 "}\n";
 
@@ -82,6 +82,7 @@ static const char fragment_shader_lens[] =
 int uPos_location;
 int uTexPos_location;
 int uRadius_location;
+int uTexture_location;
 
 static float tex_coords[] = {
 	0.0f, 1.0f,
@@ -115,6 +116,7 @@ void getrgb(int c, char *p)
 void draw_bg()
 {
 	blend_color();
+	glActiveTexture(GL_TEXTURE0);
 	glUseProgram(bg_program.program);
 	u2gl_draw_textured_triangle_strip(&bg_program, bg_obj, 4);
 }
@@ -124,12 +126,15 @@ void draw_lens()
 	Matrix m;
 
 	blend_alpha();
+	glActiveTexture(GL_TEXTURE1);
 	glUseProgram(lens_program.program);
+	glUniform1i(uTexture_location, 1);
 	matrix_identity(m);
         matrix_translate(m, (float)lens_x - 64, (float)lens_y - 53.33);
         u2gl_set_matrix(&lens_program, m);
 	u2gl_draw_triangle_strip(&lens_program, lens_obj, 4);
 }
+
 
 static void init_texture()
 {
@@ -138,7 +143,6 @@ static void init_texture()
 	unsigned char* image;
 
 	glGenTextures(2, tex);
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
 	u2gl_set_tex_coords(tex_coords);
@@ -218,6 +222,7 @@ int init_opengl(int width, int height)
 
 	f = u2gl_compile_fragment_shader(fragment_shader_texture);
 	u2gl_create_program(&lens_program, f, v);
+	uTexture_location = glGetUniformLocation(lens_program.program, "uTexture");
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
