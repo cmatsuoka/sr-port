@@ -219,13 +219,14 @@ void	part2(void)
 	}
 }
 
-#if 0
 void	part3(void)
 {
 	int	x,y,xa,ya;
 	int	a/*,r,g,b,c,i*/;
-	int	frame=0;
+	int	ff, frame=0;
 	//char	*cp,*dp;
+
+#if 0
 	rotpic90=back;
 	for(x=0;x<256;x++)
 	{
@@ -234,9 +235,10 @@ void	part3(void)
 			rotpic90[x+y*256]=rotpic[y+(255-x)*256];
 		}
 	}
+#endif
 	waitb();
-	setpalarea(fade+64*64*3,0,64);
-	inittwk();
+	//setpalarea(fade+64*64*3,0,64);
+	//inittwk();
 	{
 		double	d1,d2,d3,scale/*,scaleb*/,scalea;
 		//int	flag=1;
@@ -248,8 +250,13 @@ void	part3(void)
 		frame=0;
 		while(!dis_exit() && frame<2000)
 		{	
-			if(dis_musplus()>-4) break;
+printf("frame=%d\n", frame);
+			//if(dis_musplus()>-4) break;
 			#ifdef SAVEPATH
+
+			ff=a=waitb();
+			while(ff--) {
+
 			x=70.0*sin(d1)-30;
 			y=70.0*cos(d1)+60;
 			d1-=.005;
@@ -262,7 +269,7 @@ void	part3(void)
 			//putw(y,fp);
 			//putw(xa,fp);
 			//putw(ya,fp);
-			rotate(x,y,xa,ya);
+			//rotate(x,y,xa,ya);
 			scale+=scalea;
 			if(frame>25)
 			{
@@ -288,38 +295,46 @@ void	part3(void)
 				a=frame-900; if(a>100) a=100;
 				if(scalea<256) scalea+=0.000001*a;
 			}
+			}
 			#else
 			x=pathdata2[frame*4+0];
 			y=pathdata2[frame*4+1];
 			xa=pathdata2[frame*4+2];
 			ya=pathdata2[frame*4+3];
-			rotate(x,y,xa,ya);
+			//rotate(x,y,xa,ya);
 			#endif
-			frame+=waitb();
+			frame+=a;
+
+			clear_screen();
+			draw_rot();
+			swap_buffers();
+
+			// end fade
 			if(frame>2000-128)
 			{
 				a=frame-(2000-128);
 				a/=2;
 				if(a>63) a=63;
-				setpalarea(fade+a*64*3,0,64);
+				//setpalarea(fade+a*64*3,0,64);
 			}
+
+			// start fade
 			if(frame<16)
 			{
-				setpalarea(fade+(64+frame)*64*3,0,64);
+				//setpalarea(fade+(64+frame)*64*3,0,64);
 			}
 		}
 	}
-	for(a=0;a<768;a++) palette[a]=63;
-	setpalarea(palette,0,256);
+	//for(a=0;a<768;a++) palette[a]=63;
+	//setpalarea(palette,0,256);
 }
-#endif
 
 int main()
 {
-	int	x,y/*,xa,ya*/;
-	int	a,r,g,b,c,i;
+	//int	x,y,xa,ya;
+	//int	a,r,g,b,c,i;
 	//int	frame=0;
-	char	*cp,*dp;
+	//char	*cp,*dp;
 	//FILE	*f1;
 	dis_partstart();
 	//rotpic=calloc(16384,4);
@@ -428,7 +443,7 @@ int main()
 	#ifdef SAVEPATH
 	//pathstart2=(ftell(fp)-4)/2;
 	#endif
-	//if(!dis_exit()) part3();
+	if(!dis_exit()) part3();
 	
 	#ifdef SAVEPATH
 	//rewind(fp);

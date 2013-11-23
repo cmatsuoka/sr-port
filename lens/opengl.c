@@ -14,6 +14,7 @@ static int lens_x, lens_y;
 
 static struct u2gl_program bg_program;
 static struct u2gl_program lens_program;
+static struct u2gl_program rot_program;
 
 float obj[9];
 
@@ -56,7 +57,7 @@ static const char fragment_shader_texture[] =
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = vec4(texture2D(uTexture, vTexPosition).xyz, 0.5) * 0.6;\n"
+"    gl_FragColor = texture2D(uTexture, vTexPosition) * 0.4;\n"
 "}\n";
 
 static const char fragment_shader_lens[] =
@@ -78,6 +79,17 @@ static const char fragment_shader_lens[] =
 "    } else gl_FragColor = texture2D(uTexture, vTexPosition);\n"
 "}\n";
 
+static const char fragment_shader_rotate[] =
+"precision mediump float;\n"
+"uniform sampler2D uTexture;\n"
+"uniform vec4 uColor;\n"
+"varying vec3 vPosition;\n"
+"varying vec2 vTexPosition;\n"
+"\n"
+"void main() {\n"
+"    gl_FragColor = texture2D(uTexture, vTexPosition);\n"
+"}\n";
+
 
 int uPos_location;
 int uTexPos_location;
@@ -85,6 +97,13 @@ int uRadius_location;
 int uTexture_location;
 
 static float tex_coords[] = {
+	0.0f, 1.0f,
+	1.0f, 1.0f,
+	0.0f, 0.0f,
+	1.0f, 0.0f
+};
+
+static float rot_coords[] = {
 	0.0f, 1.0f,
 	1.0f, 1.0f,
 	0.0f, 0.0f,
@@ -135,6 +154,16 @@ void draw_lens()
 	u2gl_draw_triangle_strip(&lens_program, lens_obj, 4);
 }
 
+void draw_rot()
+{
+	u2gl_set_tex_coords(rot_coords);
+
+	blend_color();
+	glActiveTexture(GL_TEXTURE0);
+	glUseProgram(bg_program.program);
+	u2gl_draw_textured_triangle_strip(&bg_program, bg_obj, 4);
+}
+
 
 static void init_texture()
 {
@@ -142,10 +171,11 @@ static void init_texture()
 	int width, height;
 	unsigned char* image;
 
+	u2gl_set_tex_coords(tex_coords);
+
 	glGenTextures(2, tex);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	u2gl_set_tex_coords(tex_coords);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -161,7 +191,6 @@ static void init_texture()
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	u2gl_set_tex_coords(tex_coords);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -224,8 +253,12 @@ int init_opengl(int width, int height)
 	u2gl_create_program(&lens_program, f, v);
 	uTexture_location = glGetUniformLocation(lens_program.program, "uTexture");
 
+	f = u2gl_compile_fragment_shader(fragment_shader_rotate);
+	u2gl_create_program(&rot_program, f, v);
+
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
+
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -234,6 +267,9 @@ int init_opengl(int width, int height)
 	matrix_identity(m);
 	glUseProgram(bg_program.program);
 	u2gl_set_matrix(&bg_program, m);
+
+	glUseProgram(bg_program.program);
+	u2gl_set_matrix(&rot_program, m);
 	u2gl_check_error("init_opengl");
 
 	init_texture();
@@ -244,7 +280,8 @@ int init_opengl(int width, int height)
 
 void blend_alpha()
 {
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_COLOR);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 }
 
 void blend_color()
@@ -261,4 +298,5 @@ void projection()
 {
 	u2gl_projection(0, view_width, 0, view_height, &bg_program);
 	u2gl_projection(0, view_width, 0, view_height, &lens_program);
+	u2gl_projection(0, view_width, 0, view_height, &rot_program);
 }
