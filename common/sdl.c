@@ -223,6 +223,7 @@ int adjust_framerate()
 	return num_frames;
 }
 
+#if 0
 static void timer_delay()
 {
 	static uint32_t m = 0;
@@ -235,6 +236,7 @@ static void timer_delay()
 	}
 	m = tick_timer;
 }
+#endif
 
 void poll_event()
 {
