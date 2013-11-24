@@ -148,7 +148,10 @@ void	part1(void)
 			}
 		}
 		clear_screen();
-		draw_bg();
+		float ff = (float)frame / 40;
+		if (ff > 1.0f)
+			ff = 1.0f;
+		draw_fir(ff);
 		swap_buffers();
 		a=waitb();
 		frame+=a;

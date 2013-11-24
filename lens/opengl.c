@@ -12,6 +12,7 @@ static int view_width;
 static int view_height;
 static int lens_x, lens_y;
 
+static struct u2gl_program fir_program;
 static struct u2gl_program bg_program;
 static struct u2gl_program lens_program;
 static struct u2gl_program rot_program;
@@ -60,6 +61,27 @@ static const char fragment_shader_texture[] =
 "    gl_FragColor = texture2D(uTexture, vTexPosition) * 0.4;\n"
 "}\n";
 
+static const char fragment_shader_fir[] =
+"precision mediump float;\n"
+"uniform sampler2D uTexture;\n"
+"uniform vec4 uColor;\n"
+"uniform float uTime;\n"
+"varying vec3 vPosition;\n"
+"varying vec2 vTexPosition;\n"
+"\n"
+"void main() {\n"
+"    const float xoff = 0.25;\n"
+"    float yinv = 1.0 - vTexPosition.y;\n"
+"    float xlen = 1.0 - 2.0 * xoff;\n"
+"    float ybase = 0.2 * float(int(yinv * 5.0));\n"
+"    float xbase = xoff + ybase * xlen;\n"
+"    float xpos = xbase + (1.0 - xbase) * uTime;\n"
+"    float xx = xpos + (yinv - ybase) * xlen;\n"
+"    if (vTexPosition.x > xx || vTexPosition.x < xx - uTime) {\n"
+"        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n"
+"    } else gl_FragColor = texture2D(uTexture, vTexPosition);\n"
+"}\n";
+
 static const char fragment_shader_lens[] =
 "precision mediump float;\n"
 "uniform sampler2D uTexture;\n"
@@ -91,6 +113,7 @@ static const char fragment_shader_rotate[] =
 "}\n";
 
 
+int uTime_location;
 int uPos_location;
 int uTexPos_location;
 int uRadius_location;
@@ -130,6 +153,15 @@ void getrgb(int c, char *p)
 	p[0] = color[c][0] * CC;
 	p[1] = color[c][1] * CC;
 	p[2] = color[c][2] * CC;
+}
+
+void draw_fir(float t)
+{
+	blend_color();
+	glActiveTexture(GL_TEXTURE0);
+	glUseProgram(fir_program.program);
+	glUniform1f(uTime_location, t);
+	u2gl_draw_textured_triangle_strip(&fir_program, bg_obj, 4);
 }
 
 void draw_bg()
@@ -242,8 +274,15 @@ int init_opengl(int width, int height)
 	view_height = 200;
 
 	v = u2gl_compile_vertex_shader(vertex_shader_texture);
+	f = u2gl_compile_fragment_shader(fragment_shader_fir);
+	u2gl_create_program(&fir_program, f, v);
+	u2gl_check_error("create program fir");
+
+	uTime_location = glGetUniformLocation(fir_program.program, "uTime");
+
 	f = u2gl_compile_fragment_shader(fragment_shader_lens);
 	u2gl_create_program(&bg_program, f, v);
+	u2gl_check_error("create program bg");
 
 	uPos_location = glGetUniformLocation(bg_program.program, "uPos");
 	uTexPos_location = glGetUniformLocation(bg_program.program, "uTexPos");
@@ -251,10 +290,13 @@ int init_opengl(int width, int height)
 
 	f = u2gl_compile_fragment_shader(fragment_shader_texture);
 	u2gl_create_program(&lens_program, f, v);
+	u2gl_check_error("create program lens");
+
 	uTexture_location = glGetUniformLocation(lens_program.program, "uTexture");
 
 	f = u2gl_compile_fragment_shader(fragment_shader_rotate);
 	u2gl_create_program(&rot_program, f, v);
+	u2gl_check_error("create program rot");
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -265,6 +307,9 @@ int init_opengl(int width, int height)
 	glClearColor(.0, .0, .0, 0);
 
 	matrix_identity(m);
+	glUseProgram(fir_program.program);
+	u2gl_set_matrix(&fir_program, m);
+
 	glUseProgram(bg_program.program);
 	u2gl_set_matrix(&bg_program, m);
 
@@ -296,6 +341,7 @@ void clear_screen()
 
 void projection()
 {
+	u2gl_projection(0, view_width, 0, view_height, &fir_program);
 	u2gl_projection(0, view_width, 0, view_height, &bg_program);
 	u2gl_projection(0, view_width, 0, view_height, &lens_program);
 	u2gl_projection(0, view_width, 0, view_height, &rot_program);

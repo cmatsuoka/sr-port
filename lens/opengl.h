@@ -1,6 +1,7 @@
 
 int init_opengl(int, int);
 void clear_screen(void);
+void draw_fir(float);
 void draw_bg(void);
 void draw_lens(void);
 void draw_rot(void);
