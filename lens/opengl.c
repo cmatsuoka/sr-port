@@ -70,10 +70,10 @@ static const char fragment_shader_fir[] =
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    const float xoff = 0.25;\n"
+"    const float xoff = 0.25;\n"			// margin
 "    float yinv = 1.0 - vTexPosition.y;\n"
 "    float xlen = 1.0 - 2.0 * xoff;\n"
-"    float ybase = 0.2 * float(int(yinv * 5.0));\n"
+"    float ybase = 0.2 * float(int(yinv * 5.0));\n"	// discrete step
 "    float xbase = xoff + ybase * xlen;\n"
 "    float xpos = xbase + (1.0 - xbase) * uTime;\n"
 "    float xx = xpos + (yinv - ybase) * xlen;\n"
@@ -92,12 +92,18 @@ static const char fragment_shader_lens[] =
 "varying vec3 vPosition;\n"
 "varying vec2 vTexPosition;\n"
 "\n"
+"float rand(vec2 co) {\n"
+"    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);\n"
+"}\n"
+"\n"
 "void main() {\n"
 "    float d = distance(gl_FragCoord.xy, uPos) / uRadius;\n"
 "    if (d < 1.0) {\n"
 "       float new = 0.5 + 0.5 * pow(d * d, 0.69);\n"
+"       float fx = rand(vTexPosition) / uRadius;\n"
+"       float fy = rand(vTexPosition * 2.1) / uRadius;\n"
 "       vec2 p = uTexPos + (vec2(vTexPosition.x, 1.0 - vTexPosition.y) - uTexPos) * new;\n"
-"       gl_FragColor = texture2D(uTexture, vec2(p.x, 1.0 - p.y)) * 0.8 + vec4(0.0, 0.0, 0.2, 0.0);\n"
+"       gl_FragColor = texture2D(uTexture, vec2(p.x + fx, 1.0 - p.y + fy)) * 0.8 + vec4(0.0, 0.0, 0.2, 0.0);\n"
 "    } else gl_FragColor = texture2D(uTexture, vTexPosition);\n"
 "}\n";
 
