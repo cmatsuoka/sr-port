@@ -198,8 +198,8 @@ void draw_rot(float d1, float scale)
 	float rot[8];
 	float s, c;
 
-	scale *= 4;
-	d1 *= 3;
+	scale = 1.0 + scale / 2;
+	d1 *= 2;
 	s = sinf(d1);
 	c = cosf(d1);
 
