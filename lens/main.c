@@ -243,7 +243,7 @@ void	part3(void)
 	//setpalarea(fade+64*64*3,0,64);
 	//inittwk();
 	{
-		double	d1,d2,d3,scale/*,scaleb*/,scalea;
+		float	d1,d2,d3,scale/*,scaleb*/,scalea;
 		//int	flag=1;
 		d1=0;
 		d2=0.00007654321;
@@ -309,7 +309,7 @@ printf("frame=%d\n", frame);
 			frame+=a;
 
 			clear_screen();
-			draw_rot();
+			draw_rot(d1);
 			swap_buffers();
 
 			// end fade

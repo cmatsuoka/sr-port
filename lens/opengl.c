@@ -123,7 +123,8 @@ int uTime_location;
 int uPos_location;
 int uTexPos_location;
 int uRadius_location;
-int uTexture_location;
+int uLensTex_location;
+int uRotTex_location;
 
 static float tex_coords[] = {
 	0.0f, 1.0f,
@@ -133,10 +134,10 @@ static float tex_coords[] = {
 };
 
 static float rot_coords[] = {
-	0.0f, 1.0f,
-	1.0f, 1.0f,
-	0.0f, 0.0f,
-	1.0f, 0.0f
+	-0.18f, 1.0f,
+	1.1533f, 1.0f,
+	-0.18f, 0.0f,
+	1.1533f, 0.0f
 };
 
 
@@ -185,27 +186,28 @@ void draw_lens()
 	blend_alpha();
 	glActiveTexture(GL_TEXTURE1);
 	glUseProgram(lens_program.program);
-	glUniform1i(uTexture_location, 1);
+	glUniform1i(uLensTex_location, 1);
 	matrix_identity(m);
         matrix_translate(m, (float)lens_x - 64, (float)lens_y - 53.33);
         u2gl_set_matrix(&lens_program, m);
 	u2gl_draw_triangle_strip(&lens_program, lens_obj, 4);
 }
 
-void draw_rot()
+void draw_rot(float d1)
 {
+	glUniform1i(uRotTex_location, 2);
 	u2gl_set_tex_coords(rot_coords);
 
 	blend_color();
 	glActiveTexture(GL_TEXTURE0);
-	glUseProgram(bg_program.program);
-	u2gl_draw_textured_triangle_strip(&bg_program, bg_obj, 4);
+	glUseProgram(rot_program.program);
+	u2gl_draw_textured_triangle_strip(&rot_program, bg_obj, 4);
 }
 
 
 static void init_texture()
 {
-	GLuint tex[2];
+	GLuint tex[3];
 	int width, height;
 	unsigned char* image;
 
@@ -241,6 +243,21 @@ static void init_texture()
 	SOIL_free_image_data(image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	u2gl_check_error("init_texture 2");
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, tex[2]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	image = SOIL_load_image("lenspic1.png",
+				&width, &height, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+				GL_UNSIGNED_BYTE, image);
+	SOIL_free_image_data(image);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	u2gl_check_error("init_texture 3");
 }
 
 
@@ -298,11 +315,13 @@ int init_opengl(int width, int height)
 	u2gl_create_program(&lens_program, f, v);
 	u2gl_check_error("create program lens");
 
-	uTexture_location = glGetUniformLocation(lens_program.program, "uTexture");
+	uLensTex_location = glGetUniformLocation(lens_program.program, "uTexture");
 
 	f = u2gl_compile_fragment_shader(fragment_shader_rotate);
 	u2gl_create_program(&rot_program, f, v);
 	u2gl_check_error("create program rot");
+
+	uRotTex_location = glGetUniformLocation(rot_program.program, "uTexture");
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -319,7 +338,7 @@ int init_opengl(int width, int height)
 	glUseProgram(bg_program.program);
 	u2gl_set_matrix(&bg_program, m);
 
-	glUseProgram(bg_program.program);
+	glUseProgram(rot_program.program);
 	u2gl_set_matrix(&rot_program, m);
 	u2gl_check_error("init_opengl");
 
