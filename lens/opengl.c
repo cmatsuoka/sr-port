@@ -193,10 +193,31 @@ void draw_lens()
 	u2gl_draw_triangle_strip(&lens_program, lens_obj, 4);
 }
 
-void draw_rot(float d1)
+void draw_rot(float d1, float scale)
 {
+	float rot[8];
+	float s, c;
+
+	scale *= 4;
+	d1 *= 3;
+	s = sinf(d1);
+	c = cosf(d1);
+
 	glUniform1i(uRotTex_location, 2);
-	u2gl_set_tex_coords(rot_coords);
+
+	rot[0] = (rot_coords[0] * c + rot_coords[1] * s) * scale;
+	rot[1] = (rot_coords[0] *-s + rot_coords[1] * c) * scale;
+
+	rot[2] = (rot_coords[2] * c + rot_coords[3] * s) * scale;
+	rot[3] = (rot_coords[2] *-s + rot_coords[3] * c) * scale;
+
+	rot[4] = (rot_coords[4] * c + rot_coords[5] * s) * scale;
+	rot[5] = (rot_coords[4] *-s + rot_coords[5] * c) * scale;
+
+	rot[6] = (rot_coords[6] * c + rot_coords[7] * s) * scale;
+	rot[7] = (rot_coords[6] *-s + rot_coords[7] * c) * scale;
+
+	u2gl_set_tex_coords(rot);
 
 	blend_color();
 	glActiveTexture(GL_TEXTURE0);

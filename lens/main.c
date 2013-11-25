@@ -309,7 +309,7 @@ printf("frame=%d\n", frame);
 			frame+=a;
 
 			clear_screen();
-			draw_rot(d1);
+			draw_rot(d1, sin(d2) * scale);
 			swap_buffers();
 
 			// end fade
