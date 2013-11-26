@@ -253,6 +253,7 @@ void	part3(void)
 		frame=0;
 		while(!dis_exit() && frame<2000)
 		{	
+printf("frame=%d ||\n", frame);
 			//if(dis_musplus()>-4) break;
 			#ifdef SAVEPATH
 
@@ -294,7 +295,7 @@ void	part3(void)
 			}
 			else if(frame>1100)
 			{
-				a=frame-900; if(a>100) a=100;
+				int a=frame-900; if(a>100) a=100;
 				if(scalea<256) scalea+=0.000001*a;
 			}
 			}
