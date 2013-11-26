@@ -115,7 +115,7 @@ static const char fragment_shader_rotate[] =
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = texture2D(uTexture, vTexPosition);\n"
+"    gl_FragColor = texture2D(uTexture, vTexPosition) * (1.0 - uColor.r) + uColor;\n"
 "}\n";
 
 
@@ -390,4 +390,13 @@ void projection()
 	u2gl_projection(0, view_width, 0, view_height, &bg_program);
 	u2gl_projection(0, view_width, 0, view_height, &lens_program);
 	u2gl_projection(0, view_width, 0, view_height, &rot_program);
+}
+
+void set_color(float a)
+{
+	float color[4];
+
+	color[0] = color[1] = color[2] = a;
+	color[3] = 1.0f;
+	u2gl_set_color(color, &rot_program);
 }

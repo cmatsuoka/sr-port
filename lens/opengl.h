@@ -9,3 +9,4 @@ void set_pos(float, float);
 void set_radius(float);
 void blend_color(void);
 void blend_alpha(void);
+void set_color(float);

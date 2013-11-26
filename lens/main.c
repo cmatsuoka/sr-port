@@ -253,14 +253,13 @@ void	part3(void)
 		frame=0;
 		while(!dis_exit() && frame<2000)
 		{	
-printf("frame=%d ||\n", frame);
 			//if(dis_musplus()>-4) break;
 			#ifdef SAVEPATH
 
 			ff=a=waitb();
 			while(ff--) {
 
-			x=70.0*sin(d1)-30;
+			x=70.0*sin(d1)/*-30*/;
 			y=70.0*cos(d1)+60;
 			d1-=.005;
 			xa=-1024.0*sin(d2)*scale;
@@ -319,12 +318,14 @@ printf("frame=%d ||\n", frame);
 				a/=2;
 				if(a>63) a=63;
 				//setpalarea(fade+a*64*3,0,64);
+				set_color((float)a / 63);
 			}
 
 			// start fade
 			if(frame<16)
 			{
 				//setpalarea(fade+(64+frame)*64*3,0,64);
+				set_color(1.0 - (float)frame / 15);
 			}
 		}
 	}
