@@ -224,7 +224,7 @@ void	part2(void)
 
 void	part3(void)
 {
-	int	x,y,xa,ya;
+	float	x,y,xa,ya;
 	int	a/*,r,g,b,c,i*/;
 	int	ff, frame=0;
 	//char	*cp,*dp;
@@ -253,7 +253,6 @@ void	part3(void)
 		frame=0;
 		while(!dis_exit() && frame<2000)
 		{	
-printf("frame=%d\n", frame);
 			//if(dis_musplus()>-4) break;
 			#ifdef SAVEPATH
 
@@ -309,7 +308,7 @@ printf("frame=%d\n", frame);
 			frame+=a;
 
 			clear_screen();
-			draw_rot(d1, sin(d2) * scale);
+			draw_rot(x, y, xa, ya);
 			swap_buffers();
 
 			// end fade

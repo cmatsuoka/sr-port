@@ -193,29 +193,28 @@ void draw_lens()
 	u2gl_draw_triangle_strip(&lens_program, lens_obj, 4);
 }
 
-void draw_rot(float d1, float scale)
+void draw_rot(float x, float y, float s, float c)
 {
 	float rot[8];
-	float s, c;
 
-	scale = 1.0 + scale / 2;
-	d1 *= 2;
-	s = sinf(d1);
-	c = cosf(d1);
+	x /= 256.0f;
+	y /= 256.0f;
+	s /= 2048.0f;
+	c /= 2048.0f;
 
 	glUniform1i(uRotTex_location, 2);
 
-	rot[0] = (rot_coords[0] * c + rot_coords[1] * s) * scale;
-	rot[1] = (rot_coords[0] *-s + rot_coords[1] * c) * scale;
+	rot[0] = rot_coords[0] * c + rot_coords[1] * s + x;
+	rot[1] = rot_coords[0] *-s + rot_coords[1] * c + y;
 
-	rot[2] = (rot_coords[2] * c + rot_coords[3] * s) * scale;
-	rot[3] = (rot_coords[2] *-s + rot_coords[3] * c) * scale;
+	rot[2] = rot_coords[2] * c + rot_coords[3] * s + x;
+	rot[3] = rot_coords[2] *-s + rot_coords[3] * c + y;
 
-	rot[4] = (rot_coords[4] * c + rot_coords[5] * s) * scale;
-	rot[5] = (rot_coords[4] *-s + rot_coords[5] * c) * scale;
+	rot[4] = rot_coords[4] * c + rot_coords[5] * s + x;
+	rot[5] = rot_coords[4] *-s + rot_coords[5] * c + y;
 
-	rot[6] = (rot_coords[6] * c + rot_coords[7] * s) * scale;
-	rot[7] = (rot_coords[6] *-s + rot_coords[7] * c) * scale;
+	rot[6] = rot_coords[6] * c + rot_coords[7] * s + x;
+	rot[7] = rot_coords[6] *-s + rot_coords[7] * c + y;
 
 	u2gl_set_tex_coords(rot);
 
