@@ -89,11 +89,6 @@ void setrgb(int c, int r, int g, int b)
 {
 	float alpha = 0.5f;
 
-#if 0
-	if (c == 232 || c == 240) {
-		alpha = 0.75f;
-	}
-#endif
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;
 	color[c][2] = (float)b / CC;
@@ -128,59 +123,6 @@ static void draw_triangle(float *f, int c)
 	obj[7] = *f++;
 
 	u2gl_draw_triangle_strip(&triangle_program, obj, 3);
-}
-
-void draw_palette()
-{
-	int i;
-
-	glUseProgram(triangle_program.program);
-	for (i = 0; i < 256; i++) {
-		u2gl_set_color(color[i], &triangle_program);
-	
-		obj[0] = 20 + (i - 64 * (i / 64)) * 4;
-		obj[1] = 45 -10 * (i / 64) ;
-		obj[3] = obj[0];
-		obj[4] = obj[1] - 10;
-		obj[6] = obj[0] + 4;
-		obj[7] = obj[1] - 10;
-	
-		u2gl_draw_triangle_strip(&triangle_program, obj, 3);
-	}
-}
-
-void draw_poly(int *polylist)
-{
-	int num_vertices, c, i;
-	float f[6];
-	int *p = polylist;
-
-	glUseProgram(triangle_program.program);
-	while ((num_vertices = *polylist++) != 0) {
-		c = *polylist++ & 0xff;
-
-		for (i = 0; i < num_vertices; i++) {
-			f[i * 2 + 0] = *polylist++;
-	 		f[i * 2 + 1] = 200.0f - *polylist++;
-		}
-		if (c == 232 || c == 240 || c == 0 || c == 4)
-			draw_triangle(f, c);
-	}
-
-	polylist = p;
-	while ((num_vertices = *polylist++) != 0) {
-		c = *polylist++ & 0xff;
-		for (i = 0; i < num_vertices; i++) {
-			f[i * 2 + 0] = *polylist++;
-	 		f[i * 2 + 1] = 200.0f - *polylist++;
-		}
-		if (c != 232 && c != 240 && c != 0 && c != 4)
-			draw_triangle(f, c);
-	}
-
-#if 0
-	draw_palette();
-#endif
 }
 
 static void init_texture()
