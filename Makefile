@@ -7,7 +7,7 @@ RANLIB	= ranlib
 AR	= ar
 POVRAY	= povray
 PARTS	= dots/dots tunneli/tun10 glenz/glenz plzpart/plzpart visu/c/u2e \
-	  lens/lens
+	  lens/lens techno/koe
 
 all: common-all dis-all $(PARTS)
 

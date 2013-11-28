@@ -1,3 +1,4 @@
+#include "koe.h"
 
 extern char circle;
 extern char circle2;
@@ -505,7 +506,7 @@ sinuspower db	0
 powercnt db	0
 #endif
 
-int power0[256 * 8];
+extern int power0[256 * 16];
 
 #if 0
 PUBLIC _power0
@@ -690,7 +691,7 @@ patdir	dw	0
 memseg	dw	0
 #endif
 
-void init_interference()
+static void init_interference()
 {
 }
 

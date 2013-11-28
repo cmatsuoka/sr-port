@@ -9,6 +9,8 @@
 #include <unistd.h>
 //#include <graph.h>
 #include "../dis/dis.h"
+#include "graphics.h"
+#include "koe.h"
 
 #define O_BINARY 0
 
@@ -99,7 +101,7 @@ int *	flash(int i)
 {
 	static int pal1[16*3];
 	int	pal2[16*3];
-	int	a,j,k;
+	int	a,j/*,k*/;
 	if(i==-2) ;
 	else if(i==-1)
 	{
@@ -125,13 +127,14 @@ int main(int argc,char *argv[])
 {
 	/*FILE	*f1;*/
 	/*int	rot=45;*/
-	int	x,y,b,c,x1,y1/*,x2,y2,x3,y3,x4,y4,*/,a/*hx,hy,vx,vy,cx,cy*/,pl=1,plv=0;
+	int	x,y,b,c,x1,y1/*,x2,y2,x3,y3,x4,y4,*/,a/*hx,hy,vx,vy,cx,cy*/,pl=1/*,plv=0*/;
 	/*int	vma,vm;*/
 	char	ch;
 	int	*ip;
 	char	/**v,*/*p;
 	
 	dis_partstart();
+adjust_framerate();
 	
 	vbuf=calloc(8192,1);
 	
@@ -369,7 +372,7 @@ int main(int argc,char *argv[])
 int	doit1(int count)
 {
 	int	rot=45;
-	int	x,y,c,x1,y1,x2,y2,x3,y3,x4,y4,a,hx,hy,vx,vy,cx,cy;
+	int	/*x,y,*/c,x1,y1,x2,y2,x3,y3,x4,y4/*,a*/,hx,hy,vx,vy,cx,cy;
 	int	vma,vm;
 	vm=50; vma=0;
 	waitborder();
@@ -432,7 +435,7 @@ int	doit1(int count)
 int	doit2(int count)
 {
 	int	rot=50,rota=10;
-	int	x,/*y,*/c,x1,y1,x2,y2,x3,y3,x4,y4/*,a*/,hx,hy,vx,vy,cx,cy;
+	int	/*x,y,*/c,x1,y1,x2,y2,x3,y3,x4,y4/*,a*/,hx,hy,vx,vy,cx,cy;
 	int	vma,vm;
 	vm=100*64; vma=0;
 	waitborder();

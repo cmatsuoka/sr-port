@@ -1,11 +1,11 @@
 
-TECHNO_OBJS	= koe.o koea.o
+TECHNO_OBJS	= koe.o koea.o koeb.o
 
 TECHNO_PATH	= techno
 
 TECHNO_PATH_OBJS = $(addprefix $(TECHNO_PATH)/,$(TECHNO_OBJS))
 
-TECHNO_BIN	= techno
+TECHNO_BIN	= koe
 
 OBJS += $(TECHNO_PATH_OBJS)
 
