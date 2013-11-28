@@ -143,7 +143,7 @@ adjust_framerate();
 	};
 
 	init_opengl(window_width, window_height);
-
+	projection();
 	
 	vbuf=calloc(8192,1);
 	
@@ -459,6 +459,9 @@ int	doit2(int count)
 	{
 		count-=waitborder();
 		setborder(1);
+
+		clear_screen();
+
 		memset(vbuf,0,8000);		
 		{
 			hx=sin1024[(rot+0)&1023]*16*6/5;
@@ -498,6 +501,9 @@ int	doit2(int count)
 		_asm mov ah,byte ptr a
 		_asm out dx,ax
 #endif
+
+		swap_buffers();
+
 		plv++; plv&=7;
 		vram=(char *)(0xa0000000L+0x2000000L*(long)plv);
 		if(!plv)

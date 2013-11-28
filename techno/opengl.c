@@ -134,8 +134,9 @@ static void draw_triangle(float *f, int c)
 
 void draw_quad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
-	color[1][0] = color[1][1] = color[1][2] = 0.5f;
+	setrgb(1, 32, 32, 32);
 
+	glUseProgram(triangle_program.program);
 	u2gl_set_color(color[1], &triangle_program);
 
 	obj[0] = x1;
