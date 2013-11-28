@@ -1,5 +1,5 @@
 
-TECHNO_OBJS	= koe.o koea.o koeb.o
+TECHNO_OBJS	= koe.o koea.o koeb.o opengl.o
 
 TECHNO_PATH	= techno
 
@@ -15,4 +15,4 @@ default-techno:
 techno-all: $(TECHNO_PATH)/$(TECHNO_BIN)
 
 $(TECHNO_PATH)/$(TECHNO_BIN): $(TECHNO_PATH_OBJS)
-	$(LD) -o $@ $(LDFLAGS) $(TECHNO_PATH_OBJS) $(LIBS)
+	$(LD) -o $@ $(LDFLAGS) $(TECHNO_PATH_OBJS) $(LIBS) -lSOIL

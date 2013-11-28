@@ -39,8 +39,8 @@ char *vram=(char *)0xa0000000L;
 
 int	curpal=0;
 
-extern char power0[];
-extern char power1[];
+extern unsigned char power0[];
+extern unsigned char power1[];
 
 int 	waitborder(void)
 {	
@@ -135,6 +135,15 @@ int main(int argc,char *argv[])
 	
 	dis_partstart();
 adjust_framerate();
+
+
+	if (init_graphics("Glenz", window_width, window_height) < 0) {
+		fprintf(stderr, "Can't init graphics\n");
+		return -1;
+	};
+
+	init_opengl(window_width, window_height);
+
 	
 	vbuf=calloc(8192,1);
 	
@@ -279,16 +288,13 @@ adjust_framerate();
 		mov	ax,0f02h
 		out	dx,ax
 	}
-#endif
 	memset(vram,0,64000);
-#if 0
 	_asm
 	{
 		mov	dx,3c4h
 		mov	ax,0f02h
 		out	dx,ax
 	}
-#endif
 	memset(vram,255,8000);
 	ip=flash(-2);
 	for(a=0;a<16;a++)
@@ -339,6 +345,7 @@ adjust_framerate();
 			flash(256);
 		}
 	}
+#endif
     }
 	pic=calloc(20000,4);
 	if(!pic) 
@@ -355,24 +362,25 @@ adjust_framerate();
 	dis_partstart();
 	doit1(70*6);
 	doit2(70*12);
-	doit3(70*14);
+	//doit3(70*14);
 	free(palfade);
 	free(pic);
 
+#if 0
 	if(!dis_indemo())
 	{	
-#if 0
 		_asm mov ax,3
 		_asm int 10h
-#endif
 	}
+#endif
 	return(0);
 }
 
 int	doit1(int count)
 {
 	int	rot=45;
-	int	/*x,y,*/c,x1,y1,x2,y2,x3,y3,x4,y4/*,a*/,hx,hy,vx,vy,cx,cy;
+	int	/*x,y,*/c/*,x1,y1,x2,y2,x3,y3,x4,y4,a,hx,hy,vx,vy,cx,cy*/;
+	float	x1,y1,x2,y2,x3,y3,x4,y4,hx,hy,vx,vy,cx,cy;
 	int	vma,vm;
 	vm=50; vma=0;
 	waitborder();
@@ -381,6 +389,9 @@ int	doit1(int count)
 	{
 		count-=waitborder();
 		setborder(1);
+
+		clear_screen();
+
 		memset(vbuf,0,8000);
 		{
 			hx=sin1024[(rot+0)&1023]*16*6/5;
@@ -419,6 +430,9 @@ int	doit1(int count)
 		_asm mov ah,byte ptr a
 		_asm out dx,ax
 #endif
+
+		swap_buffers();
+
 		plv++; plv&=7;
 		vram=(char *)(0xa0000000L+0x2000000L*(long)plv);
 		if(!plv)
@@ -435,7 +449,8 @@ int	doit1(int count)
 int	doit2(int count)
 {
 	int	rot=50,rota=10;
-	int	/*x,y,*/c,x1,y1,x2,y2,x3,y3,x4,y4/*,a*/,hx,hy,vx,vy,cx,cy;
+	int	/*x,y,*/c/*,x1,y1,x2,y2,x3,y3,x4,y4,a,hx,hy,vx,vy,cx,cy*/;
+	float	x1,y1,x2,y2,x3,y3,x4,y4,hx,hy,vx,vy,cx,cy;
 	int	vma,vm;
 	vm=100*64; vma=0;
 	waitborder();

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "koe.h"
 
 //extrn _circle:byte
@@ -91,8 +92,8 @@ unsigned char pal2[] = {
 int sinuspower = 0;
 int powercnt = 0;
 
-unsigned char power0[16 * 256];
-unsigned char *power1 = power0;
+unsigned char power1[16 * 256];
+#define power0 power1
 	
 #if 0
 PLANE	MACRO pl
@@ -286,6 +287,9 @@ patdir	dw	-3
 memseg	dw	0
 #endif
 
+int *memseg;
+
+
 /*
 init_interference PROC NEAR
 	mov	dx,3d4h
@@ -388,6 +392,10 @@ init_interference PROC NEAR
 	ret
 init_interference ENDP
 */
+
+static void init_interference()
+{
+}
 
 /*
 do_interference PROC NEAR
@@ -595,31 +603,14 @@ do_interference PROC NEAR
 do_interference ENDP
 */
 
-/*
-PUBLIC _dointerference2
-_dointerference2 PROC FAR
-	push	bp
-	mov	bp,sp
-	push	si
-	push	di
-	push	ds
-	
-	call	resetmode13
-	call	init_interference
-	call	do_interference	
-	mov	es,cs:memseg
-	mov	ah,49h
-	int	21h
-	
-	pop	ds
-	pop	di
-	pop	si
-	pop	bp
-	ret
-_dointerference2 ENDP
-*/
+static void do_interference()
+{
+}
 
 void dointerference2()
 {
+	init_interference();
+	do_interference();
+	free(memseg);
 }
 	

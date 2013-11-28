@@ -1,4 +1,5 @@
 #include "koe.h"
+#include "opengl.h"
 
 extern char circle;
 extern char circle2;
@@ -389,8 +390,9 @@ l2:	IF lbl1 EQ @@r7
 drawline ENDP
 #endif
 
-void asmbox(int a, int b, int c, int d, int a1, int b1, int c1, int d1)
+void asmbox(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 {
+	draw_quad(x1, y1, x2, y2, x3, y3, x4, y4);
 }
 
 #if 0
@@ -506,28 +508,9 @@ sinuspower db	0
 powercnt db	0
 #endif
 
-extern int power0[256 * 16];
+unsigned char power0[256 * 16];
 
 #if 0
-PUBLIC _power0
-_power0	LABEL WORD
-power0	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)	
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	db	256 dup(0)
-	
 PLANE	MACRO pl
 	mov	dx,3c4h
 	mov	ax,0002h+pl*100h
