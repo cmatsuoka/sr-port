@@ -401,6 +401,7 @@ int	doit1(int count)
 			vy=sin1024[(rot+512)&1023];
 			vx=vx*vm/100;
 			vy=vy*vm/100;
+			int num = 0;
 			for(c=-10;c<11;c+=2)
 			{
 				cx=vx*c*2; cy=vy*c*2;
@@ -408,7 +409,7 @@ int	doit1(int count)
 				x2=(-hx+vx+cx)/16+160; y2=(-hy+vy+cy)/16+100;
 				x3=(+hx+vx+cx)/16+160; y3=(+hy+vy+cy)/16+100;
 				x4=(+hx-vx+cx)/16+160; y4=(+hy-vy+cy)/16+100;
-				asmbox(x1,y1,x2,y2,x3,y3,x4,y4);
+				asmbox(num++,x1,y1,x2,y2,x3,y3,x4,y4);
 			}
 			rot+=2;
 			vm+=vma;
@@ -472,6 +473,7 @@ int	doit2(int count)
 			vy=sin1024[(rot+512)&1023];
 			vx=vx*(vm/64)/100;
 			vy=vy*(vm/64)/100;
+			int num = 0;
 			for(c=-10;c<11;c+=2)
 			{
 				cx=vx*c*2; cy=vy*c*2;
@@ -479,7 +481,7 @@ int	doit2(int count)
 				x2=(-hx+vx+cx)/16+160; y2=(-hy+vy+cy)/16+100;
 				x3=(+hx+vx+cx)/16+160; y3=(+hy+vy+cy)/16+100;
 				x4=(+hx-vx+cx)/16+160; y4=(+hy-vy+cy)/16+100;
-				asmbox(x1,y1,x2,y2,x3,y3,x4,y4);
+				asmbox(num++,x1,y1,x2,y2,x3,y3,x4,y4);
 			}
 			rot+=rota/10;
 			vm+=vma;
@@ -615,6 +617,7 @@ int	doit3(int count)
 			vy=sin1024[(rot+512)&1023];
 			vx=vx*(vm/64)/100;
 			vy=vy*(vm/64)/100;
+			int num = 0;
 			for(c=-10;c<11;c+=2)
 			{
 				cx=vx*c*2; cy=vy*c*2;
@@ -622,7 +625,7 @@ int	doit3(int count)
 				x2=(-hx+vx+cx)/16+wx; y2=(-hy+vy+cy)/16+wy;
 				x3=(+hx+vx+cx)/16+wx; y3=(+hy+vy+cy)/16+wy;
 				x4=(+hx-vx+cx)/16+wx; y4=(+hy-vy+cy)/16+wy;
-				asmbox(x1,y1,x2,y2,x3,y3,x4,y4);
+				asmbox(num++,x1,y1,x2,y2,x3,y3,x4,y4);
 			}
 			rot+=rota/10;
 			{
@@ -695,7 +698,7 @@ int	doit3(int count)
 
 	dis_waitb();
 
-return;
+return 0;
 	readp(palette,-1,pic);
 	for(y=0;y<400;y++)
 	{

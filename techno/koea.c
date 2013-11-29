@@ -391,14 +391,32 @@ l2:	IF lbl1 EQ @@r7
 drawline ENDP
 #endif
 
-void asmbox(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+static float box[5][8][12];
+
+void asmbox(int i, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
+	box[0][0][i] = x1;
+	box[0][1][i] = y1;
+	box[0][2][i] = x2;
+	box[0][3][i] = y2;
+	box[0][4][i] = x3;
+	box[0][5][i] = y3;
+	box[0][6][i] = x4;
+	box[0][7][i] = y4;
+
+	draw_quad(box[4][0][i], box[4][1][i], box[4][2][i], box[4][3][i],
+		  box[4][4][i], box[4][5][i], box[4][6][i], box[4][7][i]);
+	draw_quad(box[2][0][i], box[2][1][i], box[2][2][i], box[2][3][i],
+		  box[2][4][i], box[2][5][i], box[2][6][i], box[2][7][i]);
 	draw_quad(x1, y1, x2, y2, x3, y3, x4, y4);
 }
 
 void change_plane()
 {
-
+	memcpy(box[4], box[3], sizeof(float) * 8 * 12);
+	memcpy(box[3], box[2], sizeof(float) * 8 * 12);
+	memcpy(box[2], box[1], sizeof(float) * 8 * 12);
+	memcpy(box[1], box[0], sizeof(float) * 8 * 12);
 }
 
 #if 0
