@@ -13,6 +13,8 @@ static int view_height;
 static struct u2gl_program triangle_program;
 static struct u2gl_program fc_program;
 
+static GLuint FramebufferName = 0;
+
 float obj[9];
 
 float fc_obj[12] = {
@@ -89,11 +91,6 @@ void setrgb(int c, int r, int g, int b)
 {
 	float alpha = 0.4f;
 
-#if 0
-	if (c == 232 || c == 240) {
-		alpha = 0.75f;
-	}
-#endif
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;
 	color[c][2] = (float)b / CC;
@@ -107,15 +104,15 @@ void getrgb(int c, char *p)
 	p[2] = color[c][2] * CC;
 }
 
-#if 0
 void draw_fc()
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(fc_program.program);
 	u2gl_set_color(color[15], &fc_program);
 	u2gl_draw_textured_triangle_strip(&fc_program, fc_obj, 4);
 }
-#endif
 
+#if 0
 static void draw_triangle(float *f, int c)
 {
 	u2gl_set_color(color[c], &triangle_program);
@@ -131,11 +128,13 @@ static void draw_triangle(float *f, int c)
 
 	u2gl_draw_triangle_strip(&triangle_program, obj, 3);
 }
+#endif
 
 void draw_quad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
-	setrgb(1, 116, 97, 132);
+	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
+	setrgb(1, 116, 97, 132);
 	glUseProgram(triangle_program.program);
 	u2gl_set_color(color[1], &triangle_program);
 
@@ -205,6 +204,28 @@ int init_opengl(int width, int height)
 
 	view_width = 320;
 	view_height = 200;
+
+
+// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
+glGenFramebuffers(1, &FramebufferName);
+glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+// The texture we're going to render to
+GLuint renderedTexture;
+glGenTextures(1, &renderedTexture);
+// "Bind" the newly created texture : all future texture functions will modify this texture
+glBindTexture(GL_TEXTURE_2D, renderedTexture);
+// Give an empty image to OpenGL ( the last "0" )
+glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1024, 768, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+// Poor filtering. Needed !
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+// Set "renderedTexture" as our colour attachement #0
+glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+// Set the list of draw buffers.
+GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+
+
 
 	v = u2gl_compile_vertex_shader(vertex_shader);
 	f = u2gl_compile_fragment_shader(fragment_shader);
