@@ -83,11 +83,11 @@ static float tex_coords[] = {
 
 static float color[256][4];
 
-#define CC 32
+#define CC 128
 
 void setrgb(int c, int r, int g, int b)
 {
-	float alpha = 0.5f;
+	float alpha = 0.4f;
 
 #if 0
 	if (c == 232 || c == 240) {
@@ -134,7 +134,7 @@ static void draw_triangle(float *f, int c)
 
 void draw_quad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
-	setrgb(1, 32, 32, 32);
+	setrgb(1, 116, 97, 132);
 
 	glUseProgram(triangle_program.program);
 	u2gl_set_color(color[1], &triangle_program);

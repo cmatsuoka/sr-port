@@ -135,8 +135,6 @@ int main(int argc,char *argv[])
 	char	/**v,*/*p;
 	
 	dis_partstart();
-adjust_framerate();
-
 
 	if (init_graphics("Techno", window_width, window_height) < 0) {
 		fprintf(stderr, "Can't init graphics\n");

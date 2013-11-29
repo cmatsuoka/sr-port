@@ -391,32 +391,35 @@ l2:	IF lbl1 EQ @@r7
 drawline ENDP
 #endif
 
-static float box[5][8][12];
+static float box[25][8][12];
 
 void asmbox(int i, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
 	box[0][0][i] = x1;
-	box[0][1][i] = y1;
+	box[0][1][i] = 199.0f - y1;
 	box[0][2][i] = x2;
-	box[0][3][i] = y2;
+	box[0][3][i] = 199.0f - y2;
 	box[0][4][i] = x3;
-	box[0][5][i] = y3;
+	box[0][5][i] = 199.0f - y3;
 	box[0][6][i] = x4;
-	box[0][7][i] = y4;
+	box[0][7][i] = 199.0f - y4;
 
-	draw_quad(box[4][0][i], box[4][1][i], box[4][2][i], box[4][3][i],
-		  box[4][4][i], box[4][5][i], box[4][6][i], box[4][7][i]);
-	draw_quad(box[2][0][i], box[2][1][i], box[2][2][i], box[2][3][i],
-		  box[2][4][i], box[2][5][i], box[2][6][i], box[2][7][i]);
-	draw_quad(x1, y1, x2, y2, x3, y3, x4, y4);
+	draw_quad(box[24][0][i], box[24][1][i], box[24][2][i], box[24][3][i],
+		  box[24][4][i], box[24][5][i], box[24][6][i], box[24][7][i]);
+	draw_quad(box[16][0][i], box[16][1][i], box[16][2][i], box[16][3][i],
+		  box[16][4][i], box[16][5][i], box[16][6][i], box[16][7][i]);
+	draw_quad(box[8][0][i], box[8][1][i], box[8][2][i], box[8][3][i],
+		  box[8][4][i], box[8][5][i], box[8][6][i], box[8][7][i]);
+	draw_quad(box[0][0][i], box[0][1][i], box[0][2][i], box[0][3][i],
+		  box[0][4][i], box[0][5][i], box[0][6][i], box[0][7][i]);
 }
 
 void change_plane()
 {
-	memcpy(box[4], box[3], sizeof(float) * 8 * 12);
-	memcpy(box[3], box[2], sizeof(float) * 8 * 12);
-	memcpy(box[2], box[1], sizeof(float) * 8 * 12);
-	memcpy(box[1], box[0], sizeof(float) * 8 * 12);
+	int i;
+
+	for (i = 24; i > 0; i--)
+		memcpy(box[i], box[i - 1], sizeof(float) * 8 * 12);
 }
 
 #if 0
