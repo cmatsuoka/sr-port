@@ -145,11 +145,11 @@ void draw_quad(float x1, float y1, float x2, float y2, float x3, float y3, float
 	obj[3] = x2;
 	obj[4] = y2;
 
-	obj[6] = x3;
-	obj[7] = y3;
+	obj[6] = x4;
+	obj[7] = y4;
 
-	obj[9] = x4;
-	obj[10] = y4;
+	obj[9] = x3;
+	obj[10] = y3;
 
 	u2gl_draw_triangle_strip(&triangle_program, obj, 4);
 }

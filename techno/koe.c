@@ -10,6 +10,7 @@
 //#include <graph.h>
 #include "../dis/dis.h"
 #include "graphics.h"
+#include "opengl.h"
 #include "koe.h"
 
 #define O_BINARY 0
@@ -35,7 +36,7 @@ char *vbuf;
 
 char	pal[16*16*3];
 
-char *vram=(char *)0xa0000000L;
+//char *vram=(char *)0xa0000000L;
 
 int	curpal=0;
 
@@ -127,17 +128,17 @@ int main(int argc,char *argv[])
 {
 	/*FILE	*f1;*/
 	/*int	rot=45;*/
-	int	x,y,b,c,x1,y1/*,x2,y2,x3,y3,x4,y4,*/,a/*hx,hy,vx,vy,cx,cy*/,pl=1/*,plv=0*/;
+	int	x/*,y*/,b,c,x1,y1/*,x2,y2,x3,y3,x4,y4,*/,a/*hx,hy,vx,vy,cx,cy,pl=1,plv=0*/;
 	/*int	vma,vm;*/
 	char	ch;
-	int	*ip;
+	//int	*ip;
 	char	/**v,*/*p;
 	
 	dis_partstart();
 adjust_framerate();
 
 
-	if (init_graphics("Glenz", window_width, window_height) < 0) {
+	if (init_graphics("Techno", window_width, window_height) < 0) {
 		fprintf(stderr, "Can't init graphics\n");
 		return -1;
 	};
@@ -201,7 +202,7 @@ adjust_framerate();
 	//asminit(vbuf);
 	x1=y1=100;
 
-	p=power0;
+	p=(char *)power0;
 	for(b=0;b<16;b++)
 	{
 		for(c=0;c<256;c++)
@@ -221,7 +222,7 @@ adjust_framerate();
 		}
 	}
 	
-	p=power1;
+	p=(char *)power1;
 	for(b=0;b<16;b++)
 	{
 		for(c=0;c<256;c++)
@@ -362,7 +363,7 @@ adjust_framerate();
 	dis_partstart();
 	doit1(70*6);
 	doit2(70*12);
-	//doit3(70*14);
+	doit3(70*14);
 	free(palfade);
 	free(pic);
 
@@ -432,9 +433,10 @@ int	doit1(int count)
 #endif
 
 		swap_buffers();
+		change_plane();
 
 		plv++; plv&=7;
-		vram=(char *)(0xa0000000L+0x2000000L*(long)plv);
+		//vram=(char *)(0xa0000000L+0x2000000L*(long)plv);
 		if(!plv)
 		{
 			pl<<=1;
@@ -503,9 +505,10 @@ int	doit2(int count)
 #endif
 
 		swap_buffers();
+		change_plane();
 
 		plv++; plv&=7;
-		vram=(char *)(0xa0000000L+0x2000000L*(long)plv);
+		//vram=(char *)(0xa0000000L+0x2000000L*(long)plv);
 		if(!plv)
 		{
 			pl<<=1;
@@ -535,11 +538,9 @@ int	doit3(int count)
 		mov	ax,0f02h
 		out	dx,ax
 	}
-#endif
 	vram=(char *)(0xa0000000L);
 	memset(vram,0,32768);
 	memset(vram+32768,0,32768);
-#if 0
 	_asm 
 	{
 		mov	dx,3d4h
@@ -550,8 +551,8 @@ int	doit3(int count)
 		mov	ax,13h+256*40
 		out	dx,ax
 	}
-#endif
 	vram=(char *)(0xa0000000L+40);
+#endif
 	plv=0; pl=1;
 	while(!dis_exit() && count>0)
 	{
@@ -588,8 +589,10 @@ int	doit3(int count)
 		_asm mov ah,byte ptr a
 		_asm mov al,0dh
 		_asm out dx,ax
+#endif
 		count-=(repeat=waitborder());
 		a=xpos&7;
+#if 0
 		_asm mov dx,3dah
 		_asm in al,dx
 		_asm mov dx,3c0h
@@ -599,9 +602,12 @@ int	doit3(int count)
 		_asm out dx,al
 		_asm mov al,20h
 		_asm out dx,al
-#endif
 		setborder(1);
 		memset(vbuf,0,8000);		
+#endif
+
+		clear_screen();
+
 		{
 			hx=sin1024[(rot+0)&1023]*16*6/5;
 			hy=sin1024[(rot+256)&1023]*16;
@@ -636,14 +642,21 @@ int	doit3(int count)
 		_asm mov al,2
 		_asm out dx,ax
 		asmdoit2(vbuf,vram);
+#endif
 		a=plv*0x20;
+#if 0
 		_asm mov dx,3d4h
 		_asm mov al,0ch
 		_asm mov ah,byte ptr a
 		_asm out dx,ax
 #endif
+
+		swap_buffers();
+		change_plane();
+
+	
 		plv+=2; plv&=7;
-		vram=(char *)(0xa0000000L+0x2000000L*(long)plv+40);
+		//vram=(char *)(0xa0000000L+0x2000000L*(long)plv+40);
 		if(!plv)
 		{
 			pl<<=1;
@@ -663,7 +676,7 @@ int	doit3(int count)
 		out	dx,ax
 	}
 #endif
-	vram=(char *)(0xa0000000L);
+	//vram=(char *)(0xa0000000L);
 
 	if(dis_exit()) return 1;
 	
@@ -682,11 +695,12 @@ int	doit3(int count)
 
 	dis_waitb();
 
+return;
 	readp(palette,-1,pic);
 	for(y=0;y<400;y++)
 	{
 		readp(rowbuf,y,pic);
-		lineblit(vram+80U+(unsigned)y*160U,rowbuf);
+		//lineblit(vram+80U+(unsigned)y*160U,rowbuf);
 	}
 	
 	p=palfade;
@@ -731,8 +745,10 @@ int	doit3(int count)
 		_asm mov ah,byte ptr a
 		_asm mov al,0dh
 		_asm out dx,ax
+#endif
 		count-=dis_waitb();
 		a=(xpos&3)*2;
+#if 0
 		_asm mov dx,3dah
 		_asm in al,dx
 		_asm mov dx,3c0h
