@@ -92,14 +92,6 @@ int	setvmode(int m)
 	//_asm mov ax,m
 	//_asm int 10h
 
-	if (init_graphics("Lens", window_width, window_height) < 0) {
-		fprintf(stderr, "Can't init graphics\n");
-		return -1;
-	};
-
-	init_opengl(window_width, window_height);
-	projection();
-
 	return 0;
 }
 
@@ -333,7 +325,7 @@ void	part3(void)
 	//setpalarea(palette,0,256);
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	//int	x,y,xa,ya;
 	//int	a,r,g,b,c,i;
@@ -347,6 +339,14 @@ int main()
 	if(!fade) exit(1);
 	fade2=calloc(20000,1);
 	if(!fade2) exit(1);
+
+	if (init_graphics("Lens", argc, argv) < 0) {
+		fprintf(stderr, "Can't init graphics\n");
+		return -1;
+	};
+
+	init_opengl();
+
 	setvmode(0x13);
 #if 0
 	outp(0x3c8,0);

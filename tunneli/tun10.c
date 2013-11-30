@@ -81,7 +81,7 @@ int sync;
 #define false 0
 #define true (!false)
 
-int main()
+int main(int argc, char **argv)
 {
     frames = 1;
 
@@ -105,12 +105,12 @@ int main()
     move(mem[seg(sini):ofs(sini)+4097*2],cosit,2048*2);
     move(mem[seg(tun):ofs(tun)],pcalc,sizeof(pcalc));*/
 
-    if (init_graphics("Tunneli", window_width, window_height) < 0) {
+    if (init_graphics("Tunneli", argc, argv) < 0) {
         fprintf(stderr, "Can't init graphics\n");
         return -1;
     };
 
-    init_opengl(window_width, window_height);
+    init_opengl();
 
 /*
     for x = 0 to 64 do setrgb(64+x,(64-x) *4 div 7,(64-x) * 2 div 3,64-x);
@@ -143,8 +143,6 @@ int main()
 
   //waitr;
   for (z = 0; z < 100; z++) sade[z] = 16384 / ((z*7)+95);
-
-  projection();
 
   do {
     //waitr;

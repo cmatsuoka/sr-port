@@ -1,5 +1,5 @@
 
-int init_opengl(int, int);
+int init_opengl(void);
 void clear_screen(void);
 void draw_fir(float);
 void draw_bg(void);

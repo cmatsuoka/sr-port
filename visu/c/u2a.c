@@ -249,6 +249,14 @@ printf("c=%d\n", c);
 	}
 #endif
 
+	if (init_graphics("U2A", argc, argv) < 0) {
+		fprintf(stderr, "Can't init graphics\n");
+		return;
+	};
+
+	init_opengl();
+	set_fps(36);
+
  	vid_init(3); ////// oversample x 4
 	cp=(char *)(scenem+16);
 	vid_setpal(cp);

@@ -15,7 +15,7 @@ extern float sinit[4096];
 extern float cosit[2048];
 
 void draw_pixel(float, float, int);
-void init_opengl(int, int);
+void init_opengl(void);
 void ballgen(void);
 void singen(void);
 

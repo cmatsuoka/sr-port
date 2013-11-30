@@ -173,6 +173,14 @@ int main(int argc,char *argv[])
 
 	resetscene();
 
+	if (init_graphics("Cplay", argc, argv) < 0) {
+		fprintf(stderr, "Can't init graphics\n");
+		return;
+	};
+
+	init_opengl();
+	set_fps(36);
+
 	vid_init(1); ////// oversample x 4
 	cp=(char *)(scenem+16);
 	vid_setpal(cp);

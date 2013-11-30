@@ -310,6 +310,14 @@ int main(int argc,char *argv[])
 #endif
 
 	if (!jellywas) {
+		if (init_graphics("U2E", argc, argv) < 0) {
+			fprintf(stderr, "Can't init graphics\n");
+			return -1;
+		};
+
+		init_opengl();
+		set_fps(36);
+
 		vid_init(1);
 	}
 

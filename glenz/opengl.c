@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <GLES2/gl2.h>
-#include <GL/glu.h>
 #include <SOIL/SOIL.h>
 #include "u2gl.h"
 
@@ -208,7 +207,7 @@ static void init_texture()
 	u2gl_check_error("init_texture");
 }
 
-int init_opengl(int width, int height)
+int init_opengl()
 {
 	Matrix m;
 	GLuint v, f;
@@ -242,6 +241,9 @@ int init_opengl(int width, int height)
 
 	init_texture();
 
+	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
+	u2gl_projection(0, view_width, 0, view_height, &fc_program);
+
 	return 0;
 }
 
@@ -258,10 +260,4 @@ void blend_color()
 void clear_screen()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void projection()
-{
-	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
-	u2gl_projection(0, view_width, 0, view_height, &fc_program);
 }

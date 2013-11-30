@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <GLES2/gl2.h>
-#include <GL/glu.h>
 #include "u2gl.h"
 #include "dots.h"
 
@@ -91,7 +90,7 @@ static const char floor_shader[] =
 "}\n";
 
 
-int init_opengl(int width, int height)
+int init_opengl()
 {
 	GLuint v, f;
 
@@ -110,6 +109,9 @@ int init_opengl(int width, int height)
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	u2gl_projection(0, view_width, 0, view_height, &floor_program);
+	u2gl_projection(0, view_width, 0, view_height, &dot_program);
 
 	return 0;
 }
@@ -211,8 +213,3 @@ void draw_dot(struct dot *dot)
 	}
 }
 
-void projection()
-{
-	u2gl_projection(0, view_width, 0, view_height, &floor_program);
-	u2gl_projection(0, view_width, 0, view_height, &dot_program);
-}

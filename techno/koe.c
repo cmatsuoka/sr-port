@@ -136,13 +136,12 @@ int main(int argc,char *argv[])
 	
 	dis_partstart();
 
-	if (init_graphics("Techno", window_width, window_height) < 0) {
+	if (init_graphics("Techno", argc, argv) < 0) {
 		fprintf(stderr, "Can't init graphics\n");
 		return -1;
 	};
 
-	init_opengl(window_width, window_height);
-	projection();
+	init_opengl();
 	
 	vbuf=calloc(8192,1);
 	

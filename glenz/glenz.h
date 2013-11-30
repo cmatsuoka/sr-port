@@ -5,7 +5,7 @@ void cglenzdone(void);
 void zoomer2(void);
 void zoomer1(char *);
 
-void init_opengl(int, int);
+void init_opengl(void);
 void draw_poly(int *);
 void draw_fc(void);
 void setrgb(int, int, int, int);

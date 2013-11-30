@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <GLES2/gl2.h>
-#include <GL/glu.h>
 #include "u2gl.h"
 
 static int view_width;
@@ -52,7 +51,7 @@ static const char pixel_shader[] =
 "}\n";
 
 
-int init_opengl(int width, int height)
+int init_opengl()
 {
 	GLuint v, f;
 
@@ -70,6 +69,8 @@ int init_opengl(int width, int height)
 	glClearColor(.0, .0, .0, 0);
 
 	glUseProgram(pixel_program.program);
+
+	u2gl_projection(0, view_width, 0, view_height, &pixel_program);
 
 	return 0;
 }
@@ -90,9 +91,4 @@ void draw_pixel(float x, float y, int c)
 
 	u2gl_set_matrix(&pixel_program, m);
 	u2gl_draw_triangle_strip(&pixel_program, obj, 3);
-}
-
-void projection()
-{
-	u2gl_projection(0, view_width, 0, view_height, &pixel_program);
 }

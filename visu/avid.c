@@ -109,14 +109,6 @@ void vid_window(int x1,int x2,int y1,int y2,int z1,int z2)
 
 void vid_init(int mode)
 {
-	if (init_graphics("Visu", window_width, window_height) < 0) {
-		fprintf(stderr, "Can't init graphics\n");
-		return;
-	};
-
-	init_opengl(window_width, window_height);
-	projection();
-	set_fps(36);
 }
 	
 /*

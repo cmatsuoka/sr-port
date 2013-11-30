@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <GLES2/gl2.h>
-#include <GL/glu.h>
 #include <SOIL/SOIL.h>
 #include "u2gl.h"
 
@@ -13,15 +12,15 @@ static int view_height;
 static struct u2gl_program triangle_program;
 static struct u2gl_program fc_program;
 
-static GLuint FramebufferName = 0;
+static GLuint framebuffer = 0;
 
 float obj[9];
 
 float fc_obj[12] = {
 	0.0f, 0.0f, 0.0f,
 	320.0f, 0.0f, 0.0f,
-	0.0f, 50.0f, 0.0f,
-	320.0f, 50.0f, 0.0f
+	0.0f, 200.0f, 0.0f,
+	320.0f, 200.0f, 0.0f
 };
 
 static const char vertex_shader[] =
@@ -70,7 +69,7 @@ static const char fragment_shader_texture[] =
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = texture2D(uTexture, vTexPosition).rgba * uColor.x;\n"
+"    gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
 "}\n";
 
 
@@ -132,7 +131,7 @@ static void draw_triangle(float *f, int c)
 
 void draw_quad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 	setrgb(1, 116, 97, 132);
 	glUseProgram(triangle_program.program);
@@ -197,30 +196,34 @@ static void init_texture()
 	u2gl_check_error("init_texture");
 }
 
-int init_opengl(int width, int height)
+extern int window_width;
+extern int window_height;
+
+int init_opengl()
 {
 	Matrix m;
 	GLuint v, f;
+	GLuint fb_texture;
 
 	view_width = 320;
 	view_height = 200;
 
 
 // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-glGenFramebuffers(1, &FramebufferName);
-glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+glGenFramebuffers(1, &framebuffer);
+glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 // The texture we're going to render to
-GLuint renderedTexture;
-glGenTextures(1, &renderedTexture);
+glGenTextures(1, &fb_texture);
 // "Bind" the newly created texture : all future texture functions will modify this texture
-glBindTexture(GL_TEXTURE_2D, renderedTexture);
+glActiveTexture(GL_TEXTURE0);
+glBindTexture(GL_TEXTURE_2D, fb_texture);
 // Give an empty image to OpenGL ( the last "0" )
-glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1024, 768, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, window_width, window_height, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
 // Poor filtering. Needed !
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-// Set "renderedTexture" as our colour attachement #0
-glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+// Set "fb_texture" as our colour attachement #0
+glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fb_texture, 0);
 // Set the list of draw buffers.
 GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
 glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
@@ -253,6 +256,9 @@ glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
 	init_texture();
 
+	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
+	u2gl_projection(0, view_width, 0, view_height, &fc_program);
+
 	return 0;
 }
 
@@ -269,10 +275,4 @@ void blend_color()
 void clear_screen()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void projection()
-{
-	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
-	u2gl_projection(0, view_width, 0, view_height, &fc_program);
 }

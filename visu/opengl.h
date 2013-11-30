@@ -1,7 +1,6 @@
 
-int init_opengl(int width, int height);
+int init_opengl(void);
 void set_window(int, int, int, int);
-void projection(void);
 void draw_palette(void);
 void draw_poly(short *, int, int);
 void draw_poly_diffuse(short *, int *, int, int);

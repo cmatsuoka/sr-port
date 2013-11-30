@@ -13,7 +13,7 @@ struct dot {
 };
 
 
-int init_opengl(int, int);
+int init_opengl(void);
 void draw_dot(struct dot *);
 
 #endif

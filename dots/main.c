@@ -267,24 +267,18 @@ static void draw_dots()
 	}
 }
 
-int main()
+int main(int argc, char **argv)
 {
-	int width, height;
-
 	srand(0xfcfc);
 
-	width = window_width;
-	height = window_height;
-
-	if (init_graphics("DOTS", width, height) < 0) {
+	if (init_graphics("Dots", argc, argv) < 0) {
 		fprintf(stderr, "can't init graphics\n");
 		exit(1);
 	}
 
-	init_opengl(width, height);
-	setup_dots();
+	init_opengl();
 
-	projection();
+	setup_dots();
 
 	while(frame<2450) {
 		int num;

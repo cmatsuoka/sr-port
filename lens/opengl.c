@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <GLES2/gl2.h>
-#include <GL/glu.h>
 #include <SOIL/SOIL.h>
 #include "u2gl.h"
 #include "opengl.h"
@@ -308,7 +307,7 @@ void set_pos(float x, float y)
 	glUniform2fv(uTexPos_location, 1, vec);
 }
 
-int init_opengl(int width, int height)
+int init_opengl()
 {
 	Matrix m;
 	GLuint v, f;
@@ -365,6 +364,11 @@ int init_opengl(int width, int height)
 	init_texture();
 	u2gl_check_error("init_texture");
 
+	u2gl_projection(0, view_width, 0, view_height, &fir_program);
+	u2gl_projection(0, view_width, 0, view_height, &bg_program);
+	u2gl_projection(0, view_width, 0, view_height, &lens_program);
+	u2gl_projection(0, view_width, 0, view_height, &rot_program);
+
 	return 0;
 }
 
@@ -382,14 +386,6 @@ void blend_color()
 void clear_screen()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void projection()
-{
-	u2gl_projection(0, view_width, 0, view_height, &fir_program);
-	u2gl_projection(0, view_width, 0, view_height, &bg_program);
-	u2gl_projection(0, view_width, 0, view_height, &lens_program);
-	u2gl_projection(0, view_width, 0, view_height, &rot_program);
 }
 
 void set_color(float a)

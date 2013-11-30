@@ -5,6 +5,7 @@
 #include <X11/Xlib.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
+#include <getopt.h>
 #include "u2gl.h"
 
 static volatile uint32_t tick_timer = 0;
@@ -13,10 +14,13 @@ static EGLContext context;
 static EGLSurface surface;
 static Display *x11_display = NULL;
 
-#define configs_in 10
+#define MAX_CONFIGS 10
 
 int window_width = 640;
 int window_height = 480;
+static int frame_dump = 0;
+
+static void dump_frame(void);
 
 static uint32_t timer_function(uint32_t i)
 {
@@ -59,15 +63,45 @@ static EGLint contextParams[] = {
 	EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE
 };
 
+extern char *optarg;
 
-int init_graphics(char *caption, int width, int height)
+#define OPTIONS "ds:"
+static int parse_options(int argc, char **argv)
+{
+	int o;
+
+	while ((o = getopt(argc, argv, OPTIONS)) != -1) {
+		switch (o) {
+		case 'd':
+			frame_dump = 1;
+			break;
+		case 's':
+			if ((strtok(optarg, "x"))) {
+				window_width = atoi(optarg);
+				window_height = atoi(strtok(NULL, ""));
+				printf("window size: %dx%d\n",
+						window_width, window_height);
+			}
+			break;
+		default:
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+int init_graphics(char *caption, int argc, char **argv)
 {
 	const SDL_VideoInfo *info;
 	int bpp;
 	EGLint num_configs = 0;
-	EGLConfig configs[configs_in];
+	EGLConfig configs[MAX_CONFIGS];
 	EGLConfig my_config;
 	SDL_SysWMinfo sysInfo;
+
+	if (parse_options(argc, argv) < 0)
+		return -1;
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) {
 		fprintf(stderr, "error: %s\n", SDL_GetError());
@@ -90,7 +124,7 @@ int init_graphics(char *caption, int width, int height)
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	if (SDL_SetVideoMode(width, height, bpp, SDL_OPENGL) == 0) {
+	if (SDL_SetVideoMode(window_width, window_height, bpp, SDL_OPENGL) == 0) {
 		fprintf(stderr, "error: %s\n", SDL_GetError());
 		return -1;
 	}
@@ -116,7 +150,7 @@ int init_graphics(char *caption, int width, int height)
 
 	/* Choose configuration */
 	if (eglChooseConfig(display, s_configAttribs, configs,
-	    configs_in, &num_configs) != EGL_TRUE || num_configs == 0) {
+	    MAX_CONFIGS, &num_configs) != EGL_TRUE || num_configs == 0) {
 		close_window();
 		fprintf(stderr, "error: No suitable EGL configuration");
 		return -1;
@@ -190,7 +224,9 @@ void swap_buffers()
 	}
 
 	deltaus = us - oldus;
-	//deltaus = 1000000 / 60;
+	if (frame_dump) {
+		deltaus = 1000000 / 60;
+	}
 	oldus = us;
 
 	if (deltaus > 0) {
@@ -204,7 +240,8 @@ void swap_buffers()
 
 	printf("fps = %5.1f, avg = %5.1f    \r", fps, avg);
 	
-	//dump_frame();
+	if (frame_dump)
+		dump_frame();
 	eglSwapBuffers(display, surface);
 }
 
@@ -254,7 +291,7 @@ void poll_event()
 	}
 }
 
-void dump_frame()
+static void dump_frame()
 {
 	static char *buffer = NULL;
 	static int num;

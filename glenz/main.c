@@ -296,7 +296,7 @@ void /*_loadds*/ copper(void)
 }
 //#pragma check_stack(on)
     
-int main()
+int main(int argc, char **argv)
 {
     int a,b,c,/*x,*/y,rx,ry,rz,/*n=8,p1,p2,*/r,g,zpos=7500,y1,y2,/*rya,*/ypos,yposa;
     int ya,yy,boingm=6,boingd=7;
@@ -318,14 +318,12 @@ int main()
 
     zoomer2();
 
-    if (init_graphics("Glenz", window_width, window_height) < 0) {
+    if (init_graphics("Glenz", argc, argv) < 0) {
         fprintf(stderr, "Can't init graphics\n");
         return -1;
     };
 
-    init_opengl(window_width, window_height);
-
-    projection();
+    init_opengl();
 
 #if 0
     _asm mov dx,3c4h
