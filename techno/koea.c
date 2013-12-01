@@ -686,22 +686,23 @@ rotate1	PROC NEAR
 rotate1	ENDP
 
 ALIGN 2
-framecount dw	0
 palanimc dw	0
 palanimc2 dw	0
 scrnpos dw	0
 scrnposl dw	0
-scrnx	dw	0
-scrny	dw	0
-scrnrot dw	0
 sinurot dw	0
-overrot dw	211
-overx	dw	0
-overya	dw	0
 patdir	dw	0
 
 memseg	dw	0
 #endif
+
+int framecount = 0;
+int scrnrot = 0;
+int scrnx = 0;
+int scrny = 0;
+int overrot = 211;
+int overx = 0;
+int overya = 0;
 
 #if 0
 init_interference PROC NEAR
@@ -895,17 +896,18 @@ do_interference PROC NEAR
 @@m1:	cmp	bx,4
 	jne	@@m2
 	mov	cs:patdir,-3 ;-3
+
 @@m2:
 	mov	bx,cs:scrnrot
 	add	bx,5
-	and	bx,1023
-	mov	cs:scrnrot,bx
+	and	bx,1023			; scrnrot = (scrnrot + 5) & 1023
+	mov	cs:scrnrot,bx		; bx = scrnrot
 
-	shl	bx,1
-	mov	ax,cs:_sin1024[bx]
-	sar	ax,2
-	add	ax,160
-	mov	cs:scrnx,ax
+	shl	bx,1			; bx *= 2;
+	mov	ax,cs:_sin1024[bx]	; ax = sin(bx)
+	sar	ax,2			; ax /= 4;
+	add	ax,160			; ax += 160
+	mov	cs:scrnx,ax		; scrn = ax
 	add	bx,256*2
 	and	bx,1024*2-1
 	mov	ax,cs:_sin1024[bx]
@@ -981,8 +983,34 @@ void initinterference()
 {
 }
 
+extern int sin1024[1024];
+
 void dointerference()
 {
+	int bx;
+
+	//@@m2
+	scrnrot += 5;
+	scrnrot &= 1023;
+	bx = scrnrot;
+	scrnx = sin1024[bx] / 4 + 160;
+
+	bx += 256;
+	bx &= 1024 - 1;
+	scrny = sin1024[bx] / 4 + 100;
+	
+	overrot += 7;
+	overrot &= 1023;
+	bx = overrot;
+	overx = sin1024[bx] / 4 + 160;
+
+	bx += 256;
+	bx &= 1024 - 1;
+	overya = (sin1024[bx] / 4 + 100) * 80;
+
+	//scrnposl = scrnx & 7;
+	//scrnpos = scrnx / 8 + scrny * 80;
+
 }
 
 void setpalarea(char *pal, int start, int num)
