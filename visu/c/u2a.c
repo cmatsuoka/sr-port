@@ -4,6 +4,7 @@
 #include <stdlib.h>
 //#include <malloc.h>
 #include "graphics.h"
+#include "../opengl.h"
 #include "../dis/dis.h"
 #include "../cd.h"
 #include "../c.h"
@@ -251,7 +252,7 @@ printf("c=%d\n", c);
 
 	if (init_graphics("U2A", argc, argv) < 0) {
 		fprintf(stderr, "Can't init graphics\n");
-		return;
+		return -1;
 	};
 
 	init_opengl();

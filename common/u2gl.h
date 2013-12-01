@@ -16,11 +16,13 @@ struct u2gl_program {
 	GLuint aTexPosition_location;
 };
 
-static inline void u2gl_set_color(GLfloat *c, struct u2gl_program *p) {
+static inline void u2gl_set_color(struct u2gl_program *p, GLfloat *c) {
+	glUseProgram(p->program);
 	glUniform4fv(p->uColor_location, 1, c);
 }
 
 static inline void u2gl_set_matrix(struct u2gl_program *p, float *m) {
+	glUseProgram(p->program);
 	glUniformMatrix4fv(p->uMatrix_location, 1, 0, m);
 }
 

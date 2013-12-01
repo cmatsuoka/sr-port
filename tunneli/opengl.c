@@ -84,7 +84,7 @@ void draw_pixel(float x, float y, int c)
 {
 	Matrix m;
 
-	u2gl_set_color(color[c], &pixel_program);
+	u2gl_set_color(&pixel_program, color[c]);
 
 	matrix_identity(m);
 	matrix_translate(m, x, 200 - y);

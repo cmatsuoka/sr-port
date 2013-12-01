@@ -157,7 +157,7 @@ void draw_poly(short *f, int sides, int c)
 	int i;
 
 	glUseProgram(triangle_program.program);
-	u2gl_set_color(color[c], &triangle_program);
+	u2gl_set_color(&triangle_program, color[c]);
 
 	for (i = 0; i < sides; i++) {
 		obj[i * 3 + 0] = *f++;
@@ -172,7 +172,7 @@ void draw_poly_diffuse(short *f, int *n, int sides, int c)
 	int i;
 
 	glUseProgram(diffuse_triangle_program.program);
-	u2gl_set_color(color[c], &diffuse_triangle_program);
+	u2gl_set_color(&diffuse_triangle_program, color[c]);
 
 	for (i = 0; i < sides; i++) {
 		obj[i * 3 + 0] = *f++;
@@ -192,7 +192,7 @@ void draw_palette()
 
 	glUseProgram(triangle_program.program);
 	for (i = 0; i < 256; i++) {
-		u2gl_set_color(color[i], &triangle_program);
+		u2gl_set_color(&triangle_program, color[i]);
 	
 		obj[0] = 20 + (i - 64 * (i / 64)) * 4;
 		obj[1] = 70 -10 * (i / 64) ;
@@ -208,21 +208,21 @@ void draw_palette()
 void draw_rectangle1()
 {
 	glUseProgram(triangle_program.program);
-	u2gl_set_color(color[1], &triangle_program);
+	u2gl_set_color(&triangle_program, color[1]);
 	u2gl_draw_triangle_strip(&triangle_program, rectangle1_obj, 4);
 }
 
 void draw_rectangle2()
 {
 	glUseProgram(triangle_program.program);
-	u2gl_set_color(color[2], &triangle_program);
+	u2gl_set_color(&triangle_program, color[2]);
 	u2gl_draw_triangle_strip(&triangle_program, rectangle2_obj, 4);
 }
 
 void draw_rectangle3()
 {
 	glUseProgram(triangle_program.program);
-	u2gl_set_color(color[255], &triangle_program);
+	u2gl_set_color(&triangle_program, color[255]);
 	u2gl_draw_triangle_strip(&triangle_program, rectangle3_obj, 4);
 }
 
@@ -268,7 +268,6 @@ extern int newlight[3];
 
 int init_opengl()
 {
-	Matrix m;
 	GLuint v, f;
 	float lightpos[3];
 
@@ -292,13 +291,6 @@ int init_opengl()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(.0, .0, .0, 0);
-
-	matrix_identity(m);
-	glUseProgram(triangle_program.program);
-	u2gl_set_matrix(&triangle_program, m);
-
-	glUseProgram(diffuse_triangle_program.program);
-	u2gl_set_matrix(&diffuse_triangle_program, m);
 
 	lightpos[0] = newlight[0];
 	lightpos[1] = newlight[1];

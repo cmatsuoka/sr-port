@@ -4,11 +4,12 @@
 #include <stdlib.h>
 //#include <malloc.h>
 #include "graphics.h"
+#include "../opengl.h"
 #include "../dis/dis.h"
 #include "../cd.h"
 #include "../c.h"
 
-#define	DEBUG
+#define	noDEBUG
 #define huge
 #define _loadds
 
@@ -175,7 +176,7 @@ int main(int argc,char *argv[])
 
 	if (init_graphics("Cplay", argc, argv) < 0) {
 		fprintf(stderr, "Can't init graphics\n");
-		return;
+		return -1;
 	};
 
 	init_opengl();
@@ -352,6 +353,8 @@ int main(int argc,char *argv[])
 		#ifdef DEBUG
 		fprintf(fr,"\n");
 		#endif
+
+		swap_buffers();
 	}
 
 	vid_deinit();

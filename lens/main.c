@@ -102,10 +102,10 @@ int	firfade2a[200];
 
 void	part1(void)
 {
-	int	x,y/*,xa,ya*/;
-	int	a/*,r,g*/,b,c/*,i*/;
+	//int	x,y,xa,ya;
+	int	a/*,r,g*/,b/*,c,i*/;
 	int	frame=0;
-	char	*cp,*dp;
+	//char	*cp,*dp;
 	frame=0;
 	for(b=0;b<200;b++)
 	{
@@ -123,21 +123,23 @@ void	part1(void)
 		if(frame<80)
 		{
 			a=frame*2;
+#if 0
 			for(c=0;c<6;c++)
 			{
 				//cp=vram; dp=back;
 				for(y=0;y<200;y++)
 				{
 					x=firfade1[y]>>6;
-					//cp[x]=dp[x];
+					cp[x]=dp[x];
 					x=firfade2[y]>>6;
-					//cp[x]=dp[x];
+					cp[x]=dp[x];
 					firfade1[y]+=firfade1a[y];
 					firfade2[y]+=firfade2a[y];
 					cp+=320;
 					dp+=320;
 				}
 			}
+#endif
 		}
 		clear_screen();
 		float ff = (float)frame / 40;

@@ -309,7 +309,6 @@ void set_pos(float x, float y)
 
 int init_opengl()
 {
-	Matrix m;
 	GLuint v, f;
 
 	view_width = 320;
@@ -349,16 +348,6 @@ int init_opengl()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(.0, .0, .0, 0);
-
-	matrix_identity(m);
-	glUseProgram(fir_program.program);
-	u2gl_set_matrix(&fir_program, m);
-
-	glUseProgram(bg_program.program);
-	u2gl_set_matrix(&bg_program, m);
-
-	glUseProgram(rot_program.program);
-	u2gl_set_matrix(&rot_program, m);
 	u2gl_check_error("init_opengl");
 
 	init_texture();
@@ -394,5 +383,5 @@ void set_color(float a)
 
 	color[0] = color[1] = color[2] = a;
 	color[3] = 1.0f;
-	u2gl_set_color(color, &rot_program);
+	u2gl_set_color(&rot_program, color);
 }

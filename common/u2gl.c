@@ -103,6 +103,7 @@ void u2gl_projection(float left, float right, float bottom, float top, struct u2
 int u2gl_create_program(struct u2gl_program *p, GLuint v, GLuint f)
 {
 	char msg[512];
+	Matrix m;
 
 	p->program = glCreateProgram();
 	glAttachShader(p->program, v);
@@ -119,6 +120,9 @@ int u2gl_create_program(struct u2gl_program *p, GLuint v, GLuint f)
 	p->aPosition_location = glGetAttribLocation(p->program, "aPosition");
 	p->uColor_location = glGetUniformLocation(p->program, "uColor");
 	p->aTexPosition_location = glGetAttribLocation(p->program, "aTexPosition");
+
+	matrix_identity(m);
+        u2gl_set_matrix(p, m);
 
 	return 0;
 }

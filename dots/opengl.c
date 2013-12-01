@@ -137,7 +137,6 @@ void shift_color(float *color2, float *color)
 
 void clear_screen()
 {
-	Matrix m;
 	float color[3] = { 0.0f, 0.0f, 0.0f };
 	float color2[3];
 
@@ -145,14 +144,9 @@ void clear_screen()
 	glClearColor(color2[0], color2[1], color2[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(floor_program.program);
-
-	matrix_identity(m);
-
 	color2[0] = colorshift;
 
-	u2gl_set_matrix(&floor_program, m);
-	u2gl_set_color(color2, &floor_program);
+	u2gl_set_color(&floor_program, color2);
 	u2gl_draw_triangle_strip(&floor_program, floor_obj, 4);
 
 	glUseProgram(dot_program.program);
@@ -173,7 +167,7 @@ void draw_dot(struct dot *dot)
 			/* shadow */
 
 			shift_color(color2, shadow_color);
-			u2gl_set_color(color2, &dot_program);
+			u2gl_set_color(&dot_program, color2);
 
 			matrix_identity(m);
 			matrix_translate(m, x, 200 - shadow_y);
@@ -201,7 +195,7 @@ void draw_dot(struct dot *dot)
 
 				shift_color(color2, color);
 
-				u2gl_set_color(color2, &dot_program);
+				u2gl_set_color(&dot_program, color2);
 
 				matrix_identity(m);
 				matrix_translate(m, x, 200 - y);

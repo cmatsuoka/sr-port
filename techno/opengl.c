@@ -138,7 +138,7 @@ void draw_fb()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(fb_program.program);
-	u2gl_set_color(color[15], &fb_program);
+	u2gl_set_color(&fb_program, color[15]);
 	u2gl_draw_textured_triangle_strip(&fb_program, fb_obj, 4);
 }
 
@@ -152,7 +152,7 @@ void draw_interference2()
 #if 0
 static void draw_triangle(float *f, int c)
 {
-	u2gl_set_color(color[c], &triangle_program);
+	u2gl_set_color(&triangle_program, color[c]);
 
 	obj[0] = *f++;
 	obj[1] = *f++;
@@ -172,7 +172,7 @@ void draw_quad(float x1, float y1, float x2, float y2, float x3, float y3, float
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
 	glUseProgram(triangle_program.program);
-	u2gl_set_color(color[1], &triangle_program);
+	u2gl_set_color(&triangle_program, color[1]);
 
 	obj[0] = x1;
 	obj[1] = 199 - y1;
@@ -195,7 +195,7 @@ void draw_palette()
 
 	glUseProgram(triangle_program.program);
 	for (i = 0; i < 256; i++) {
-		u2gl_set_color(color[i], &triangle_program);
+		u2gl_set_color(&triangle_program, color[i]);
 	
 		obj[0] = 20 + (i - 64 * (i / 64)) * 4;
 		obj[1] = 45 -10 * (i / 64) ;
@@ -238,7 +238,6 @@ extern int window_height;
 
 int init_opengl()
 {
-	Matrix m;
 	GLuint v, f;
 	GLuint fb_texture;
 
@@ -288,16 +287,6 @@ glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_t
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glClearColor(.0, .0, .0, 0);
-
-	glUseProgram(triangle_program.program);
-	matrix_identity(m);
-	u2gl_set_matrix(&triangle_program, m);
-
-	glUseProgram(fb_program.program);
-	u2gl_set_matrix(&fb_program, m);
-
-	glUseProgram(inter2_program.program);
-	u2gl_set_matrix(&inter2_program, m);
 
 	u2gl_check_error("init_opengl");
 
