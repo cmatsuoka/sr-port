@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include "graphics.h"
+#include "opengl.h"
 #include "koe.h"
 
 //extrn _circle:byte
@@ -605,6 +607,14 @@ do_interference ENDP
 
 static void do_interference()
 {
+	int framecount;
+
+	for (framecount = 0; framecount < 256; framecount++) {
+		clear_screen();
+		draw_interference2();
+		draw_fb();
+		swap_buffers();
+	}
 }
 
 void dointerference2()

@@ -1,6 +1,7 @@
 #include <string.h>
-#include "koe.h"
+#include "graphics.h"
 #include "opengl.h"
+#include "koe.h"
 
 extern char circle;
 extern char circle2;
@@ -702,10 +703,6 @@ patdir	dw	0
 memseg	dw	0
 #endif
 
-static void init_interference()
-{
-}
-
 #if 0
 init_interference PROC NEAR
 	mov	dx,3d4h
@@ -984,147 +981,9 @@ void initinterference()
 {
 }
 
-#if 0
-PUBLIC _initinterference
-_initinterference PROC FAR
-	push	bp
-	mov	bp,sp
-	push	si
-	push	di
-	push	ds
-	
-;	call	resetmode13
-
-;@@wm1:	mov	bx,2
-;	int	0fch
-;	or	ax,ax
-;	jnz	@@xit
-;	mov	bx,6
-;	mov	ax,0f1h
-;	int	0fch
-;	cmp	ax,0f1h
-;	jne	@@wm1
-	
-	call	init_interference
-	
-	pop	ds
-	pop	di
-	pop	si
-	pop	bp
-	ret
-_initinterference ENDP
-#endif
-
 void dointerference()
 {
 }
-
-#if 0
-PUBLIC _dointerference
-_dointerference PROC FAR
-	push	bp
-	mov	bp,sp
-	push	si
-	push	di
-	push	ds
-	
-	call	do_interference	
-	
-	mov	es,cs:memseg
-	mov	ah,49h
-	int	21h
-
-	pop	ds
-	pop	di
-	pop	si
-	pop	bp
-	ret
-_dointerference ENDP
-	
-PUBLIC _inittwk
-_inittwk PROC FAR
-	push	bp
-	mov	bp,sp
-	push	si
-	push	di
-	push	ds
-	;clear palette
-	mov	dx,3c8h
-	xor	al,al
-	out	dx,al
-	inc	dx
-	mov	cx,768
-@@1:	out	dx,al
-	loop	@@1
-	;400 rows
-	mov	dx,3d4h
-	mov	ax,00009h
-	out	dx,ax
-	;tweak
-	mov	dx,3d4h
-	mov	ax,00014h
-	out	dx,ax
-	mov	ax,0e317h
-	out	dx,ax
-	mov	dx,3c4h
-	mov	ax,0604h
-	out	dx,ax
-	;
-	mov	dx,3c4h
-	mov	ax,0f02h
-	out	dx,ax
-	mov	ax,0a000h
-	mov	es,ax
-	xor	di,di
-	mov	cx,32768
-	xor	ax,ax
-	rep	stosw
-	;
-	pop	ds
-	pop	di
-	pop	si
-	pop	bp
-	ret
-_inittwk ENDP
-#endif
-
-void lineblit()
-{
-}
-
-#if 0
-PUBLIC _lineblit
-_lineblit PROC FAR
-	push	bp
-	mov	bp,sp
-	push	si
-	push	di
-	push	ds
-	mov	di,[bp+6]
-	mov	es,[bp+8]
-	mov	si,[bp+10]
-	mov	ds,[bp+12]
-	zpl=0
-	REPT	4
-	mov	dx,3c4h
-	mov	ax,02h+(100h shl zpl)
-	out	dx,ax
-	zzz=0
-	REPT	80/2
-	mov	al,ds:[si+(zzz+0)*4+zpl]
-	mov	ah,ds:[si+(zzz+1)*4+zpl]
-	mov	es:[di+zzz],ax
-	zzz=zzz+2
-	ENDM
-	zpl=zpl+1
-	ENDM
-	pop	ds
-	pop	di
-	pop	si
-	pop	bp
-	ret
-_lineblit ENDP
-#endif
 
 void setpalarea(char *pal, int start, int num)
 {
