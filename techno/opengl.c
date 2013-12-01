@@ -10,13 +10,13 @@ static int view_width;
 static int view_height;
 
 static struct u2gl_program triangle_program;
-static struct u2gl_program fc_program;
+static struct u2gl_program fb_program;
 
 static GLuint framebuffer = 0;
 
 float obj[9];
 
-float fc_obj[12] = {
+float fb_obj[12] = {
 	0.0f, 0.0f, 0.0f,
 	320.0f, 0.0f, 0.0f,
 	0.0f, 200.0f, 0.0f,
@@ -72,6 +72,28 @@ static const char fragment_shader_texture[] =
 "    gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
 "}\n";
 
+static const char fragment_shader_fbtexture[] =
+"precision mediump float;\n"
+"uniform sampler2D uTexture;\n"
+"uniform vec4 uColor;\n"
+"varying vec3 vPosition;\n"
+"varying vec2 vTexPosition;\n"
+"\n"
+"void main() {\n"
+"    const vec4 color0 = vec4(0.332,0.301,0.395,1.0);\n"
+"    const vec4 color1 = vec4(0.457,0.395,0.523,1.0);\n"
+"    const vec4 color2 = vec4(0.602,0.555,0.664,1.0);\n"
+//"    const vec4 color2 = vec4(1.0,0.0,0.0,1.0);\n"
+"    const vec4 color3 = vec4(0.742,0.695,0.809,1.0);\n"
+//"    const vec4 color3 = vec4(0.0,1.0,0.0,1.0);\n"
+"    float c = texture2D(uTexture, vTexPosition).r;\n"
+"    if (c > 0.1) { if (c < 0.3) gl_FragColor = color0;\n"
+"    else if (c < 0.45) gl_FragColor = color1;\n"
+"    else if (c < 0.52) gl_FragColor = color2;\n"
+"    else gl_FragColor = color3; }\n"
+"    else gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
+"}\n";
+
 
 
 static float tex_coords[] = {
@@ -86,16 +108,14 @@ static int fb_location;
 
 static float color[256][4];
 
-#define CC 128
+#define CC 256
 
 void setrgb(int c, int r, int g, int b)
 {
-	float alpha = 0.4f;
-
 	color[c][0] = (float)r / CC;
 	color[c][1] = (float)g / CC;
 	color[c][2] = (float)b / CC;
-	color[c][3] = alpha;
+	color[c][3] = 0.5f;
 }
 
 void getrgb(int c, char *p)
@@ -105,12 +125,12 @@ void getrgb(int c, char *p)
 	p[2] = color[c][2] * CC;
 }
 
-void draw_fc()
+void draw_fb()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glUseProgram(fc_program.program);
-	u2gl_set_color(color[15], &fc_program);
-	u2gl_draw_textured_triangle_strip(&fc_program, fc_obj, 4);
+	glUseProgram(fb_program.program);
+	u2gl_set_color(color[15], &fb_program);
+	u2gl_draw_textured_triangle_strip(&fb_program, fb_obj, 4);
 }
 
 #if 0
@@ -135,7 +155,6 @@ void draw_quad(float x1, float y1, float x2, float y2, float x3, float y3, float
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	setrgb(1, 116, 97, 132);
 	glUseProgram(triangle_program.program);
 	u2gl_set_color(color[1], &triangle_program);
 
@@ -238,10 +257,10 @@ glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_t
 	u2gl_create_program(&triangle_program, f, v);
 
 	v = u2gl_compile_vertex_shader(vertex_shader_texture);
-	f = u2gl_compile_fragment_shader(fragment_shader_texture);
-	u2gl_create_program(&fc_program, f, v);
+	f = u2gl_compile_fragment_shader(fragment_shader_fbtexture);
+	u2gl_create_program(&fb_program, f, v);
 
-	fb_location = glGetUniformLocation(fc_program.program, "uTexture");
+	fb_location = glGetUniformLocation(fb_program.program, "uTexture");
 
 
 	glDisable(GL_DEPTH_TEST);
@@ -255,13 +274,13 @@ glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_t
 	matrix_identity(m);
 	u2gl_set_matrix(&triangle_program, m);
 
-	glUseProgram(fc_program.program);
-	u2gl_set_matrix(&fc_program, m);
+	glUseProgram(fb_program.program);
+	u2gl_set_matrix(&fb_program, m);
 
 	u2gl_check_error("init_opengl");
 
 	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
-	u2gl_projection(0, view_width, 0, view_height, &fc_program);
+	u2gl_projection(0, view_width, 0, view_height, &fb_program);
 
 	return 0;
 }
