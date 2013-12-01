@@ -377,8 +377,7 @@ int main(int argc,char *argv[])
 int	doit1(int count)
 {
 	int	rot=45;
-	int	/*x,y,*/c/*,x1,y1,x2,y2,x3,y3,x4,y4,a,hx,hy,vx,vy,cx,cy*/;
-	float	x1,y1,x2,y2,x3,y3,x4,y4,hx,hy,vx,vy,cx,cy;
+	int	/*x,y,*/c,x1,y1,x2,y2,x3,y3,x4,y4,/*a,*/hx,hy,vx,vy,cx,cy;
 	int	vma,vm;
 	vm=50; vma=0;
 	waitborder();
@@ -450,8 +449,7 @@ int	doit1(int count)
 int	doit2(int count)
 {
 	int	rot=50,rota=10;
-	int	/*x,y,*/c/*,x1,y1,x2,y2,x3,y3,x4,y4,a,hx,hy,vx,vy,cx,cy*/;
-	float	x1,y1,x2,y2,x3,y3,x4,y4,hx,hy,vx,vy,cx,cy;
+	int	/*x,y,*/c,x1,y1,x2,y2,x3,y3,x4,y4,/*a,*/hx,hy,vx,vy,cx,cy;
 	int	vma,vm;
 	vm=100*64; vma=0;
 	waitborder();
@@ -653,6 +651,7 @@ int	doit3(int count)
 		_asm out dx,ax
 #endif
 
+		draw_fb();
 		swap_buffers();
 		change_plane();
 

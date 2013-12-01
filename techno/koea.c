@@ -391,9 +391,9 @@ l2:	IF lbl1 EQ @@r7
 drawline ENDP
 #endif
 
-static float box[25][8][12];
+static int box[25][8][12];
 
-void asmbox(int i, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
+void asmbox(int i, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 {
 	box[0][0][i] = x1;
 	box[0][1][i] = 199.0f - y1;
@@ -420,7 +420,7 @@ void change_plane()
 	int i;
 
 	for (i = 24; i > 0; i--)
-		memcpy(box[i], box[i - 1], sizeof(float) * 8 * 12);
+		memcpy(box[i], box[i - 1], sizeof(int) * 8 * 12);
 }
 
 #if 0

@@ -3,7 +3,7 @@
 
 void dointerference(void);
 void dointerference2(void);
-void asmbox(int i, float, float, float, float, float, float, float, float);
+void asmbox(int, int, int, int, int, int, int, int, int);
 void setpalarea(char *, int, int);
 void change_plane(void);
 
