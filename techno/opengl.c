@@ -159,16 +159,16 @@ void draw_quad(float x1, float y1, float x2, float y2, float x3, float y3, float
 	u2gl_set_color(color[1], &triangle_program);
 
 	obj[0] = x1;
-	obj[1] = y1;
+	obj[1] = 199 - y1;
 
 	obj[3] = x2;
-	obj[4] = y2;
+	obj[4] = 199 - y2;
 
 	obj[6] = x4;
-	obj[7] = y4;
+	obj[7] = 199 - y4;
 
 	obj[9] = x3;
-	obj[10] = y3;
+	obj[10] = 199 - y3;
 
 	u2gl_draw_triangle_strip(&triangle_program, obj, 4);
 }
