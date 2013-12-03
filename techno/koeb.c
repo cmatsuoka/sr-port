@@ -611,8 +611,8 @@ static void do_interference()
 
 	for (framecount = 0; framecount < 256; framecount++) {
 		clear_screen();
-		draw_interference2();
-		draw_fb();
+		draw_inter();
+		draw_interfb();
 		swap_buffers();
 	}
 }

@@ -429,7 +429,7 @@ int	doit1(int count)
 		_asm out dx,ax
 #endif
 
-		draw_fb();
+		draw_doitfb();
 		swap_buffers();
 		change_plane();
 
@@ -502,7 +502,7 @@ int	doit2(int count)
 		_asm out dx,ax
 #endif
 
-		draw_fb();
+		draw_doitfb();
 		swap_buffers();
 		change_plane();
 
@@ -651,7 +651,7 @@ int	doit3(int count)
 		_asm out dx,ax
 #endif
 
-		draw_fb();
+		draw_doitfb();
 		swap_buffers();
 		change_plane();
 

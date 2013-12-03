@@ -10,8 +10,10 @@ static int view_width;
 static int view_height;
 
 static struct u2gl_program triangle_program;
-static struct u2gl_program fb_program;
-static struct u2gl_program inter2_program;
+static struct u2gl_program doitfb_program;
+static struct u2gl_program doit_program;
+static struct u2gl_program interfb_program;
+static struct u2gl_program inter_program;
 
 static GLuint framebuffer = 0;
 
@@ -73,7 +75,7 @@ static const char fragment_shader_texture[] =
 "    gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
 "}\n";
 
-static const char fragment_shader_fbtexture[] =
+static const char fragment_shader_doitfb[] =
 "precision mediump float;\n"
 "uniform sampler2D uTexture;\n"
 "uniform vec4 uColor;\n"
@@ -95,7 +97,27 @@ static const char fragment_shader_fbtexture[] =
 "    else gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
 "}\n";
 
-static const char fragment_shader_inter2[] =
+static const char fragment_shader_i2[] =
+"precision mediump float;\n"
+"uniform vec4 uColor;\n"
+"varying vec3 vPosition;\n"
+"\n"
+"void main() {\n"
+"    gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n"
+"}\n";
+
+static const char fragment_shader_interfb[] =
+"precision mediump float;\n"
+"uniform sampler2D uTexture;\n"
+"uniform vec4 uColor;\n"
+"varying vec3 vPosition;\n"
+"varying vec2 vTexPosition;\n"
+"\n"
+"void main() {\n"
+"    gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
+"}\n";
+
+static const char fragment_shader_inter[] =
 "precision mediump float;\n"
 "uniform vec4 uColor;\n"
 "varying vec3 vPosition;\n"
@@ -112,7 +134,8 @@ static float tex_coords[] = {
 	1.0f, 0.0f
 };
 
-static int fb_location;
+static int doitfb_location;
+static int interfb_location;
 
 
 static float color[256][4];
@@ -134,19 +157,34 @@ void getrgb(int c, char *p)
 	p[2] = color[c][2] * CC;
 }
 
-void draw_fb()
+void draw_doitfb()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glUseProgram(fb_program.program);
-	u2gl_set_color(&fb_program, color[15]);
-	u2gl_draw_textured_triangle_strip(&fb_program, fb_obj, 4);
+	glUseProgram(doitfb_program.program);
+	u2gl_set_color(&doitfb_program, color[15]);
+	u2gl_draw_textured_triangle_strip(&doitfb_program, fb_obj, 4);
 }
 
-void draw_interference2()
+void draw_doit()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	glUseProgram(inter2_program.program);
-	u2gl_draw_triangle_strip(&inter2_program, fb_obj, 4);
+	glUseProgram(doit_program.program);
+	u2gl_draw_triangle_strip(&doit_program, fb_obj, 4);
+}
+
+void draw_interfb()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glUseProgram(doitfb_program.program);
+	u2gl_set_color(&doitfb_program, color[15]);
+	u2gl_draw_textured_triangle_strip(&doitfb_program, fb_obj, 4);
+}
+
+void draw_inter()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glUseProgram(doit_program.program);
+	u2gl_draw_triangle_strip(&doit_program, fb_obj, 4);
 }
 
 #if 0
@@ -271,15 +309,22 @@ glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_t
 	f = u2gl_compile_fragment_shader(fragment_shader);
 	u2gl_create_program(&triangle_program, f, v);
 
-	f = u2gl_compile_fragment_shader(fragment_shader_inter2);
-	u2gl_create_program(&inter2_program, f, v);
+	f = u2gl_compile_fragment_shader(fragment_shader_i2);
+	u2gl_create_program(&doit_program, f, v);
+
+	f = u2gl_compile_fragment_shader(fragment_shader_inter);
+	u2gl_create_program(&inter_program, f, v);
 
 	v = u2gl_compile_vertex_shader(vertex_shader_texture);
-	f = u2gl_compile_fragment_shader(fragment_shader_fbtexture);
-	u2gl_create_program(&fb_program, f, v);
+	f = u2gl_compile_fragment_shader(fragment_shader_doitfb);
+	u2gl_create_program(&doitfb_program, f, v);
 
-	fb_location = glGetUniformLocation(fb_program.program, "uTexture");
+	doitfb_location = glGetUniformLocation(doitfb_program.program, "uTexture");
 
+	f = u2gl_compile_fragment_shader(fragment_shader_interfb);
+	u2gl_create_program(&interfb_program, f, v);
+
+	interfb_location = glGetUniformLocation(interfb_program.program, "uTexture");
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -291,8 +336,10 @@ glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_t
 	u2gl_check_error("init_opengl");
 
 	u2gl_projection(0, view_width, 0, view_height, &triangle_program);
-	u2gl_projection(0, view_width, 0, view_height, &fb_program);
-	u2gl_projection(0, view_width, 0, view_height, &inter2_program);
+	u2gl_projection(0, view_width, 0, view_height, &doitfb_program);
+	u2gl_projection(0, view_width, 0, view_height, &doit_program);
+	u2gl_projection(0, view_width, 0, view_height, &interfb_program);
+	u2gl_projection(0, view_width, 0, view_height, &inter_program);
 
 	return 0;
 }
