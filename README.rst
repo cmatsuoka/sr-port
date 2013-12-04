@@ -2,7 +2,7 @@
 Second Reality Effects
 ======================
 
-A few effects from Second Reality ported to Linux.
+Effects from Second Reality ported to C, Linux and OpenGL ES 2.0.
 
 
 Notes
@@ -17,9 +17,7 @@ Notes
 
 * Pixel art upscaled with 4xbrz.
 
-* IDEA: make ported DIS code interface to libxmp to get music information.
-
 
 
 See https://github.com/cmatsuoka/sr-port/wiki/Second-Reality-port-notes
-for further information.
+for screenshots and further information.
