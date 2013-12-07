@@ -5,6 +5,7 @@
 #include <GLES2/gl2.h>
 #include <SOIL/SOIL.h>
 #include "u2gl.h"
+#include "opengl.h"
 
 static int view_width;
 static int view_height;
@@ -16,6 +17,9 @@ static struct u2gl_program interfb_program;
 static struct u2gl_program inter_program;
 
 static GLuint framebuffer = 0;
+
+extern int window_width;
+extern int window_height;
 
 float obj[9];
 
@@ -120,12 +124,12 @@ static const char fragment_shader_interfb[] =
 static const char fragment_shader_inter[] =
 "precision mediump float;\n"
 "uniform vec4 uColor;\n"
+"uniform vec2 uPos;\n"
 "varying vec3 vPosition;\n"
 "\n"
 "void main() {\n"
-"    vec2 uPos = vec2(320.0, 240.0);\n"
 "    float d = distance(gl_FragCoord.xy, uPos);\n"
-"    float c = mod(d,40.0) / 40.0;\n"
+"    float c = mod(d,32.0) / 32.0;\n"
 "    gl_FragColor = vec4(c,c,c,1.0);\n"
 "}\n";
 
@@ -140,6 +144,7 @@ static float tex_coords[] = {
 //static int doitfb_location;
 //static int interfb_location;
 
+static int uPos_location;
 
 static float color[256][4];
 
@@ -181,6 +186,18 @@ void draw_interfb()
 	glUseProgram(interfb_program.program);
 	//u2gl_set_color(&dinterfb_program, color[15]);
 	u2gl_draw_textured_triangle_strip(&interfb_program, fb_obj, 4);
+}
+
+
+void set_pos(int x, int y)
+{
+	float vec[2];
+
+	glUseProgram(inter_program.program);
+	vec[0] = x * window_width / view_width;
+	vec[1] = y * window_height / view_height;
+printf("%f %f\n", vec[0], vec[1]);
+	glUniform2fv(uPos_location, 1, vec);
 }
 
 void draw_inter()
@@ -317,6 +334,8 @@ glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_t
 
 	f = u2gl_compile_fragment_shader(fragment_shader_inter);
 	u2gl_create_program(&inter_program, f, v);
+
+	uPos_location = glGetUniformLocation(inter_program.program, "uPos");
 
 	v = u2gl_compile_vertex_shader(vertex_shader_texture);
 	f = u2gl_compile_fragment_shader(fragment_shader_doitfb);

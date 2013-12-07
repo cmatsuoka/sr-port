@@ -1008,6 +1008,13 @@ void dointerference()
 	bx &= 1024 - 1;
 	overya = (sin1024[bx] / 4 + 100) * 80;
 
+	set_pos(scrnx, 199 - scrny);
+	clear_screen();
+	draw_inter();
+	draw_interfb();
+	swap_buffers();
+
+
 	//scrnposl = scrnx & 7;
 	//scrnpos = scrnx / 8 + scrny * 80;
 
