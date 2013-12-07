@@ -532,10 +532,10 @@ pal1 LABEL WORD
 	db	20,20*8/9,20
 	db	10,10*8/9,10
 	db	 0, 0*8/9, 0
-	
-sinuspower db	0
-powercnt db	0
 #endif
+
+static int sinuspower = 0;
+static int powercnt = 0;
 
 unsigned char power0[256 * 16];
 
@@ -989,34 +989,49 @@ void dointerference()
 {
 	int bx;
 
-	//@@m2
-	scrnrot += 5;
-	scrnrot &= 1023;
-	bx = scrnrot;
-	scrnx = sin1024[bx] / 4 + 160;
-
-	bx += 256;
-	bx &= 1024 - 1;
-	scrny = sin1024[bx] / 4 + 100;
+	//@@aga
+	do {
+		//@@m2
+		scrnrot -= 5;
+		if (scrnrot < 0)
+			scrnrot += 1024;
+		bx = scrnrot;
+		scrnx = sin1024[bx] / 4 + 160;
 	
-	overrot += 7;
-	overrot &= 1023;
-	bx = overrot;
-	overx = sin1024[bx] / 4 + 160;
-
-	bx += 256;
-	bx &= 1024 - 1;
-	overya = (sin1024[bx] / 4 + 100) * 80;
-
-	set_pos(scrnx, 199 - scrny);
-	clear_screen();
-	draw_inter();
-	draw_interfb();
-	swap_buffers();
-
-
-	//scrnposl = scrnx & 7;
-	//scrnpos = scrnx / 8 + scrny * 80;
+		bx += 256;
+		bx &= 1024 - 1;
+		scrny = sin1024[bx] / 4 + 100;
+		
+		overrot += 7;
+		overrot &= 1023;
+		bx = overrot;
+		overx = sin1024[bx] / 4 + 160;
+	
+		bx += 256;
+		bx &= 1024 - 1;
+		overya = (sin1024[bx] / 4 + 100) * 80;
+	
+		set_pos(scrnx, 199 - scrny);
+		clear_screen();
+		draw_inter();
+		draw_interfb();
+		swap_buffers();
+	
+		//scrnposl = scrnx & 7;
+		//scrnpos = scrnx / 8 + scrny * 80;
+		//...
+	
+		if (framecount >= 70 * 5) {
+			if (++powercnt >= 16) {
+				powercnt = 0;
+				if (sinuspower < 15)
+					sinuspower++;
+			}
+		}
+	
+		//@@p1
+		framecount++;
+	} while (framecount < 70 * 13);
 
 }
 

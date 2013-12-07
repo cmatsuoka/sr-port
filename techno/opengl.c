@@ -196,7 +196,6 @@ void set_pos(int x, int y)
 	glUseProgram(inter_program.program);
 	vec[0] = x * window_width / view_width;
 	vec[1] = y * window_height / view_height;
-printf("%f %f\n", vec[0], vec[1]);
 	glUniform2fv(uPos_location, 1, vec);
 }
 

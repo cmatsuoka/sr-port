@@ -91,8 +91,8 @@ unsigned char pal2[] = {
 	40,40*6/9,40
 };
 	
-int sinuspower = 0;
-int powercnt = 0;
+//int sinuspower = 0;
+//int powercnt = 0;
 
 unsigned char power1[16 * 256];
 #define power0 power1
