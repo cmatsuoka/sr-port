@@ -609,7 +609,7 @@ static void do_interference()
 {
 	int framecount;
 
-	set_pos(160, 100);
+	set_pos(160, 100, 0, 0);
 	for (framecount = 0; framecount < 256; framecount++) {
 		clear_screen();
 		draw_inter();

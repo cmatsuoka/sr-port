@@ -118,19 +118,28 @@ static const char fragment_shader_interfb[] =
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = texture2D(uTexture, vTexPosition).rgba;\n"
+"    vec4 c = texture2D(uTexture, vTexPosition).rgba * 0.8;\n"
+"    vec4 d;\n"
+"    float cc = 0.8 - c.r;\n"
+"    if (c.g < 0.01) d = vec4(c.r, c.r / 1.2, c.r, 1.0);\n"
+"    else d = vec4(cc / 1.1, cc / 1.5, cc, 1.0);\n"
+"    gl_FragColor = d;\n"
 "}\n";
 
 static const char fragment_shader_inter[] =
 "precision mediump float;\n"
 "uniform vec4 uColor;\n"
 "uniform vec2 uPos;\n"
+"uniform vec2 uOverpos;\n"
 "varying vec3 vPosition;\n"
 "\n"
 "void main() {\n"
 "    float d = distance(gl_FragCoord.xy, uPos);\n"
 "    float c = mod(d,32.0) / 32.0;\n"
-"    gl_FragColor = vec4(c,c,c,1.0);\n"
+"    float od = distance(gl_FragCoord.xy, uOverpos);\n"
+"    float oc = mod(od,64.0) / 64.0;\n"
+"    if (oc > 0.5) oc = 1.0; else oc = 0.0;\n"
+"    gl_FragColor = vec4(c,oc,0.0,1.0);\n"
 "}\n";
 
 
@@ -145,6 +154,7 @@ static float tex_coords[] = {
 //static int interfb_location;
 
 static int uPos_location;
+static int uOverpos_location;
 
 static float color[256][4];
 
@@ -189,7 +199,7 @@ void draw_interfb()
 }
 
 
-void set_pos(int x, int y)
+void set_pos(int x, int y, int overx, int overy)
 {
 	float vec[2];
 
@@ -197,6 +207,10 @@ void set_pos(int x, int y)
 	vec[0] = x * window_width / view_width;
 	vec[1] = y * window_height / view_height;
 	glUniform2fv(uPos_location, 1, vec);
+
+	vec[0] = overx * window_width / view_width;
+	vec[1] = overy * window_height / view_height;
+	glUniform2fv(uOverpos_location, 1, vec);
 }
 
 void draw_inter()
@@ -335,6 +349,7 @@ glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_t
 	u2gl_create_program(&inter_program, f, v);
 
 	uPos_location = glGetUniformLocation(inter_program.program, "uPos");
+	uOverpos_location = glGetUniformLocation(inter_program.program, "uOverpos");
 
 	v = u2gl_compile_vertex_shader(vertex_shader_texture);
 	f = u2gl_compile_fragment_shader(fragment_shader_doitfb);

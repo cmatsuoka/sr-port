@@ -7,4 +7,4 @@ void draw_interfb(void);
 void draw_inter(void);
 void clear_screen(void);
 void setrgb(int, int, int, int);
-void set_pos(int, int);
+void set_pos(int, int, int, int);
