@@ -6,7 +6,8 @@
 //#include <dos.h>
 #include "tweak.h"
 #include "../dis/dis.h"
-
+#include "opengl.h"
+#include "graphics.h"
 #include "common.h"
 
 #define DO_TABLES
@@ -126,6 +127,10 @@ void plz(){
 		setplzparas(l1,l2,l3,l4);
 		for(y=0;y<MAXY;y+=2)
 			plzline(y,y*6);
+
+		vga_show_framebuffer();
+		draw_bg();
+		swap_buffers();
 		}
 	cop_drop=0; frame_count=0; while(frame_count==0);
 	set_plzstart(500);

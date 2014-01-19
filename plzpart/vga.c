@@ -12,7 +12,7 @@ static uint8_t palette[256 * 3];
 #define FRAME_BUFFER_WIDTH 320
 #define FRAME_BUFFER_HEIGHT 480
 
-static uint8_t fb[SCREEN_WIDTH * SCREEN_HEIGHT];
+uint8_t fb[SCREEN_WIDTH * SCREEN_HEIGHT];
 
 
 void vga_select_bitplanes_02()
@@ -75,6 +75,8 @@ void vga_set_palette_entry(int index, int r, int g, int b)
 	palette[index] = b;
 }
 
+extern unsigned char *image;	// The OpenGL background image texture
+
 void vga_show_framebuffer()
 {
 	int x, y;
@@ -90,20 +92,17 @@ void vga_show_framebuffer()
 	for (y = nFirstLineIndex; y < SCREEN_HEIGHT; y++) {
 		for (x = 0; x < SCREEN_WIDTH; x++) {
 			//ASSERT(x + hscroll_offset < FRAME_BUFFER_WIDTH);
-			int nPaletteIndex = fb[fb_offs + x + hscroll_offset];
+			int r, g, b;
+			int idx = fb[fb_offs + x + hscroll_offset] * 3;
 
-#if 0
-			var nPaletteOffset = 0;
-			nPaletteOffset = (nPaletteIndex * 3) + 0;
-			var r = Palette_ReadByte(nPaletteOffset);
-			nPaletteOffset = (nPaletteIndex * 3) + 1;
-			var g = Palette_ReadByte(nPaletteOffset);
-			nPaletteOffset = (nPaletteIndex * 3) + 2;
-			var b = Palette_ReadByte(nPaletteOffset);
+			r = palette[idx++];
+			g = palette[idx++];
+			b = palette[idx];
 
 			// [NK 12/1/2014] VGA colours range from 0 - 63 inclusive, but
 			// [NK 12/1/2014] SDL colours range from 0 - 255 inclusive, so
 			// [NK 12/1/2014] account for this here.
+#if 0
 			r &= 63;
 			g &= 63;
 			b &= 63;
@@ -117,6 +116,11 @@ void vga_show_framebuffer()
 
 			SDL_SetPixelColours(x, y, r, g, b);
 #endif
+
+			int ofs = (y * 320 + x) * 3;
+			image[ofs++] = (r << 2) & 0xff;
+			image[ofs++] = (g << 2) & 0xff;
+			image[ofs]   = (b << 2) & 0xff;
 		}
 
 		fb_offs += FRAME_BUFFER_WIDTH;
