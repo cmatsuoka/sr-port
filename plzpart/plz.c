@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 //#include <conio.h>
@@ -6,8 +7,10 @@
 #include "tweak.h"
 #include "../dis/dis.h"
 
-//#define DO_TABLES
-//#define DPII (3.1415926535*2.0)
+#include "common.h"
+
+#define DO_TABLES
+#define DPII (3.1415926535*2.0)
 
 #define LINELEN 41
 #define MAXY 280
@@ -30,9 +33,13 @@ extern  far int do_pal;
 extern int plzline(int y, int vseg);
 extern int setplzparas(int c1, int c2, int c3, int c4);
 extern int set_plzstart(int y);
-extern char far psini[16384];
-extern int far lsini4[8192];
-extern int far lsini16[8192];
+//extern char far psini[16384];
+//extern int far lsini4[8192];
+//extern int far lsini16[8192];
+
+unsigned char *psini;
+short *lsini4;
+short *lsini16;
 
 //int (* vmem)[LINELEN]=MK_FP(0x0a000,0);
 //char	psini[16384]=
@@ -74,7 +81,7 @@ void plz(){
 
 	init_plz();
 	cop_drop=128;
-	cop_fadepal=pals[curpal++];
+	cop_fadepal=(char *)pals[curpal++];
 
 	frame_count=0;
 	while(!dis_exit())
@@ -84,7 +91,7 @@ void plz(){
 			{
 			memset(fadepal,0,768);
 			cop_drop=1;
-			cop_fadepal=pals[curpal++];
+			cop_fadepal=(char *)pals[curpal++];
 			ttptr++;
 			il1=inittable[ttptr][0];
 			il2=inittable[ttptr][1];
@@ -103,10 +110,10 @@ void plz(){
 
 		setplzparas(k1,k2,k3,k4);
 		for(y=0;y<MAXY;y+=2)
-			plzline(y,0x0a000+y*6+YADD*6);
+			plzline(y,y*6);
 		setplzparas(l1,l2,l3,l4);
 		for(y=1;y<MAXY;y+=2)
-			plzline(y,0x0a000+y*6+YADD*6);
+			plzline(y,y*6);
 
 
 		//asm	mov dx, 3c4h
@@ -115,10 +122,10 @@ void plz(){
 
 		setplzparas(k1,k2,k3,k4);
 		for(y=1;y<MAXY;y+=2)
-			plzline(y,0x0a000+y*6+YADD*6);
+			plzline(y,y*6);
 		setplzparas(l1,l2,l3,l4);
 		for(y=0;y<MAXY;y+=2)
-			plzline(y,0x0a000+y*6+YADD*6);
+			plzline(y,y*6);
 		}
 	cop_drop=0; frame_count=0; while(frame_count==0);
 	set_plzstart(500);
@@ -128,16 +135,13 @@ void plz(){
 void init_plz()
 	{
 	int	a/*,b,c,z*/;
-	int	*pptr=pals;
+	int	*pptr=(int *)pals;
 
+	psini = malloc(16384 + 2 * 8192 + 2 * 8192);
+	lsini4 = (short *)psini + 8192;
+	lsini16 = lsini4 + 8192;
+	
 #ifdef	DO_TABLES
-	{
-	FILE	*f1,*f2,*f3,*f4;
-	f1=fopen("lsini4.inc","wb");
-	f2=fopen("lsini16.inc","wb");
-	f3=fopen("psini.inc","wb");
-	f4=fopen("ptau.inc","wb");
-
 	for(a=0;a<1024*16;a++)
 		{
 		if(a<1024*8)
@@ -146,36 +150,9 @@ void init_plz()
 			lsini16[a]=(sin(a*DPII/4096)*55+sin(a*DPII/4096*4)*5+sin(a*DPII/4096*17)*3+64)*16;
 			}
 		psini[a]=sin(a*DPII/4096)*55+sin(a*DPII/4096*6)*5+sin(a*DPII/4096*21)*4+64;
-		if((a&15)==0)
-			{
-			if(a<1024*8)
-				{
-				fprintf(f1,"\ndw	%4d",lsini4[a]);
-				fprintf(f2,"\ndw	%4d",lsini16[a]);
-				}
-			fprintf(f3,"\ndb	%4d",psini[a]);
-			}
-		else	{
-			if(a<1024*8)
-				{
-				fprintf(f1,",%4d",lsini4[a]);
-				fprintf(f2,",%4d",lsini16[a]);
-				}
-			fprintf(f3,",%4d",psini[a]);
-			}
-		}
-
-	fprintf(f4,"{\n%d",ptau[0]=0);
-	for(a=1;a<=128;a++)
-		{
-		fprintf(f4,",%3d",ptau[a]=cos(a*DPII/128+3.1415926535)*31+32);
-		if(!(a&15)) fputc('\n',f4);
-		}
-	fputc('}',f4); fputc(';',f4);
-
-	fclose(f1); fclose(f2); fclose(f3); fclose(f4);
 	}
 #endif
+
 	tw_opengraph2();
 	cop_start=96*(682-400);
 	set_plzstart(60);
@@ -216,7 +193,7 @@ void init_plz()
 	for(a=0;a<106;a++)*pptr++=0,*pptr++=0,*pptr++=0;
 	for(a=0;a<75;a++) *pptr++=ptau[a*64/75]*8/10,*pptr++=ptau[a*64/75]*9/10,*pptr++=ptau[a*64/75];
 
-	pptr=pals;
+	pptr=(int *)pals;
 	for(a=0;a<768;a++,pptr++) *pptr=(*pptr-63)*2;
 	for(a=768;a<768*5;a++,pptr++) *pptr*=8;
 	}

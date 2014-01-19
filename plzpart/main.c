@@ -1,9 +1,10 @@
 #include "../dis/dis.h"
+#include "common.h"
 
 extern void plz();
 extern void vect();
 
-main()  {
+int main()  {
 	int a = adjust_framerate();
 	dis_partstart();
 	init_copper();

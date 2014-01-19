@@ -1,6 +1,6 @@
 
-PLZPART_OBJS	= plz.o plza.o plzfill.o copper.o asmyt.o psini.o tweak.o \
-		  vect.o main.o sinit.o spline.o
+PLZPART_OBJS	= plz.o plza.o plzfill.o copper.o asmyt.o tweak.o \
+		  vect.o main.o sinit.o spline.o vga.o
 
 PLZPART_PATH	= plzpart
 
@@ -16,6 +16,6 @@ default-plzpart:
 plzpart-all: $(PLZPART_PATH)/$(PLZPART_BIN)
 
 $(PLZPART_PATH)/$(PLZPART_BIN): $(PLZPART_PATH_OBJS)
-	$(LD) -o $@ $(LDFLAGS) $(PLZPART_PATH_OBJS) $(LIBS) -lSOIL
+	$(LD) -o $@ $(LDFLAGS) $(PLZPART_PATH_OBJS) $(LIBS)
 
 plz.c: tweak.h ptau.pre
