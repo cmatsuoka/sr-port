@@ -1,6 +1,6 @@
 
-PLZPART_OBJS	= plz.o plza.o plzfill.o copper.o asmyt.o tweak.o \
-		  vect.o main.o sinit.o spline.o vga.o opengl.o
+PLZPART_OBJS	= plz.o copper.o asmyt.o tweak.o vect.o vga.o opengl.o \
+		  plza.o plzfill.o sinit.o spline.o main.o
 
 PLZPART_PATH	= plzpart
 

@@ -76,8 +76,8 @@ extern far long	ay1,ay2,ax1,ax2,xx1,yy1,xx2,yy2;
 extern far long	txx1,txy1,tay1,tax1;
 extern far long	txx2,txy2,tay2,tax2;
 
-char*	kuvataus[]={FP_SEG(kuva1),FP_SEG(kuva2),FP_SEG(kuva3),FP_SEG(kuva1)};
-char*	disttaus[]={FP_SEG(dist1),FP_SEG(dist1),FP_SEG(dist1),FP_SEG(dist1)};
+char*	kuvataus[]={&kuva1[0][0],&kuva2[0][0],&kuva3[0][0],&kuva1[0][0]};
+char*	disttaus[]={&dist1[0][0],&dist1[0][0],&dist1[0][0],&dist1[0][9]};
 
 void do_poly(x1,y1,x2,y2,x3,y3,x4,y4,color, dd)
 int	x1,y1,x2,y2,x3,y3,x4,y4,color, dd;

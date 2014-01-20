@@ -5,6 +5,7 @@
 //#include <io.h>
 #include <fcntl.h>
 #include "tweak.h"
+#include "../dis/dis.h"
 
 #define SX sinit[kx]
 #define SY sinit[ky]
@@ -16,11 +17,11 @@
 extern	far char (* far vmem)[160];
 extern char far pal[768];
 
-extern clear();
-extern init();
-extern shadepal(char far *fpal, char far *ppal, int shade);
-extern	init_copper();
-extern	close_copper();
+extern void clear();
+//extern init();
+extern void shadepal(char far *fpal, char far *ppal, int shade);
+extern	int init_copper();
+extern	int close_copper();
 extern 	int far cop_rotatev;
 extern	far int frame_count;
 extern  far char * far cop_pal;
@@ -107,9 +108,16 @@ int	ls_kx=0,ls_ky=0,ls_kz=0,ls_x=0,ls_y=0,ls_z=128;
 int 	page=0;
 int	frames=0;
 
+void sort_faces(void);
+void draw(int);
+void swappage(void);
+void rotate(void);
+void count_const(void);
+void calculate(int);
+
 void vect()
 	{
-	int	c=0,a;
+	int	/*c=0,*/a;
 
 	tw_opengraph();
 
@@ -131,8 +139,8 @@ void vect()
 
 void calculate(int k)
 	{
-	int	a;
-	static int px=0,py=256;
+	//int	a;
+	//static int px=0,py=256;
 
 	getspl(4*256+frames*4);
         kx=kx&1023;
@@ -163,31 +171,31 @@ void count_const()
 	//12=Xcos*Zcos*Ysin	14=Xcos*Ysin*Zsin	16=Ycos*Xcos
 	//   +Xsin*Zsin		   -Xsin*Zcos
 
-	cxx=(long)CY*(long)CZ>>15+7;
-	cxy=(long)CY*(long)SZ>>15+7;
-	cxz=-(long)SY>>7;
+	cxx=CY*CZ>>(15+7);
+	cxy=CY*SZ>>(15+7);
+	cxz=-SY>>7;
 
-	cyx=((long)SX*(long)CZ+16384L>>15)*(long)SY - (long)CX*(long)SZ>>15+7;
-	cyy=((long)SX*(long)SY+16384L>>15)*(long)SZ + (long)CX*(long)CZ>>15+7;
-	cyz=(long)CY*(long)SX>>15+7;
+	cyx=(((SX*CZ+16384L)>>15)*SY - CX*SZ)>>(15+7);
+	cyy=(((SX*SY+16384L)>>15)*SZ + CX*CZ)>>(15+7);
+	cyz=CY*SX>>(15+7);
 
-	czx=((long)CX*(long)CZ+16384L>>15)*(long)SY + (long)SX*(long)SZ>>15+7;
-	czy=((long)CX*(long)SY+16384L>>15)*(long)SZ - (long)SX*(long)CZ>>15+7;
-	czz=(long)CY*(long)CX>>15+7;
+	czx=(((CX*CZ+16384L)>>15)*SY + SX*SZ)>>(15+7);
+	czy=(((CX*SY+16384L)>>15)*SZ - SX*CZ)>>(15+7);
+	czz=CY*CX>>(15+7);
 
 	}
 
 void rotate()
 	{
-	int	a,b,x,y,z,xx,yy,zz;
+	int	a,/*b,*/x,y,z,xx,yy,zz;
 
 	for(a=0;a<object.pnts;a++)
 		{
 		x=object.point[a].x; y=object.point[a].y; z=object.point[a].z;
 
-		object.point[a].xx=xx=((x*cxx>>1) + (y*cxy>>1) + (z*cxz>>1)>>7)+tx;
-		object.point[a].yy=yy=((x*cyx>>1) + (y*cyy>>1) + (z*cyz>>1)>>7)+ty;
-		object.point[a].zz=zz=((x*czx>>1) + (y*czy>>1) + (z*czz>>1)>>7)+dis;
+		object.point[a].xx=xx=(((x*cxx>>1) + (y*cxy>>1) + (z*cxz>>1))>>7)+tx;
+		object.point[a].yy=yy=(((x*cyx>>1) + (y*cyy>>1) + (z*cyz>>1))>>7)+ty;
+		object.point[a].zz=zz=(((x*czx>>1) + (y*czy>>1) + (z*czz>>1))>>7)+dis;
 
 /*
 		1000,1000,1000
@@ -202,8 +210,8 @@ void rotate()
 
 void sort_faces()
 	{
-	int 	a=0,b,c,x,y,z,p=0;
-	long	ax,ay,az,bx,by,bz,kx,ky,kz,nx,ny,nz,s,l;
+	int 	a=0,/*b,*/c,x,y,z,p=0;
+	long	ax,ay,az,bx,by,bz,/*kx,ky,kz,*/nx,ny,nz,s/*,l*/;
 
 	while(a<object.faces)
 		{
@@ -246,10 +254,10 @@ void sort_faces()
 	}
 
 
-void draw()
+void draw(int notused)
 	{
-	int 	a=0,b,c,f,x,y,z;
-	long	ax,ay,az,bx,by,bz,kx,ky,kz,nx,ny,nz,s;
+	int 	a=0,/*b,*/c/*,f,x,y,z*/;
+	//long	ax,ay,az,bx,by,bz,kx,ky,kz,nx,ny,nz,s;
 
 	for(a=0;a<polys;a++)
 		{
