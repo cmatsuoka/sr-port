@@ -71,6 +71,13 @@ int	inittable[10][8]={{1000,2000,3000,4000,3500,2300,3900,3670},
 			  {1000,2000,3000,4000,3500,2300,3900,3670},
 			  {1000,2000,3000,4000,3500,2300,3900,3670}};
 
+int fixme_dis_getmframe()
+{
+        static int s_nResult = 0;
+        s_nResult++;
+        return s_nResult;
+}
+
 void plz(){
 	register int /*x,*/y;
 	//int	*ptr;
@@ -88,7 +95,7 @@ void plz(){
 	while(!dis_exit())
 		{
 		tim+=frame_count; frame_count=0; count++;
-		if(dis_getmframe()>timetable[ttptr])
+		if(fixme_dis_getmframe()>timetable[ttptr])
 			{
 			memset(fadepal,0,768);
 			cop_drop=1;
@@ -114,11 +121,10 @@ void plz(){
 
 		setplzparas(k1,k2,k3,k4);
 		for(y=0;y<MAXY;y+=2)
-			plzline(y,y*6);
+			plzline(y,y*6+YADD*6);
 		setplzparas(l1,l2,l3,l4);
 		for(y=1;y<MAXY;y+=2)
-			plzline(y,y*6);
-
+			plzline(y,y*6+YADD*6);
 
 		// [nk] VGA: select bit planes 1,3 (?)
 		//asm	mov dx, 3c4h
@@ -129,10 +135,10 @@ void plz(){
 
 		setplzparas(k1,k2,k3,k4);
 		for(y=1;y<MAXY;y+=2)
-			plzline(y,y*6);
+			plzline(y,y*6+YADD*6);
 		setplzparas(l1,l2,l3,l4);
 		for(y=0;y<MAXY;y+=2)
-			plzline(y,y*6);
+			plzline(y,y*6+YADD*6);
 
 		vga_show_framebuffer();
 		draw_bg();

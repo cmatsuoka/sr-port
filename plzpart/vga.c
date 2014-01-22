@@ -12,7 +12,7 @@ static uint8_t palette[256 * 3];
 #define FRAME_BUFFER_WIDTH 384
 #define FRAME_BUFFER_HEIGHT 400
 
-uint8_t fb[SCREEN_WIDTH * SCREEN_HEIGHT];
+uint8_t fb[FRAME_BUFFER_WIDTH * FRAME_BUFFER_HEIGHT];
 
 
 void vga_select_bitplanes_02()
@@ -80,6 +80,9 @@ extern unsigned char *image;	// The OpenGL background image texture
 void vga_show_framebuffer()
 {
 	int x, y;
+
+	// Clear the screen.
+	memset(image, 0, 320 * 480 * 3);
 
 	copper1();
 	copper2();

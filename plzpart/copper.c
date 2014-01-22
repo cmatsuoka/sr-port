@@ -96,7 +96,7 @@ void pompota()
 		// [NK 12/1/2014] Moving the starting line up and down each alternate frame
 		// [NK 12/1/2014] doesn't look good in windowed mode.
 		// [NK 13/1/2014] Seems to work okay in fullscreen mode though.
-		//vga_set_line_compare(61);
+		vga_set_line_compare(61);
 		cop_scrl = 0;
 	}
 #endif
@@ -112,6 +112,7 @@ void moveplz()
 	k3 &= 4095;
 	k4 += 2;
 	k4 &= 4095;
+
 	l1 += -1;
 	l1 &= 4095;
 	l2 += -2;
@@ -132,13 +133,6 @@ void do_drop()
 		//@@over
 
 		int bShouldFade = 0;
-
-#if 0
-		// [NK 18/1/2014] Hack for looping back to the first plasma.
-		if ((cop_drop == 65) && (ttptr == 0)) {
-			cop_drop = 128;
-		}
-#endif
 
 		if (cop_drop >= 256) {
 		} else if (cop_drop >= 128) {
