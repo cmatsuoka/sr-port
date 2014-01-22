@@ -105,9 +105,12 @@ void plz(){
 			}
 		if(curpal==5 && cop_drop>64) break;
 
+		// [nk] VGA: select bit planes 0,2 (?)
 		//asm	mov dx, 3c4h
 		//asm	mov ax, 0a02h
 		//asm	out dx, ax
+
+		vga_select_bitplanes_02();
 
 		setplzparas(k1,k2,k3,k4);
 		for(y=0;y<MAXY;y+=2)
@@ -117,9 +120,12 @@ void plz(){
 			plzline(y,y*6);
 
 
+		// [nk] VGA: select bit planes 1,3 (?)
 		//asm	mov dx, 3c4h
 		//asm	mov ax, 0502h
 		//asm	out dx, ax
+
+		vga_select_bitplanes_13();
 
 		setplzparas(k1,k2,k3,k4);
 		for(y=1;y<MAXY;y+=2)
@@ -155,6 +161,11 @@ void init_plz()
 			lsini16[a]=(sin(a*DPII/4096)*55+sin(a*DPII/4096*4)*5+sin(a*DPII/4096*17)*3+64)*16;
 			}
 		psini[a]=sin(a*DPII/4096)*55+sin(a*DPII/4096*6)*5+sin(a*DPII/4096*21)*4+64;
+	}
+
+	for(a=1;a<=128;a++)
+	{
+		ptau[a]=cos(a*DPII/128+3.1415926535)*31+32;
 	}
 #endif
 
@@ -198,7 +209,7 @@ void init_plz()
 	for(a=0;a<106;a++)*pptr++=0,*pptr++=0,*pptr++=0;
 	for(a=0;a<75;a++) *pptr++=ptau[a*64/75]*8/10,*pptr++=ptau[a*64/75]*9/10,*pptr++=ptau[a*64/75];
 
-	pptr=(int *)pals;
+	pptr=&pals[0][0];
 	for(a=0;a<768;a++,pptr++) *pptr=(*pptr-63)*2;
 	for(a=768;a<768*5;a++,pptr++) *pptr*=8;
 	}

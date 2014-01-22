@@ -8,9 +8,9 @@ static int hscroll_offset = 0;
 static uint8_t palette[256 * 3];
 
 #define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 480
-#define FRAME_BUFFER_WIDTH 320
-#define FRAME_BUFFER_HEIGHT 480
+#define SCREEN_HEIGHT 400
+#define FRAME_BUFFER_WIDTH 384
+#define FRAME_BUFFER_HEIGHT 400
 
 uint8_t fb[SCREEN_WIDTH * SCREEN_HEIGHT];
 
@@ -47,7 +47,7 @@ void vga_write32(int offset, int val)
 	// offset = 0, 4, 8, etc
 
 	for (i = 0; i < 4; i++) {
-		if (!plane_select[i]) {
+		if (plane_select[i]) {
 			for (j = 0; j < 4; j++) {
 				// Get byte to write.
 				uint8_t b = (val >> (j * 8));
@@ -87,13 +87,13 @@ void vga_show_framebuffer()
 	int nFirstLineIndex = (line_compare + 1);
 
 	// Plot the palettised frame buffer.
-	int fb_offs = 0;
+	uint8_t *ptr = fb;
 
 	for (y = nFirstLineIndex; y < SCREEN_HEIGHT; y++) {
 		for (x = 0; x < SCREEN_WIDTH; x++) {
 			//ASSERT(x + hscroll_offset < FRAME_BUFFER_WIDTH);
 			int r, g, b;
-			int idx = fb[fb_offs + x + hscroll_offset] * 3;
+			int idx = ptr[x + hscroll_offset] * 3;
 
 			r = palette[idx++];
 			g = palette[idx++];
@@ -123,7 +123,7 @@ void vga_show_framebuffer()
 			image[ofs]   = (b << 2) & 0xff;
 		}
 
-		fb_offs += FRAME_BUFFER_WIDTH;
+		ptr += FRAME_BUFFER_WIDTH;
 	}
 }
 

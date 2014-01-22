@@ -89,7 +89,7 @@ void getrgb(int c, char *p)
 void draw_bg()
 {
 	//glActiveTexture(GL_TEXTURE0);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 320, 480, GL_RGB,
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 320, 400, GL_RGB,
 					GL_UNSIGNED_BYTE, image);
 	glUseProgram(bg_program.program);
 	u2gl_draw_textured_triangle_strip(&bg_program, bg_obj, 4);
@@ -109,9 +109,9 @@ static void init_texture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	image = calloc(3, 320 * 480);
+	image = calloc(3, 320 * 400);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 320, 480, 0, GL_RGB,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 320, 400, 0, GL_RGB,
 				GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	u2gl_check_error("init_texture 1");

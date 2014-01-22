@@ -157,8 +157,6 @@ void do_drop()
 				initpparas();
 			} else {
 				int i, ccc;
-				int cop_fadepal_idx = 0;
-				int fadepal_idx = 0;
 
 				vga_set_line_compare(60);
 
@@ -183,8 +181,8 @@ void do_drop()
 						pfadepal[ccc] += ah + carry;
 					}
 
-					cop_fadepal_idx += 32;
-					fadepal_idx += 16;
+					pcop_fadepal += 32;
+					pfadepal += 16;
 				}
 			}
 		} else {
