@@ -1,7 +1,6 @@
 #include <string.h>
 #include "common.h"
 
-//var g_au8FrameBuffer = new Uint8Array(FRAME_BUFFER_WIDTH * FRAME_BUFFER_HEIGHT);
 static int plane_select[4] = { 0, 0, 0, 0 };
 static int line_compare = 0;
 static int hscroll_offset = 0;
@@ -82,7 +81,7 @@ void vga_show_framebuffer()
 	int x, y;
 
 	// Clear the screen.
-	memset(image, 0, 320 * 480 * 3);
+	memset(image, 0, FRAME_BUFFER_WIDTH * FRAME_BUFFER_HEIGHT * 3);
 
 	copper1();
 	copper2();
@@ -101,24 +100,6 @@ void vga_show_framebuffer()
 			r = palette[idx++];
 			g = palette[idx++];
 			b = palette[idx];
-
-			// [NK 12/1/2014] VGA colours range from 0 - 63 inclusive, but
-			// [NK 12/1/2014] SDL colours range from 0 - 255 inclusive, so
-			// [NK 12/1/2014] account for this here.
-#if 0
-			r &= 63;
-			g &= 63;
-			b &= 63;
-
-			r *= 255;
-			r /= 63;
-			g *= 255;
-			g /= 63;
-			b *= 255;
-			b /= 63;
-
-			SDL_SetPixelColours(x, y, r, g, b);
-#endif
 
 			int ofs = (y * 320 + x) * 3;
 			image[ofs++] = (r << 2) & 0xff;

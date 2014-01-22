@@ -144,7 +144,7 @@ void plz(){
 		draw_bg();
 		swap_buffers();
 		}
-	cop_drop=0; frame_count=0; while(frame_count==0);
+	cop_drop=0; frame_count=0; //while(frame_count==0);
 	set_plzstart(500);
 	cop_plz=0;
 	}

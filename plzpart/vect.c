@@ -121,7 +121,8 @@ void vect()
 
 	tw_opengraph();
 
-	while(dis_musplus()<13 && !dis_exit()); frame_count=0;
+	//while(dis_musplus()<13 && !dis_exit());
+	frame_count=0;
 	while(!dis_exit())
 		{
 		a=dis_musplus();

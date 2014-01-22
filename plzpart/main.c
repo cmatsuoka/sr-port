@@ -20,7 +20,7 @@ int main(int argc, char **argv)  {
 	init_copper();
 	initvect();
 	plz();
-	vect();
+	//vect();
 	close_copper();
 	return 0;
 	}
