@@ -53,7 +53,7 @@ void init_plz(void);
 char	ptau[256]=
 #include "ptau.pre"
 
-int	pals[6][768];
+int16_t	pals[6][768];
 int	curpal=0;
 int	timetable[10]={64*6*2-45,64*6*4-45,64*6*5-45,64*6*6-45,64*6*7+90,0};
 int	ttptr=0;
@@ -152,7 +152,7 @@ void plz(){
 void init_plz()
 	{
 	int	a/*,b,c,z*/;
-	int	*pptr=(int *)pals;
+	int16_t	*pptr=(int16_t *)pals;
 
 	psini = malloc(16384 + 2 * 8192 + 2 * 8192);
 	lsini4 = (short *)psini + 8192;

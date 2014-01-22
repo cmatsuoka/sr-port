@@ -102,9 +102,9 @@ void vga_show_framebuffer()
 			b = palette[idx];
 
 			int ofs = (y * 320 + x) * 3;
-			image[ofs++] = (r << 2) & 0xff;
-			image[ofs++] = (g << 2) & 0xff;
-			image[ofs]   = (b << 2) & 0xff;
+			image[ofs++] = r << 2;
+			image[ofs++] = g << 2;
+			image[ofs]   = b << 2;
 		}
 
 		ptr += FRAME_BUFFER_WIDTH;
