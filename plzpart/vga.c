@@ -94,7 +94,7 @@ void vga_show_framebuffer()
 	for (y = nFirstLineIndex; y < SCREEN_HEIGHT; y++) {
 		for (x = 0; x < SCREEN_WIDTH; x++) {
 			//ASSERT(x + hscroll_offset < FRAME_BUFFER_WIDTH);
-			int r, g, b;
+			uint8_t r, g, b;
 			int idx = ptr[x + hscroll_offset] * 3;
 
 			r = palette[idx++];

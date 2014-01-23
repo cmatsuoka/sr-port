@@ -44,7 +44,7 @@ static const char fragment_shader_texture[] =
 "varying vec2 vTexPosition;\n"
 "\n"
 "void main() {\n"
-"    gl_FragColor = texture2D(uTexture, vTexPosition) * 0.4;\n"
+"    gl_FragColor = texture2D(uTexture, vTexPosition);\n"
 "}\n";
 
 
