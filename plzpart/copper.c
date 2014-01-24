@@ -1,3 +1,7 @@
+/*
+ * Written by Nick Kovac with minor changes by Claudio Matsuoka
+ */
+
 #include "common.h"
 
 int frame_count = 0;

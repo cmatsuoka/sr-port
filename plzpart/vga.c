@@ -1,3 +1,7 @@
+/*
+ * Written by Nick Kovac with minor changes by Claudio Matsuoka
+ */
+
 #include <string.h>
 #include "common.h"
 

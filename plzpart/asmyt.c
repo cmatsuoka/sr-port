@@ -1,3 +1,7 @@
+/*
+ * Written by Nick Kovac with minor changes by Claudio Matsuoka
+ */
+
 #include "common.h"
 
 static uint16_t selfmod[5][84];
