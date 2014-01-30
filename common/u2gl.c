@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <GLES2/gl2.h>
-#include <GL/glu.h>
 #include "u2gl.h"
 
 static float tex_coords[8];
