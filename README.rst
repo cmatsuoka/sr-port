@@ -17,7 +17,13 @@ Notes
 
 * Pixel art upscaled with 4xbrz.
 
+Dependencies
+------------
 
+libsoil-dev
+libgles2-mesa-dev
+
+Screenshots and further information
+-----------------------------------
 
 See https://github.com/cmatsuoka/sr-port/wiki/Second-Reality-port-notes
-for screenshots and further information.
