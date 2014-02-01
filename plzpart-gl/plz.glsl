@@ -5,7 +5,8 @@ uniform float	iGlobalTime;		// shader playback time (in seconds)
 
 
 
-#define DPII (3.1415926535*2.0)
+#define PI 3.1415926535
+#define DPII (PI*2.0)
 
 // The original code had a "pompota" function that would toggle the VGA
 // horizontal scroll offset each frame between values of 0 and 4, as well
@@ -291,9 +292,8 @@ int GetC1(int nXOffset0or1, int t)
 	if (fResult < 0.0) {
 		fResult += 4096.0;
 	}
-	nResult = int(fResult);
 
-	return nResult;
+	return int(fResult);
 }
 
 int GetC2(int nXOffset0or1, int t)
@@ -314,9 +314,8 @@ int GetC2(int nXOffset0or1, int t)
 	if (fResult < 0.0) {
 		fResult += 4096.0;
 	}
-	nResult = int(fResult);
 
-	return nResult;
+	return int(fResult);
 }
 
 int GetC3(int nXOffset0or1, int t)
@@ -337,9 +336,8 @@ int GetC3(int nXOffset0or1, int t)
 	if (fResult < 0.0) {
 		fResult += 4096.0;
 	}
-	nResult = int(fResult);
 
-	return nResult;
+	return int(fResult);
 }
 
 int GetC4(int nXOffset0or1, int t)
@@ -360,9 +358,8 @@ int GetC4(int nXOffset0or1, int t)
 	if (fResult < 0.0) {
 		fResult += 4096.0;
 	}
-	nResult = int(fResult);
 
-	return nResult;
+	return int(fResult);
 }
 
 float Palette0_GetRed(float nIndex)
@@ -380,7 +377,7 @@ float Palette0_GetRed(float nIndex)
 		a = nIndex - 192.0;
 	}
 
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
+	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
 	fResult /= 63.0;
 
 	return fResult;
@@ -388,22 +385,7 @@ float Palette0_GetRed(float nIndex)
 
 float Palette0_GetGreen(float nIndex)
 {
-	float a = 0.0;
-
-	if ((nIndex >= 0.0) && (nIndex < 64.0)) {
-		a = 0.0;
-	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
-		a = 0.0;
-	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
-		a = 0.0;
-	} else {
-		a = 0.0;
-	}
-
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
+	return 0.0;
 }
 
 float Palette0_GetBlue(float nIndex)
@@ -417,11 +399,10 @@ float Palette0_GetBlue(float nIndex)
 	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
 		a = nIndex - 128.0;
 	} else {
-		a = nIndex - 192.0;
-		a = 63.0 - a;
+		a = 63.0 - (nIndex - 192.0);
 	}
 
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
+	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
 	fResult /= 63.0;
 
 	return fResult;
@@ -434,15 +415,14 @@ float Palette1_GetRed(float nIndex)
 	if ((nIndex >= 0.0) && (nIndex < 64.0)) {
 		a = nIndex;
 	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
-		a = nIndex - 64.0;
-		a = 63.0 - a;
+		a = 63.0 - (nIndex - 64.0);
 	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
 		a = 0.0;
 	} else {
 		a = nIndex - 192.0;
 	}
 
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
+	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
 	fResult /= 63.0;
 
 	return fResult;
@@ -462,7 +442,7 @@ float Palette1_GetGreen(float nIndex)
 		a = 63.0;
 	}
 
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
+	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
 	fResult /= 63.0;
 
 	return fResult;
@@ -477,13 +457,12 @@ float Palette1_GetBlue(float nIndex)
 	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
 		a = nIndex - 64.0;
 	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
-		a = nIndex - 128.0;
-		a = 63.0 - a;
+		a = 63.0 - (nIndex - 128.0);
 	} else {
 		a = nIndex - 192.0;
 	}
 
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
+	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
 	fResult /= 63.0;
 
 	return fResult;
@@ -498,185 +477,17 @@ float Palette2_GetRed(float nIndex)
 	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
 		a = nIndex - 64.0;
 	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
-		a = nIndex - 128.0;
-		a = 63.0 - a;
+		a = 63.0 - (nIndex - 128.0);
 	} else {
 		a = 0.0;
 	}
 
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
+	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
 	fResult /= 2.0;
 	fResult /= 63.0;
 
 	return fResult;
 }
-
-float Palette2_GetGreen(float nIndex)
-{
-	float a = 0.0;
-
-	if ((nIndex >= 0.0) && (nIndex < 64.0)) {
-		a = 0.0;
-	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
-		a = nIndex - 64.0;
-	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
-		a = nIndex - 128.0;
-		a = 63.0 - a;
-	} else {
-		a = 0.0;
-	}
-
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
-	fResult /= 2.0;
-	fResult /= 63.0;
-
-	return fResult;
-}
-
-float Palette2_GetBlue(float nIndex)
-{
-	float a = 0.0;
-
-	if ((nIndex >= 0.0) && (nIndex < 64.0)) {
-		a = 0.0;
-	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
-		a = nIndex - 64.0;
-	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
-		a = nIndex - 128.0;
-		a = 63.0 - a;
-	} else {
-		a = 0.0;
-	}
-
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
-	fResult /= 2.0;
-	fResult /= 63.0;
-
-	return fResult;
-}
-
-/*
-float Palette3_GetRed(int nIndex)
-{
-	float a = 0.0;
-
-	if ((nIndex >= 0) && (nIndex < 64)) {
-		a = float(nIndex);
-	} else if ((nIndex >= 64) && (nIndex < 128)) {
-		a = 63.0;
-	} else if ((nIndex >= 128) && (nIndex < 192)) {
-		a = float(nIndex) - 128.0;
-		a = 63.0 - a;
-	} else {
-		a = 0.0;
-	}
-
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
-}
-float Palette3_GetGreen(int nIndex)
-{
-	float a = 0.0;
-
-	if ((nIndex >= 0) && (nIndex < 64)) {
-		a = 0.0;
-	} else if ((nIndex >= 64) && (nIndex < 128)) {
-		a = float(nIndex) - 64.0;
-	} else if ((nIndex >= 128) && (nIndex < 192)) {
-		a = float(nIndex) - 128.0;
-		a = 63.0 - a;
-	} else {
-		a = 0.0;
-	}
-
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
-}
-
-float Palette3_GetBlue(int nIndex)
-{
-	float a = 0.0;
-
-	if ((nIndex >= 0) && (nIndex < 64)) {
-		a = 0.0;
-	} else if ((nIndex >= 64) && (nIndex < 128)) {
-		a = float(nIndex) - 64.0;
-	} else if ((nIndex >= 128) && (nIndex < 192)) {
-		a = 63.0;
-	} else {
-		a = 63.0;
-	}
-
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
-}
-
-float Palette4_GetRed(int nIndex)
-{
-	float a = 0.0;
-
-	if ((nIndex >= 0) && (nIndex < 75)) {
-		a = float(nIndex);
-		a = 63.0 - a * 64.0 / 75.0;
-	} else if ((nIndex >= 75) && (nIndex < 181)) {
-		return 0.0;
-	} else {
-		a = float(nIndex) - 181.0;
-		a = (a * 64.0 / 75.0) * 8.0 / 10.0;
-	}
-
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
-}
-
-float Palette4_GetGreen(int nIndex)
-{
-	float a = 0.0;
-
-	if ((nIndex >= 0) && (nIndex < 75)) {
-		a = float(nIndex);
-		a = 63.0 - a * 64.0 / 75.0;
-	} else if ((nIndex >= 75) && (nIndex < 181)) {
-		return 0.0;
-	} else {
-		a = float(nIndex) - 181.0;
-		a = (a * 64.0 / 75.0) * 9.0 / 10.0;
-	}
-
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
-}
-
-float Palette4_GetBlue(int nIndex)
-{
-	float a = 0.0;
-
-	if ((nIndex >= 0) && (nIndex < 75)) {
-		a = float(nIndex);
-		a = 63.0 - a * 64.0 / 75.0;
-	} else if ((nIndex >= 75) && (nIndex < 181)) {
-		return 0.0;
-	} else {
-		a = float(nIndex) - 181.0;
-		a = (a * 64.0 / 75.0);
-	}
-
-	float fResult = cos(a*(3.1415926535*2.0)/128.0+3.1415926535)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
-}
-*/
 
 float Palette_GetRed(float nIndex, int t)
 {
@@ -710,11 +521,11 @@ float Palette_GetGreen(float nIndex, int t)
 	} else if (nPlasmaIndex == 1) {
 		fResult = Palette1_GetGreen(nIndex);
 	} else if (nPlasmaIndex == 2) {
-		fResult = Palette2_GetGreen(nIndex);
+		fResult = Palette2_GetRed(nIndex);
 	} else if (nPlasmaIndex == 3) {
 		fResult = Palette1_GetGreen(nIndex);
 	} else if (nPlasmaIndex == 4) {
-		fResult = Palette2_GetGreen(nIndex);
+		fResult = Palette2_GetRed(nIndex);
 	}
 
 	return fResult;
@@ -730,11 +541,11 @@ float Palette_GetBlue(float nIndex, int t)
 	} else if (nPlasmaIndex == 1) {
 		fResult = Palette1_GetBlue(nIndex);
 	} else if (nPlasmaIndex == 2) {
-		fResult = Palette2_GetBlue(nIndex);
+		fResult = Palette2_GetRed(nIndex);
 	} else if (nPlasmaIndex == 3) {
 		fResult = Palette1_GetBlue(nIndex);
 	} else if (nPlasmaIndex == 4) {
-		fResult = Palette2_GetBlue(nIndex);
+		fResult = Palette2_GetRed(nIndex);
 	}
 
 	return fResult;
