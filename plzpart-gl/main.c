@@ -20,7 +20,7 @@ int main(int argc, char **argv)  {
 	//init_copper();
 	//initvect();
 
-	while(!dis_exit()) {
+	while(!dis_exit() && time < 32.32) {
 		draw_bg(time);
 		swap_buffers();
 		time += (float)adjust_framerate() / 60;

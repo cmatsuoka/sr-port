@@ -122,10 +122,6 @@ float FadeColourComponent(float c, int t)
 		// For plasma 3, fade from black to the palette.
 		fProportion = float(t-1491-64) / 31.0;
 		fResult = (fProportion * c) + ((1.0 - fProportion) * 0.0);
-	} else if ( (t >= (1875+64)) && (t < (1875+64+32)) ) {
-		// For plasma 4, fade from black to the palette.
-		fProportion = float(t-1875-64) / 31.0;
-		fResult = (fProportion * c) + ((1.0 - fProportion) * 0.0);
 	}
 
 	return fResult;
