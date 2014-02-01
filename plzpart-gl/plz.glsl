@@ -6,13 +6,6 @@ uniform float	iGlobalTime;		// shader playback time (in seconds)
 #define PI 3.1415926535
 #define DPII (PI*2.0)
 
-// The original code had a "pompota" function that would toggle the VGA
-// horizontal scroll offset each frame between values of 0 and 4, as well
-// as toggle the vertical start position between 60 and 61. This effect
-// doesn't seem to  work that well now, so it has been disabled.
-
-#define POMPOTA 0
-
 int GetPerPlasmaTime(int t)
 {
 	// Get the time since this plasma started using the total time.
@@ -53,23 +46,6 @@ int GetPlasmaIndex(int t)
 	return nPlasmaIndex;
 }
 
-int GetXOffset(int t)
-{
-#if POMPOTA == 1
-	int nResult = 4;
-	float fT = float(t);
-	int nMod = int(mod(fT, 2.0));
-
-	if (nMod != 0) {
-		nResult = 0;
-	}
-	return nResult;
-
-#else //POMPOTA == 1
-		return 0;
-#endif //POMPOTA == 1
-}
-
 int GetYOffset(int t)
 {
 	int nResult = 60;
@@ -92,15 +68,6 @@ int GetYOffset(int t)
 	if (bDrop) {
 		nResult = t * t / 4 * 43 / 128 + 60;
 	}
-#if POMPOTA == 1
-	else {
-		float fT = float(t);
-		int nMod = int(mod(fT, 2.0));
-		if (nMod != 0) {
-			nResult = 61;
-		}
-	}
-#endif //POMPOTA == 1
 
 	return nResult;
 }
@@ -328,9 +295,7 @@ float Palette0_GetBlue(float nIndex)
 {
 	float a = 0.0;
 
-	if ((nIndex >= 0.0) && (nIndex < 64.0)) {
-		a = 0.0;
-	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
+	if ((nIndex >= 0.0) && (nIndex < 128.0)) {
 		a = 0.0;
 	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
 		a = nIndex - 128.0;
@@ -341,30 +306,11 @@ float Palette0_GetBlue(float nIndex)
 	return (cos(a*DPII/128.0+PI)*31.0+32.0) / 63.0;
 }
 
-float Palette1_GetRed(float nIndex)
-{
-	float a = 0.0;
-
-	if ((nIndex >= 0.0) && (nIndex < 64.0)) {
-		a = nIndex;
-	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
-		a = 63.0 - (nIndex - 64.0);
-	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
-		a = 0.0;
-	} else {
-		a = nIndex - 192.0;
-	}
-
-	return (cos(a*DPII/128.0+PI)*31.0+32.0) / 63.0;
-}
-
 float Palette1_GetGreen(float nIndex)
 {
 	float a = 0.0;
 
-	if ((nIndex >= 0.0) && (nIndex < 64.0)) {
-		a = 0.0;
-	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
+	if ((nIndex >= 0.0) && (nIndex < 128.0)) {
 		a = 0.0;
 	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
 		a = nIndex - 128.0;
@@ -418,7 +364,7 @@ float Palette_GetRed(float nIndex, int t)
 	if (nPlasmaIndex == 0) {
 		fResult = Palette0_GetRed(nIndex);
 	} else if (nPlasmaIndex == 1) {
-		fResult = Palette1_GetRed(nIndex);
+		fResult = Palette0_GetRed(nIndex);
 	} else if (nPlasmaIndex == 2) {
 		fResult = Palette2_GetRed(nIndex);
 	}
@@ -442,6 +388,7 @@ float Palette_GetGreen(float nIndex, int t)
 
 	return fResult;
 }
+
 float Palette_GetBlue(float nIndex, int t)
 {
 	int nPlasmaIndex = GetPlasmaIndex(t);
@@ -475,7 +422,7 @@ void main(void)
 	fPlasmaY = 399.0 - fPlasmaY;
 
 	fPlasmaY -= float(GetYOffset(t));
-	fPlasmaX += float(GetXOffset(t));
+	/* fPlasmaX += float(GetXOffset(t)); */
 
 	float fRed = 0.0;
 	float fGreen = 0.0;
