@@ -3,8 +3,6 @@ precision mediump float;
 uniform vec3	iResolution;		// viewport resolution (in pixels)
 uniform float	iGlobalTime;		// shader playback time (in seconds)
 
-
-
 #define PI 3.1415926535
 #define DPII (PI*2.0)
 
@@ -50,12 +48,6 @@ int GetPlasmaIndex(int t)
 		nPlasmaIndex = 1;
 	} else if (t < 1875+64) {
 		nPlasmaIndex = 2;
-	} else if (t < 2259+64) {
-		nPlasmaIndex = 3;
-	} else if (t < 2278+64) {
-		nPlasmaIndex = 4;
-	} else {
-		nPlasmaIndex = 5;
 	}
 
 	return nPlasmaIndex;
@@ -145,14 +137,8 @@ int GetInitialL1(int nPlasmaIndex)
 		return 1000;
 	} else if (nPlasmaIndex == 1) {
 		return 1000;
-	} else if (nPlasmaIndex == 2) {
+	} else /* if (nPlasmaIndex == 2) */ {
 		return 3500;
-	} else if (nPlasmaIndex == 3) {
-		return 1000;
-	} else if (nPlasmaIndex == 4) {
-		return 1000;
-	} else {
-		return 1000;
 	}
 }
 int GetInitialL2(int nPlasmaIndex)
@@ -161,14 +147,8 @@ int GetInitialL2(int nPlasmaIndex)
 		return 2000;
 	} else if (nPlasmaIndex == 1) {
 		return 2000;
-	} else if (nPlasmaIndex == 2) {
+	} else /* if (nPlasmaIndex == 2) */ {
 		return 1000;
-	} else if (nPlasmaIndex == 3) {
-		return 2000;
-	} else if (nPlasmaIndex == 4) {
-		return 2000;
-	} else {
-		return 2000;
 	}
 }
 
@@ -178,13 +158,7 @@ int GetInitialL3(int nPlasmaIndex)
 		return 3000;
 	} else if (nPlasmaIndex == 1) {
 		return 4000;
-	} else if (nPlasmaIndex == 2) {
-		return 3000;
-	} else if (nPlasmaIndex == 3) {
-		return 3000;
-	} else if (nPlasmaIndex == 4) {
-		return 3000;
-	} else {
+	} else /* if (nPlasmaIndex == 2) */ {
 		return 3000;
 	}
 }
@@ -195,14 +169,8 @@ int GetInitialL4(int nPlasmaIndex)
 		return 4000;
 	} else if (nPlasmaIndex == 1) {
 		return 4000;
-	} else if (nPlasmaIndex == 2) {
+	} else /* if (nPlasmaIndex == 2) */ {
 		return 1000;
-	} else if (nPlasmaIndex == 3) {
-		return 4000;
-	} else if (nPlasmaIndex == 4) {
-		return 4000;
-	} else {
-		return 4000;
 	}
 }
 
@@ -212,13 +180,7 @@ int GetInitialK1(int nPlasmaIndex)
 		return 3500;
 	} else if (nPlasmaIndex == 1) {
 		return 1500;
-	} else if (nPlasmaIndex == 2) {
-		return 3500;
-	} else if (nPlasmaIndex == 3) {
-		return 3500;
-	} else if (nPlasmaIndex == 4) {
-		return 3500;
-	} else {
+	} else /* if (nPlasmaIndex == 2) */ {
 		return 3500;
 	}
 }
@@ -229,14 +191,8 @@ int GetInitialK2(int nPlasmaIndex)
 		return 2300;
 	} else if (nPlasmaIndex == 1) {
 		return 2300;
-	} else if (nPlasmaIndex == 2) {
+	} else /* if (nPlasmaIndex == 2) */ {
 		return 3300;
-	} else if (nPlasmaIndex == 3) {
-		return 2300;
-	} else if (nPlasmaIndex == 4) {
-		return 2300;
-	} else {
-		return 2300;
 	}
 }
 
@@ -246,14 +202,8 @@ int GetInitialK3(int nPlasmaIndex)
 		return 3900;
 	} else if (nPlasmaIndex == 1) {
 		return 3900;
-	} else if (nPlasmaIndex == 2) {
+	} else /* if (nPlasmaIndex == 2) */ {
 		return 2900;
-	} else if (nPlasmaIndex == 3) {
-		return 3900;
-	} else if (nPlasmaIndex == 4) {
-		return 3900;
-	} else {
-		return 3900;
 	}
 }
 
@@ -263,14 +213,8 @@ int GetInitialK4(int nPlasmaIndex)
 		return 3670;
 	} else if (nPlasmaIndex == 1) {
 		return 1670;
-	} else if (nPlasmaIndex == 2) {
+	} else /* if (nPlasmaIndex == 2) */ {
 		return 2670;
-	} else if (nPlasmaIndex == 3) {
-		return 3670;
-	} else if (nPlasmaIndex == 4) {
-		return 3670;
-	} else {
-		return 3670;
 	}
 }
 
@@ -369,18 +313,14 @@ float Palette0_GetRed(float nIndex)
 	if ((nIndex >= 0.0) && (nIndex < 64.0)) {
 		a = nIndex;
 	} else if ((nIndex >= 64.0) && (nIndex < 128.0)) {
-		a = nIndex - 64.0;
-		a = 63.0 - a;
+		a = 63.0 - (nIndex - 64.0);
 	} else if ((nIndex >= 128.0) && (nIndex < 192.0)) {
 		a = 0.0;
 	} else {
 		a = nIndex - 192.0;
 	}
 
-	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
+	return (cos(a*DPII/128.0+PI)*31.0+32.0) / 63.0;
 }
 
 float Palette0_GetGreen(float nIndex)
@@ -402,10 +342,7 @@ float Palette0_GetBlue(float nIndex)
 		a = 63.0 - (nIndex - 192.0);
 	}
 
-	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
+	return (cos(a*DPII/128.0+PI)*31.0+32.0) / 63.0;
 }
 
 float Palette1_GetRed(float nIndex)
@@ -422,10 +359,7 @@ float Palette1_GetRed(float nIndex)
 		a = nIndex - 192.0;
 	}
 
-	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
+	return (cos(a*DPII/128.0+PI)*31.0+32.0) / 63.0;
 }
 
 float Palette1_GetGreen(float nIndex)
@@ -442,10 +376,7 @@ float Palette1_GetGreen(float nIndex)
 		a = 63.0;
 	}
 
-	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
+	return (cos(a*DPII/128.0+PI)*31.0+32.0) / 63.0;
 }
 
 float Palette1_GetBlue(float nIndex)
@@ -462,10 +393,7 @@ float Palette1_GetBlue(float nIndex)
 		a = nIndex - 192.0;
 	}
 
-	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
-	fResult /= 63.0;
-
-	return fResult;
+	return (cos(a*DPII/128.0+PI)*31.0+32.0) / 63.0;
 }
 
 float Palette2_GetRed(float nIndex)
@@ -482,11 +410,7 @@ float Palette2_GetRed(float nIndex)
 		a = 0.0;
 	}
 
-	float fResult = cos(a*DPII/128.0+PI)*31.0+32.0;
-	fResult /= 2.0;
-	fResult /= 63.0;
-
-	return fResult;
+	return (cos(a*DPII/128.0+PI)*31.0+32.0) / 63.0 / 2.0;
 }
 
 float Palette_GetRed(float nIndex, int t)
@@ -500,10 +424,6 @@ float Palette_GetRed(float nIndex, int t)
 	} else if (nPlasmaIndex == 1) {
 		fResult = Palette1_GetRed(nIndex);
 	} else if (nPlasmaIndex == 2) {
-		fResult = Palette2_GetRed(nIndex);
-	} else if (nPlasmaIndex == 3) {
-		fResult = Palette1_GetRed(nIndex);
-	} else if (nPlasmaIndex == 4) {
 		fResult = Palette2_GetRed(nIndex);
 	}
 
@@ -522,10 +442,6 @@ float Palette_GetGreen(float nIndex, int t)
 		fResult = Palette1_GetGreen(nIndex);
 	} else if (nPlasmaIndex == 2) {
 		fResult = Palette2_GetRed(nIndex);
-	} else if (nPlasmaIndex == 3) {
-		fResult = Palette1_GetGreen(nIndex);
-	} else if (nPlasmaIndex == 4) {
-		fResult = Palette2_GetRed(nIndex);
 	}
 
 	return fResult;
@@ -542,10 +458,6 @@ float Palette_GetBlue(float nIndex, int t)
 		fResult = Palette1_GetBlue(nIndex);
 	} else if (nPlasmaIndex == 2) {
 		fResult = Palette2_GetRed(nIndex);
-	} else if (nPlasmaIndex == 3) {
-		fResult = Palette1_GetBlue(nIndex);
-	} else if (nPlasmaIndex == 4) {
-		fResult = Palette2_GetRed(nIndex);
 	}
 
 	return fResult;
@@ -558,7 +470,7 @@ void main(void)
 
 	// Wrap t when it exceeds 2323, so that the plasmas will repeat.
 	float fT = float(t);
-	t = int(mod(fT, 2323.0));
+	t = int(mod(fT, 1939.0));
 
 	// fPlasmaX is a float from 0 to 319,
 	// fPlasmaY is a float from 0 to 399.
@@ -582,8 +494,11 @@ void main(void)
 		float bx = 0.0;
 
 		int nXOffset0or1 = int(mod(fScreenX, 2.0));
-		// On every odd row, toggle the x offset. This causes different plasma constants to be
-		// read for these pixels, achieving a chequered overlay of two plasmas.
+
+		// On every odd row, toggle the x offset. This causes different
+		// plasma constants to be read for these pixels, achieving a
+		// chequered overlay of two plasmas.
+
 		int xor = int(mod(fScreenY, 2.0));
 		if (xor == 1) {
 			if (nXOffset0or1 == 0) {
