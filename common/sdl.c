@@ -16,6 +16,7 @@ static Display *x11_display = NULL;
 
 #define MAX_CONFIGS 10
 
+char *argv0;
 int window_width = 640;
 int window_height = 480;
 static int frame_dump = 0;
@@ -99,6 +100,8 @@ int init_graphics(char *caption, int argc, char **argv)
 	EGLConfig configs[MAX_CONFIGS];
 	EGLConfig my_config;
 	SDL_SysWMinfo sysInfo;
+
+	argv0 = argv[0];
 
 	if (parse_options(argc, argv) < 0)
 		return -1;

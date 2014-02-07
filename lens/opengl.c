@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <GLES2/gl2.h>
-#include <SOIL/SOIL.h>
 #include "u2gl.h"
 #include "opengl.h"
+#include "resource.h"
 
 static int view_width;
 static int view_height;
@@ -240,11 +240,10 @@ static void init_texture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	image = SOIL_load_image("lenspic.png",
-				&width, &height, 0, SOIL_LOAD_RGB);
+	image = load_image("lenspic.png", &width, &height);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
 				GL_UNSIGNED_BYTE, image);
-	SOIL_free_image_data(image);
+	free_image(image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	u2gl_check_error("init_texture 1");
 
@@ -255,11 +254,10 @@ static void init_texture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	image = SOIL_load_image("lens.png",
-				&width, &height, 0, SOIL_LOAD_RGB);
+	image = load_image("lens.png", &width, &height);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
 				GL_UNSIGNED_BYTE, image);
-	SOIL_free_image_data(image);
+	free_image(image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	u2gl_check_error("init_texture 2");
 
@@ -270,11 +268,10 @@ static void init_texture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	image = SOIL_load_image("lenspic1.png",
-				&width, &height, 0, SOIL_LOAD_RGB);
+	image = load_image("lenspic1.png", &width, &height);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
 				GL_UNSIGNED_BYTE, image);
-	SOIL_free_image_data(image);
+	free_image(image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	u2gl_check_error("init_texture 3");
 }
